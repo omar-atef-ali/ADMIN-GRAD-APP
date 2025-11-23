@@ -1,0 +1,44 @@
+
+footer {
+    background: linear-gradient(135deg, #030f31 10%,#020b27 50%, #000a23 100%);
+    color: #fff;
+    padding: 2rem 0 1.5rem 15px;
+    bottom: 0;
+    left: 5%;
+    position: absolute;
+    width: 90%;
+    border-radius: 17px;
+    margin-bottom: 10px !important;
+
+  }
+  @media (max-width: 768px) {
+  footer {
+    position: static !important;
+    width: 100% !important;
+    left: 0 !important;
+    border-radius: 0 !important;   /* عشان يملى الشاشة */
+  }
+  .footerLogo{
+    padding-left: 75px;
+  }
+  
+  
+}
+
+  .footerLinks{
+ color: white !important; 
+ opacity: 0.7 !important; 
+  text-decoration: none !important;
+  padding: 4px 0 !important;
+  transition: 0.2s ease-in-out;
+
+}
+ .footerLinks:hover{
+ color: white !important; 
+ opacity: 1 !important; 
+}
+.footerLogo{
+  font-size: 1.8rem !important;
+  font-weight:600 !important;
+  opacity: .8 !important;
+}

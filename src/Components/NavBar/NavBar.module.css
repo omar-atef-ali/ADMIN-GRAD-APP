@@ -1,0 +1,64 @@
+.demosection {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  margin-top: 17px;
+
+
+  
+}
+
+/* Custom styles untuk navbar ke-2 */
+.navbargradient {
+  background: linear-gradient(135deg, #041037 10%, #000d2f 100%);
+  width: 80%;
+  border-radius: 15px;
+  z-index: 999 !important;
+  opacity: 1;
+}
+.loginbtn {
+  transition: all 0.2s ease-in-out;
+  background-color: rgb(19, 32, 84);
+  color: white;
+  opacity: .9 !important;
+  height: 38px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+  border-radius: 15px;
+  width: 90px;
+}
+
+
+.freebtn {
+  height: 38px !important;
+  border-radius: 15px !important;
+  color: white !important ;
+  opacity: 0.9 !important ;
+
+  
+}
+.freebtn:hover{
+    color: white !important;
+    background-color:  rgb(19, 32, 84) !important;
+    border: 1px solid transparent !important;
+}
+.mainbtns{
+    opacity: .9 !important;
+}
+
+/* Logo styles */
+.logo {
+  font-size: 1.5rem !important;
+  font-weight:600 !important;
+  opacity: .8 !important;
+}
+.navCollapseZ {
+  position: relative !important; /* مهم جداً */
+  z-index: 9999 !important;
+  background: inherit; /* يخلي الخلفية نفس لون الـ navbar لو كنت عايز */
+}
+
+
