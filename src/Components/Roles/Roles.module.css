@@ -1,0 +1,92 @@
+.rolesPage {
+  background: linear-gradient(to right, #21304c, #1f3347 90%);
+  min-height: 100vh;
+  padding-top: 120px;
+  padding-bottom: 20px;
+}
+
+.rolesH {
+  color: white;
+  font-size: "2.25rem";
+  background: linear-gradient(to right, white, #bcbcbcff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.rolesTable {
+  margin-top: 30px;
+  background: linear-gradient(to right, #2a3d61, #1c3855 90%);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+.innerTable {
+  width: 97%;
+  background-color: rgb(45, 68, 81);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  padding-bottom: 10px;
+  gap: 20px;
+  border-radius: 5px;
+}
+.realTable {
+  width: 97% !important;
+}
+
+.searchContainer {
+  width: 97%;
+}
+
+.realTable th,
+.realTable td {
+  border-right: none; /* تشيل الفاصل العمودي */
+  border-left: none; /* اختياري */
+}
+/* الجدول نفسه */
+.realTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: #f0f0f0; /* نص فاتح */
+}
+
+/* رؤوس الأعمدة */
+.realTable thead th {
+  background-color: #000000; /* header أسود كامل */
+  color: #f0f0f0;
+  padding: 10px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid #444;
+}
+
+/* خلايا الـ body */
+.realTable tbody td {
+  background-color: #1a1a1a; /* خلفية داكنة */
+  padding: 10px;
+  vertical-align: middle;
+  border-bottom: 1px solid #333;
+}
+
+/* hover على الصف */
+.realTable tbody tr:hover {
+  background-color: #333333; /* درجة داكنة مختلفة عند hover */
+}
+
+/* hover على الصف */
+
+.permissionsDiv{
+  padding: 10px 15px;
+  height: 25px;
+  background-color: grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  color: white;
+  display: inline-flex ;
+  margin-right: 10px;
+}

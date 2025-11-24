@@ -7,15 +7,12 @@ import { Toaster } from 'react-hot-toast'
 import Protected from './Components/Protected/Protected'
 import { userContext } from './context/userContext'
 import Home from './Components/Home/Home'
+import Roles from './Components/Roles/Roles'
 
 let routers = createBrowserRouter([
   {path : "login" , element : <Login /> } ,
-  {path:"/" , element: <Layout/> ,children : [
-      {path : "home" , element : <Protected><Home/></Protected> } ,
-     
-      
-
-  ]}
+  {path:"/" , element: <Login/>} , 
+  {path:"roles" , element: <Roles/>} , 
 ])
 
 
