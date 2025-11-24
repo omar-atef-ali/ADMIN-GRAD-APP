@@ -1,18 +1,22 @@
+
 import { useContext, useEffect } from 'react'
 import './App.css'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
 import Login from "./Components/Login/Login"
-import Layout from "./Components/Layout/Layout"
+import Main from './Components/Main/Main'
+import Layout from './Components/Layout/Layout'
+
 import { Toaster } from 'react-hot-toast'
-import Protected from './Components/Protected/Protected'
 import { userContext } from './context/userContext'
-import Home from './Components/Home/Home'
-import Roles from './Components/Roles/Roles'
+import Admin from './Components/Admin/Admin'
 
 let routers = createBrowserRouter([
-  {path : "login" , element : <Login /> } ,
-  {path:"/" , element: <Login/>} , 
-  {path:"roles" , element: <Roles/>} , 
+  {path : "/" , element : <Login /> },
+  {path:"/main",element:<Main/>},
+  {path:"/dashboard",element:<Layout/>,children:[
+    {path:"",element:<Admin/>}
+  ]},
+  
 ])
 
 

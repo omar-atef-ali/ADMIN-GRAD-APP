@@ -14,7 +14,7 @@ export default function NavBar() {
               className={`navbar-brand ${style.logo} totalFont mx-1 `}
               to={"/home"}
             >
-              DeebAI
+              AdminHub
             </Link>
 
             {/* زرار فتح القائمة في الموبايل */}
@@ -31,14 +31,17 @@ export default function NavBar() {
             </button>
 
             {/* القائمة */}
-            <div className={`collapse navbar-collapse ${style.navCollapseZ}`} id="navbarNav2">
-              <ul className="navbar-nav ms-auto">
+            <div
+              className={`collapse navbar-collapse ${style.navCollapseZ}`}
+              id="navbarNav2"
+            >
+              <ul className="navbar-nav mx-auto">
                 <li className="nav-item mx-2">
                   <Link
-                    className={`nav-link totalFont mx-3 mx-lg-2  ${style.mainbtns}`}
+                    className={`nav-link totalFont mx-3 mx-lg-3  ${style.mainbtns}`}
                     to={"/home"}
                   >
-                    Home
+                    Dashboard
                   </Link>
                 </li>
 
@@ -47,65 +50,39 @@ export default function NavBar() {
                     className={`nav-link totalFont mx-3 ${style.mainbtns}`}
                     to={"/tableau"}
                   >
-                    Demo
+                    Users
                   </Link>
                 </li>
 
                 <li className="nav-item mx-2">
                   <Link
-                    className={`nav-link totalFont mx-3 mx-lg-2 ${style.mainbtns}`}
+                    className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
                     to={"/features"}
                   >
-                    Features
+                    Roles
                   </Link>
                 </li>
 
                 <li className="nav-item mx-2">
                   <Link
-                    className={`nav-link totalFont mx-3 ${style.mainbtns}`}
+                    className={`nav-link totalFont mx-3  ${style.mainbtns}`}
                     to={"/pricing"}
                   >
-                    Pricing
-                  </Link>
-                </li>
-
-                <li className="nav-item mx-2">
-                  <Link
-                    className={`nav-link totalFont mx-3 mx-lg-2 ${style.mainbtns}`}
-                    to={"#"}
-                  >
-                    Contact
-                  </Link>
-                </li>
-
-                <li className="nav-item mx-2">
-                  <Link
-                    className={`nav-link totalFont mx-3 mx-lg-2 ${style.mainbtns}`}
-                    style={{ marginRight: "25px" }}
-                    to={"#"}
-                  >
-                    About us
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link
-                    className={`btn btn-outline-light ms-2 totalFont  my-2 my-lg-0 ${style.freebtn}`}
-                    to={"#"}
-                  >
-                    Free Trail
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link
-                    className={` ms-2  totalFont ${style.borderbtn} ${style.loginbtn}`}
-                    to={"/login"}
-                  >
-                    Login
+                    Account
                   </Link>
                 </li>
               </ul>
+              <li className="nav-item" style={{ listStyle: "none" }}>
+                <Link
+                  className={` ms-2  totalFont ${style.borderbtn} ${style.logoutbtn}`}
+                  to={"/login"}
+                  style={{
+                    marginLeft: "50px",
+                  }}
+                >
+                  Logout
+                </Link>
+              </li>
             </div>
           </div>
         </nav>

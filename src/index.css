@@ -1,3 +1,5 @@
+
+
 :root {
   /* Darker blue color scheme for Deeb AI */
   --background: oklch(0.98 0.005 250);
@@ -36,7 +38,11 @@
   --main-font: 'DM Mono', monospace;
 }
 
-
+/* body{
+  padding: 0px !important;
+  position: relative !important;
+  background: radial-gradient(circle at bottom, #3f6c98, #3c6690 70%) !important;
+} */
 
 
 @font-face {
@@ -119,5 +125,6 @@
 .totalFont{
    font-family: 'Inter', sans-serif;
 }
+
 
 

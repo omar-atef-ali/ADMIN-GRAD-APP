@@ -1,3 +1,5 @@
+
+
 import React, { useContext, useState } from "react";
 import style from "./Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,7 +15,6 @@ export default function Login() {
 
   let [loading, setLoading] = useState(false);
   let { setUserToken } = useContext(userContext);
-
   let [showPassword, setShowPassword] = useState(false);
 
   async function submit(values) {
@@ -23,7 +24,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("refreshToken", data.refreshToken);
       setUserToken(data.token);
-      navigate("/home");
+      navigate("/main");
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -242,3 +243,4 @@ export default function Login() {
     </>
   );
 }
+
