@@ -36,11 +36,7 @@
   --main-font: 'DM Mono', monospace;
 }
 
-body{
-  padding: 0px !important;
-  position: relative !important;
-  background: radial-gradient(circle at bottom, #001f3f, #0a0f1f 70%);
-}
+
 
 
 @font-face {
