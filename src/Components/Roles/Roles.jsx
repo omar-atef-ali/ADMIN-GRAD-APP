@@ -7,7 +7,9 @@ export default function Roles() {
       <div className={` container-fluid ${style.rolesPage}`}>
         <div className=" d-flex justify-content-between">
           <h2 className={`${style.rolesH} totalFont`}>Roles</h2>
-          <button className="btn btn-info totalFont">Add Role</button>
+          <button className={`${style.RoleButton} totalFont  col-12 col-md-2`}>
+            <i class="fa-solid fa-circle-plus"></i> Add Role
+          </button>
         </div>
 
         <div className={`${style.rolesTable}`}>
@@ -21,56 +23,55 @@ export default function Roles() {
                   aria-label="Search"
                 />
                 <button
-                  className="btn btn-outline-success totalFont"
-                  type="submit"
+                  className={`${style.UserButton} totalFont  col-12 col-md-1`}
                 >
-                  Search
+                  Searsh
                 </button>
               </form>
             </div>
 
-            <table
-              className={`${style.realTable}  table-bordered  `}
-            >
-              <thead >
+            <table className={`${style.realTable}  table-bordered  `}>
+              <thead>
                 <tr className="sticky-top">
-                  <th style={{ width: "20%" }}>Role Name</th>
-                  <th style={{ width: "40%" }}>Permissions</th>
-                  <th style={{ width: "40%" }}>Actions</th>
+                  <th className="totalFont" style={{ width: "60%" }}>
+                    Role Name
+                  </th>
+                  <th className="totalFont" style={{ width: "20%" }}>
+                    Edit
+                  </th>
+                  <th className="totalFont" style={{ width: "20%" }}>
+                    Is Deleted
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>1</td>
+                  <td>Admin</td>
                   <td>
-                    <div className={`${style.permissionsDiv}`}>read</div>
-                    <div className={`${style.permissionsDiv}`}>manage</div>
+                    <i class="fa-regular fa-pen-to-square"></i>Edit
                   </td>
-                  <td>Smith</td>
+                  <td><i class="fa-solid fa-lock"></i> <i class="fa-solid fa-lock-open"></i></td>
                 </tr>
                 <tr>
-                  <td>2</td>
+                  <td>Manager</td>
                   <td>
-                    <div className={`${style.permissionsDiv}`}>read</div>
-                    <div className={`${style.permissionsDiv}`}>read</div>
+                    <i class="fa-regular fa-pen-to-square"></i>Edit
                   </td>
-                  <td>Smith</td>
+                  <td><i class="fa-solid fa-lock"></i> <i class="fa-solid fa-lock-open"></i></td>
                 </tr>
                 <tr>
-                  <td>2</td>
+                  <td>Editor</td>
                   <td>
-                    <div className={`${style.permissionsDiv}`}>read</div>
-                    <div className={`${style.permissionsDiv}`}>read</div>
+                    <i class="fa-regular fa-pen-to-square"></i>Edit
                   </td>
-                  <td>Smith</td>
+                  <td><i class="fa-solid fa-lock"></i> <i class="fa-solid fa-lock-open"></i></td>
                 </tr>
                 <tr>
-                  <td>2</td>
+                  <td>Viewer</td>
                   <td>
-                    <div className={`${style.permissionsDiv}`}>read</div>
-                    <div className={`${style.permissionsDiv}`}>read</div>
+                    <i class="fa-regular fa-pen-to-square"></i>Edit
                   </td>
-                  <td>Smith</td>
+                  <td><i class="fa-solid fa-lock"></i> <i class="fa-solid fa-lock-open"></i></td>
                 </tr>
               </tbody>
             </table>

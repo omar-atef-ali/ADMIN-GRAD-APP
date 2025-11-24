@@ -17,7 +17,7 @@ export default function NavBar() {
               AdminHub
             </Link>
 
-            {/* زرار فتح القائمة في الموبايل */}
+            
             <button
               className="navbar-toggler"
               type="button"
@@ -39,7 +39,7 @@ export default function NavBar() {
                 <li className="nav-item mx-2">
                   <Link
                     className={`nav-link totalFont mx-3 mx-lg-3  ${style.mainbtns}`}
-                    to={"/home"}
+                    to={"/dashboard"}
                   >
                     Dashboard
                   </Link>
@@ -48,7 +48,7 @@ export default function NavBar() {
                 <li className="nav-item mx-2">
                   <Link
                     className={`nav-link totalFont mx-3 ${style.mainbtns}`}
-                    to={"/tableau"}
+                    to={"#"}
                   >
                     Users
                   </Link>
@@ -57,7 +57,7 @@ export default function NavBar() {
                 <li className="nav-item mx-2">
                   <Link
                     className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
-                    to={"/features"}
+                    to={"roles"}
                   >
                     Roles
                   </Link>
@@ -66,7 +66,7 @@ export default function NavBar() {
                 <li className="nav-item mx-2">
                   <Link
                     className={`nav-link totalFont mx-3  ${style.mainbtns}`}
-                    to={"/pricing"}
+                    to={"#"}
                   >
                     Account
                   </Link>
@@ -75,7 +75,7 @@ export default function NavBar() {
               <li className="nav-item" style={{ listStyle: "none" }}>
                 <Link
                   className={` ms-2  totalFont ${style.borderbtn} ${style.logoutbtn}`}
-                  to={"/login"}
+                  to={"#"}
                   style={{
                     marginLeft: "50px",
                   }}
