@@ -1,0 +1,14 @@
+.mainBody{
+  height: 100vh;
+  background: linear-gradient(to right, #11273e, #370106);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+.parentMain{
+  display: flex;
+  justify-content: center;
+  justify-content: space-around;
+
+}

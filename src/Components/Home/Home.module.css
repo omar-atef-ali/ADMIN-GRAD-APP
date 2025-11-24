@@ -1,0 +1,185 @@
+body {
+  background: radial-gradient(circle at bottom, #001f3f, #0a0f1f 70%);
+}
+
+.homeBody{
+  /* height: 4500px; */
+  min-height: 100vh;
+  height: auto !important;
+   padding-bottom: 550px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.home_bg {
+  width: 100%;
+  height: 100vh;
+  background-image: url("../../assets/images/WhatsApp\ Image\ 2025-10-15\ at\ 22.47.21_21869805.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+}
+.home_bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.info {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.info h1 {
+  font-size: 3rem;
+}
+.info p {
+  font-size: 1.25rem;
+}
+.why_deep_h4 {
+  color: rgb(255, 255, 255) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 60px;
+  background: linear-gradient(to right, white, rgb(187, 176, 176));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.parent_cards {
+  width: 100% !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.customCard{
+
+  width: 31% !important;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+    80deg,
+    rgba(133, 133, 133, 0.744) ,
+    #696565bb ,
+
+    #323946c0 ,
+
+    #1c2336 ,
+    #1119349d 
+  );
+  border: 1px solid rgb(22, 25, 37);
+  border-radius: 11px;
+}
+
+.parent_card2 {
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+   gap: 70px;
+}
+
+.hrStyle {
+  width: 70px;
+  height: 3px;
+  border-radius: 10px;
+  background-color: rgb(0, 75, 128);
+  margin: auto;
+}
+
+ 
+
+
+.customCard2{
+  width: 95% !important;
+  height: 200px;
+ background-color: #a9b8c7 !important;
+  border: 1px solid black;
+  border-radius: 11px;
+}
+
+.parent_card3{
+  width: 100% !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 50px;
+
+}
+.customCard3{
+   width: 40% !important;
+  height: 200px;
+ background-color: #3d6083;
+  border: 1px solid black;
+  border-radius: 11px;
+  margin-left: 5% !important;
+}
+.parent_card4{
+  width: 100% !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 300px;
+
+}
+.customCard4{
+   width:40% !important;
+  height: 200px;
+ background-color: #3d6083;
+  border: 1px solid black;
+  border-radius: 11px;
+  margin-left: 30% !important;
+}
+@media (max-width: 768px) {
+  .customCard {
+    width: 100% !important;
+  }
+
+  .customCard3,
+  .customCard4 {
+    width: 100% !important;
+    margin-left: 0 !important;
+
+  }
+  .homeBody{
+  
+   padding-bottom: 50px;
+
+}
+.parent_card2 {
+  
+   gap: 18px;
+}
+.parent_card4{
+  margin-top: 6px;
+}
+.info p {
+  font-size: 0.8rem;
+}
+.why_deep_h4{
+  font-size: 15px;
+}
+.why_deep_h4_2{
+  margin-left: 40px !important;
+}
+
+}
+
+
+
+
