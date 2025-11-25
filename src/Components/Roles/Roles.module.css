@@ -19,6 +19,7 @@
   border: 1px solid #9897977c;
   border-radius: 8px;
   /* padding: 5px 50px; */
+
   font-weight: 500;
   font-size: 18px;
   cursor: pointer;
@@ -144,8 +145,7 @@
   margin: 0;
 }
 
-.pageItem {
-}
+
 
 .pageLink {
   color: #fff;

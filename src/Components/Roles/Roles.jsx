@@ -268,10 +268,14 @@ export default function Roles() {
                 ×
               </span>
 
-              <h3 className="totalFont" style={{ marginBottom: "20px" }}>Add Role</h3>
+              <h3 className="totalFont" style={{ marginBottom: "20px" }}>
+                Add Role
+              </h3>
 
               <form onSubmit={formik.handleSubmit}>
-                <label className="totalFont" htmlFor="name">Role Name</label>
+                <label className="totalFont" htmlFor="name">
+                  Role Name
+                </label>
                 <input
                   name="name"
                   value={formik.values.name}
@@ -283,10 +287,10 @@ export default function Roles() {
                   className="form-control my-2"
                 />
                 {formik.touched.name && formik.errors.name && (
-                <div className="text-danger small mt-1">
-                  {formik.errors.name}
-                </div>
-              )}
+                  <div className="text-danger small mt-1">
+                    {formik.errors.name}
+                  </div>
+                )}
 
                 <div className={`${style.allDiv}`}>
                   <div className={`${style.PermissionsDiv}`}>

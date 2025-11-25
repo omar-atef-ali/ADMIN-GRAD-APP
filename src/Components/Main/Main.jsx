@@ -5,38 +5,16 @@ export default function Main() {
   return (
     <div className={`${style.mainBody}`}>
       <div className="container">
-        <div className={`${style.parentMain}`}>
-          <Link className='totalFont' to={'/profile'}
-            style={{
-              backgroundColor: "#1a1a1aff",
-              color: "#ffffff",
-              border: "1px solid #007bff",
-              borderRadius: "8px",
-              padding: "20px 50px",
-              fontWeight: "500",
-              fontSize: "18px",
-              cursor: "pointer",
-              textDecoration: "none"
-            }}
+        <div className={`row ${style.parentMain}`}>
+          <Link className={`totalFont ${style.clientButton} col-12 col-md-6 col-lg-3`} to={'/profile'}
+
+          >
+            Client
+          </Link>
+          <Link className={`totalFont ${style.userButton} col-12 col-md-6 col-lg-3`}  to={'/dashboard'}
 
           >
             User
-          </Link>
-          <Link className='totalFont' to={'/dashboard'}
-            style={{
-              backgroundColor: "#1a1a1aff",
-              color: "#ffffff",
-              border: "1px solid #007bff",
-              borderRadius: "8px",
-              padding: "20px 45px",
-              fontWeight: "500",
-              fontSize: "18px",
-              cursor: "pointer",
-              textDecoration: "none"
-            }}
-
-          >
-            Admin
           </Link>
         </div>
       </div>
