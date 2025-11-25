@@ -1,6 +1,78 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import style from './admin.module.css'
+import axios from 'axios'
+import { userContext } from '../../context/userContext';
+import api from '../../api';
 export default function Admin() {
+    const userId = localStorage.getItem('id')
+    const { userToken } = useContext(userContext)
+    const [analytics, setAnalytics] = useState({
+        totalUsers: 0,
+        activeUsers: 0,
+        lockedUsers: 0,
+        disabledUsers: 0,
+        roleCount: 0,
+    });
+    const [recentusers, setrecentusers] = useState([]);
+    const [recentroles, setrecentroles] = useState([]);
+
+    console.log(userId)
+    async function getAnalytics() {
+        try {
+            const response = await api.get(`/Dashboard/${userId}/analytics`, {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log(response.data)
+            setAnalytics(response.data)
+        } catch (error) {
+            console.log(error.response?.status, error.response?.data);
+        }
+
+    }
+
+    async function getRecentUsers() {
+        try {
+            const response = await api.get(`/Dashboard/${userId}/recent-users`, {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log(response.data)
+            setrecentusers(response.data)
+
+        } catch (error) {
+            console.log(error.response?.status, error.response?.data);
+        }
+
+    }
+    async function getRecentRoles() {
+        try {
+            const response = await api.get(`/Dashboard/${userId}/recent-roles`, {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log(response.data)
+            setrecentroles(response.data)
+
+        } catch (error) {
+            console.log(error.response?.status, error.response?.data);
+        }
+
+    }
+
+
+
+    useEffect(() => {
+        if (userId && userToken) {
+            getAnalytics();
+            getRecentUsers();
+            getRecentRoles()
+        }
+    }, [userId, userToken])
+
     return (
 
 
@@ -14,21 +86,21 @@ export default function Admin() {
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                 }}>Dashboard</h1>
-                <div className={`row ${style.parentKpis}`}>
+                <div className={`row g-md-4 ${style.parentKpis}`}>
                     <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont fa-solid fa-users`}></i>
-                            <h7 className="totalFont text-white">+12</h7>
+                            <h5 className="totalFont text-white">+12</h5>
                         </div>
-                        <h3 className={`totalFont text-white ${style.count}`}>150</h3>
+                        <h3 className={`totalFont text-white ${style.count}`}>{analytics.totalUsers}</h3>
                         <h5 className={`totalFont text-white ${style.kpisRole}`}>Total Users</h5>
                     </div>
                     <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont fa-solid fa-chart-line`}></i>
-                            <h7 className="totalFont text-white">+12</h7>
+                            <h5 className="totalFont text-white">+8</h5>
                         </div>
-                        <h3 className={`totalFont text-white ${style.count}`}>150</h3>
+                        <h3 className={`totalFont text-white ${style.count}`}>{analytics.activeUsers}</h3>
 
                         <h5 className={`totalFont text-white ${style.kpisRole}`}>Active Users</h5>
 
@@ -36,57 +108,32 @@ export default function Admin() {
                     <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont  fa-solid fa-shield`}></i>
-                            <h7 className="totalFont text-white">+12</h7>
+                            <h5 className="totalFont text-white">+1</h5>
                         </div>
-                        <h3 className={`totalFont text-white ${style.count}`}>150</h3>
-                        <h5 className={`totalFont text-white ${style.kpisRole}`}>Role Count</h5>
+                        <h3 className={`totalFont text-white ${style.count}`}>{analytics.roleCount}</h3>
+                        <h5 className={`totalFont text-white ${style.kpisRole}`}>Roles Count</h5>
                     </div>
                     <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
-                            <i className={`${style.kpisIcon} totalFont  fa-solid fa-lock`}></i>
-                            <h7 className="totalFont text-white">+12</h7>
+                            <i className={`${style.kpisIcon} totalFont  fa-solid fa-lock `}></i>
+                            <h5 className="totalFont text-white">-2</h5>
                         </div>
-                        <h3 className={`totalFont text-white ${style.count}`}>150</h3>
-                        <h5 className={`totalFont text-white ${style.kpisRole}`}>Locked Users</h5>
+                        <h3 className={`totalFont text-white ${style.count}`}>{analytics.lockedUsers}</h3>
+                        <h5 className={`totalFont text-white ${style.kpisRole}`}>in Active Users</h5>
                     </div>
                     <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont fa-solid fa-ban`}></i>
-                            <h7 className="totalFont text-white">+12</h7>
+                            <h5 className="totalFont text-white">-2</h5>
                         </div>
-                        <h3 className={`totalFont text-white ${style.count}`}>150</h3>
+                        <h3 className={`totalFont text-white ${style.count}`}>{analytics.disabledUsers}</h3>
                         <h5 className={`totalFont text-white ${style.kpisRole}`}>Disapled Users</h5>
-                    </div>
-                </div>
-                <div className="container">
-                    <div className={`row ${style.parentBtns}`}>
-                        <button className={`${style.UserButton} totalFont  col-12 col-md-3`}
-                            style={{
-                                backgroundColor: "rgba(10, 104, 159, 0.884)",
-                                color: "#ffffff",
-                                border: "1px solid #000000ff",
-                                borderRadius: "8px",
-                                padding: "15px 50px",
-                                fontWeight: "500",
-                                fontSize: "18px",
-                                cursor: "pointer",
-                                textDecoration: "none"
-                            }}
-
-                        >
-                            <i class="fa-solid fa-user-plus"></i> Add User
-                        </button>
-                        <button className={`${style.RoleButton} totalFont  col-12 col-md-3`}
-
-                        >
-                            <i class="fa-solid fa-circle-plus"></i> Add Role
-                        </button>
                     </div>
                 </div>
                 <div className={`row mt-5 py-4 ${style.bgTable}`}>
                     <div className={`${style.rolesTable} col-12 col-md-6`}>
                         <div className={`${style.innerTable}`}>
-
+                            <h4 className='totalFont text-white'>Recent Users</h4>
                             <table
                                 className={`${style.realTable} table-bordered table-hover `}
                             >
@@ -94,109 +141,141 @@ export default function Admin() {
                                     <tr className="sticky-top">
                                         <th style={{ width: "20%" }}>Name</th>
                                         <th style={{ width: "20%" }}>Email</th>
-                                        <th style={{ width: "20%" }}>Role</th>
-                                        <th style={{ width: "20%" }}>status</th>
-                                        <th style={{ width: "20%" }}>lock</th>
+                                        <th style={{ width: "20%" }}>Status</th>
+                                        <th className={`${style.toggleCol}`} style={{ width: "20%" }}>Is Deleted</th>
 
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td 
-                                          style={{opacity:"0.7"}}>John</td>
-                                        <td>Smith</td>
-                                        <td>fasf</td>
-                                        <td>fasf</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td  style={{opacity:"0.7"}}>Jane</td>
-                                        <td>Smith</td>
-                                        <td>fasf</td>
-                                        <td>fasf</td>
+                                    {recentusers.map((user) => (
+                                        <tr key={user.id}>
+                                            <td>{user.name}</td>
 
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td  style={{opacity:"0.7"}}>Jane</td>
-                                        <td>Smith</td>
-                                        <td>fasf</td>
-                                        <td>fasf</td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td  style={{opacity:"0.7"}}>Jane</td>
-                                        <td>Smith</td>
-                                        <td>fasf</td>
-                                        <td>fasf</td>
-
-                                    </tr>
+                                            <td className={`${style.toggleCol2}`} style={{ opacity: "0.7" }}>
+                                                {user.email}
+                                            </td>
 
 
+                                            <td>
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await api.put(
+                                                                `/users/${user.id}/unlock`,
+                                                                {},
+                                                                {
+                                                                    headers: { Authorization: `Bearer ${userToken}` },
+                                                                }
+                                                            );
 
-
-
+                                                            setrecentusers((prev) =>
+                                                                prev.map((u) =>
+                                                                    u.id === user.id ? { ...u, status: !u.status } : u
+                                                                )
+                                                            );
+                                                        } catch (err) {
+                                                            console.log("Status error:", err);
+                                                        }
+                                                    }}
+                                                    className={`${user.status ? style.activebtn : style.inactivebtn} totalFont`}
+                                                >
+                                                    {user.status ? "Active" : "InActive"}
+                                                </button>
+                                            </td>
 
 
 
+                                            <td>
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await api.put(
+                                                                `/users/${user.id}/toggle-status`,
+                                                                {},
+                                                                {
+                                                                    headers: { Authorization: `Bearer ${userToken}` },
+                                                                }
+                                                            );
+
+                                                            setrecentusers((prev) =>
+                                                                prev.map((u) =>
+                                                                    u.id === user.id ? { ...u, toggle: !u.toggle } : u
+                                                                )
+                                                            );
+                                                        } catch (err) {
+                                                            console.log("Toggle error:", err);
+                                                        }
+                                                    }}
+                                                    className={`${user.toggle ? style.lockIcon : style.openlockIcon} totalFont`}
+                                                >
+                                                    {user.toggle ? (
+                                                        <i className="fa-solid fa-lock"></i>
+                                                    ) : (
+                                                        <i className="fa-solid fa-lock-open"></i>
+                                                    )}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
+
+
                             </table>
                         </div>
                     </div>
                     <div className={`${style.rolesTable} col-12 col-md-6`}>
                         <div className={`${style.innerTable}`}>
-
+                            <h4 className='totalFont text-white'>Recent Role</h4>
                             <table
                                 className={`${style.realTable} table-bordered table-hover `}
                             >
                                 <thead>
                                     <tr className="sticky-top">
-                                        <th style={{ width: "20%" }}>RoleName</th>
-                                        <th style={{ width: "20%" }}>Changed By</th>
+                                        <th style={{ width: "30%" }}>RoleName</th>
 
-                                        <th style={{ width: "20%" }}>lock</th>
+                                        <th style={{ width: "30%" }}>Is Deleted</th>
 
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td  style={{opacity:"0.7"}}>John</td>
-                                        <td>Smith</td>
+                                    {recentroles.map((role) => (
+                                        <tr key={role.id}>
+                                            <td>{role.name}</td>
+                                            <td>
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await api.put(
+                                                                `/Roles/${role.id}/toggle-status`,
+                                                                {},
+                                                                {
+                                                                    headers: { Authorization: `Bearer ${userToken}` },
+                                                                }
+                                                            );
 
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td  style={{opacity:"0.7"}}>Jane</td>
-                                        <td>Smith</td>
-
-
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td  style={{opacity:"0.7"}}>Jane</td>
-                                        <td>Smith</td>
-
-
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td  style={{opacity:"0.7"}}>Jane</td>
-                                        <td>Smith</td>
-
-
-                                    </tr>
-
-
-
-
-
-
-
-
+                                                        
+                                                            setrecentroles((prev) =>
+                                                                prev.map((r) =>
+                                                                    r.id === role.id ? { ...r, isDeleted: !r.isDeleted } : r
+                                                                )
+                                                            );
+                                                        } catch (err) {
+                                                            console.log("Toggle error:", err.response?.data || err.message);
+                                                        }
+                                                    }}
+                                                    className={`${role.isDeleted ? style.lockIcon : style.openlockIcon} totalFont`}
+                                                >
+                                                    {role.isDeleted ? (
+                                                        <i className="fa-solid fa-lock"></i>
+                                                    ) : (
+                                                        <i className="fa-solid fa-lock-open"></i>
+                                                    )}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
+
                             </table>
                         </div>
                     </div>

@@ -4,7 +4,6 @@ import React, { useContext, useState } from "react";
 import style from "./Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import axios from "axios";
 import api from "../../api";
 import toast from "react-hot-toast";
 import { userContext } from "../../context/userContext";
@@ -14,18 +13,23 @@ export default function Login() {
   let navigate = useNavigate();
 
   let [loading, setLoading] = useState(false);
-  let { setUserToken } = useContext(userContext);
+  let { setUserToken} = useContext(userContext);
   let [showPassword, setShowPassword] = useState(false);
 
   async function submit(values) {
     try {
       setLoading(true);
       const { data } = await api.post("/Auth", values);
+      
       localStorage.setItem("token", data.token);
       localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("id", data.id);
+      console.log(data.id)
       setUserToken(data.token);
       navigate("/main");
+
       setLoading(false);
+
     } catch (error) {
       setLoading(false);
       console.error("Login Error:", error);
