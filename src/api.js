@@ -46,7 +46,7 @@ api.interceptors.response.use(
         console.log("🔥 FULL refresh error object:", refreshError); // ← اضيف ده
         console.error("❌ Refresh token failed:", refreshError);
         localStorage.clear();
-        window.location.href = "/login";
+        // window.location.href = "/";
       }
     }
 

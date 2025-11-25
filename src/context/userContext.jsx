@@ -18,7 +18,6 @@ export default function UserContextProvider(props) {
     setLoading(false); 
 
   }, []);
-    // console.log(userToken);
 
   return (
     <>

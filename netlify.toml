@@ -5,7 +5,7 @@
 # أي request يبدأ بـ /api/ يروح للـ API الحقيقي
 [[redirects]]
   from = "/api/*"
-  to = "https://deebai.runasp.net/api/:splat"
+  to = "https://deebai-staging.runasp.net/api/:splat"
   status = 200
   force = true
 

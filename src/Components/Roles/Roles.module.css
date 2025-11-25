@@ -1,5 +1,5 @@
 .rolesPage {
-  background: linear-gradient(to right, #21304c, #1f3347 90%);
+  background-color: rgba(0, 0, 0, 0.941);
   min-height: 100vh;
   padding-top: 120px;
   padding-bottom: 20px;
@@ -12,17 +12,35 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.RoleButton {
+  background-color: #cbcbcb0a;
+  color: rgb(255, 255, 255);
+  border: 1px solid #9897977c;
+  border-radius: 8px;
+  /* padding: 5px 50px; */
+  font-weight: 500;
+  font-size: 18px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+.RoleButton:hover {
+  background-color: rgba(55, 55, 55, 0.479) !important;
+}
 .rolesTable {
   margin-top: 30px;
-  background: linear-gradient(to right, #2a3d61, #1c3855 90%);
+  background-color: rgba(55, 55, 55, 0.479);
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
   padding: 20px 0;
 }
 .innerTable {
   width: 97%;
-  background-color: rgb(45, 68, 81);
+  background-color: rgba(55, 55, 55, 0.479);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,22 +57,36 @@
   width: 97%;
 }
 
-.realTable th,
-.realTable td {
-  border-right: none; /* تشيل الفاصل العمودي */
-  border-left: none; /* اختياري */
+.UserButton {
+   background-color: rgba(10, 104, 159, 0.884);
+    color: #ffffff;
+    border: 1px solid rgb(53, 61, 74);
+    border-Radius: 8px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+    
 }
-/* الجدول نفسه */
+.UserButton:hover {
+   background-color: rgba(13, 79, 117, 0.884) !important;
+    
+}
+
+
+
 .realTable {
   width: 100%;
   border-collapse: collapse;
-  color: #f0f0f0; /* نص فاتح */
+  color: #f0f0f0;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #222222;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-/* رؤوس الأعمدة */
 .realTable thead th {
-  background-color: #000000; /* header أسود كامل */
-  color: #f0f0f0;
+  background-color: #0000006b;
+  color: #ffffffa6;
   padding: 10px;
   text-align: left;
   position: sticky;
@@ -63,22 +95,26 @@
   border-bottom: 1px solid #444;
 }
 
-/* خلايا الـ body */
 .realTable tbody td {
-  background-color: #1a1a1a; /* خلفية داكنة */
+  background-color: #1a1a1a;
   padding: 10px;
   vertical-align: middle;
   border-bottom: 1px solid #333;
 }
 
-/* hover على الصف */
-.realTable tbody tr:hover {
-  background-color: #333333; /* درجة داكنة مختلفة عند hover */
+.realTable th,
+.realTable td {
+  border-left: none;
+  border-right: none;
+}
+
+.realTable {
+  border: 1px solid #222222;
 }
 
 /* hover على الصف */
 
-.permissionsDiv{
+.permissionsDiv {
   padding: 10px 15px;
   height: 25px;
   background-color: grey;
@@ -87,6 +123,103 @@
   align-items: center;
   border-radius: 20px;
   color: white;
-  display: inline-flex ;
+  display: inline-flex;
   margin-right: 10px;
 }
+
+/* container pagination */
+.paginationContainer {
+  background-color: #0f0f0f;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.paginationList {
+  display: flex;
+  list-style: none;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.pageItem {
+}
+
+.pageLink {
+  color: #fff;
+  background-color: #1c1c1c;
+  border: 1px solid #333;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageLink:hover:not(:disabled) {
+  background-color: #444;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.pageLink:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.activePageLink {
+  background-color: #555;
+  border-color: #666;
+  font-weight: bold;
+}
+
+
+
+
+/* //////////////////////////////////// */
+
+.allDiv{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+
+.inheritableDiv p{
+  margin-left: 30px;
+}
+
+
+.saveBtn{
+  font-weight: 500;
+  border: 1px solid transparent;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+  background-color: rgba(10, 104, 159, 0.884);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+   font-size: 0.95rem;
+  height: 42px;
+  padding: 0 1rem;
+  border-radius: 6px;
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;       
+  pointer-events: none;
+  cursor: not-allowed; 
+
+}
+
+.saveBtn:hover {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+
