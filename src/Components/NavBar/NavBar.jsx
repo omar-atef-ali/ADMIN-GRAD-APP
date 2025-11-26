@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
 import style from "./NavBar.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { userContext } from "../../context/userContext";
 
 export default function NavBar() {
+  const {setUserToken}=useContext(userContext)
+  const navigate=useNavigate()
+  function logout(){
+     setUserToken(null)
+     localStorage.removeItem("token");
+     localStorage.removeItem("refreshToken")
+     navigate("/")
+  }
   return (
     <>
       <div className={`${style.demosection}`}>
@@ -12,7 +21,7 @@ export default function NavBar() {
           <div className="container px-4">
             <Link
               className={`navbar-brand ${style.logo} totalFont mx-1 `}
-              to={"/home"}
+              to={"/dashboard"}
             >
               AdminHub
             </Link>
@@ -41,16 +50,16 @@ export default function NavBar() {
                     className={`nav-link totalFont mx-3 mx-lg-3  ${style.mainbtns}`}
                     to={"/dashboard"}
                   >
-                    Dashboard
+                   <i className="fa-solid fa-chart-line totalFont"></i> Dashboard
                   </Link>
                 </li>
 
                 <li className="nav-item mx-2">
                   <Link
                     className={`nav-link totalFont mx-3 ${style.mainbtns}`}
-                    to={"#"}
+                    to={"/dashboard/Users"}
                   >
-                    Users
+                   <i className="fa-solid fa-users totalFont"></i> Users
                   </Link>
                 </li>
 
@@ -59,7 +68,7 @@ export default function NavBar() {
                     className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
                     to={"roles"}
                   >
-                    Roles
+                   <i className={"totalFont  fa-solid fa-shield"}></i> Roles
                   </Link>
                 </li>
 
@@ -68,7 +77,7 @@ export default function NavBar() {
                     className={`nav-link totalFont mx-3  ${style.mainbtns}`}
                     to={"#"}
                   >
-                    Account
+                   <i className="fa-solid fa-user"></i> Account
                   </Link>
                 </li>
                 <li className="nav-item mx-2">
@@ -76,20 +85,20 @@ export default function NavBar() {
                     className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
                     to={"my-permissions"}
                   >
-                    My Permissions
+                    <i className={`totalFont  fa-solid fa-list-check`}></i> My Permissions
                   </Link>
                 </li>
               </ul>
               <li className="nav-item" style={{ listStyle: "none" }}>
-                <Link
+                <button
+                onClick={logout}
                   className={` ms-2  totalFont ${style.borderbtn} ${style.logoutbtn}`}
-                  to={"#"}
                   style={{
                     marginLeft: "50px",
                   }}
                 >
                   Logout
-                </Link>
+                </button>
               </li>
             </div>
           </div>

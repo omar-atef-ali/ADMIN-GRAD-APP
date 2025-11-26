@@ -5,6 +5,7 @@ import { userContext } from "../../context/userContext";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 export default function Roles() {
   const { userToken } = useContext(userContext);
@@ -201,6 +202,7 @@ export default function Roles() {
       const permissionsArray = buildPermissionsArray();
       const body = {
         name: values.name, // اسم الرول اللي من الفورم
+
         permissions: permissionsArray,
       };
       console.log(body);
@@ -273,7 +275,7 @@ export default function Roles() {
     if (searchText.trim() === "" && userToken) {
       getAllRoles(1);
     }
-  }, [searchText , userToken]);
+  }, [searchText, userToken]);
 
   ///////////////////////////////////////////////////////////////////
 
@@ -289,7 +291,7 @@ export default function Roles() {
     if (sortDirection && userToken) {
       getAllRoles();
     }
-  }, [sortDirection , userToken]);
+  }, [sortDirection, userToken]);
 
   return (
     <>
@@ -321,7 +323,7 @@ export default function Roles() {
                   onClick={Search}
                   className={`${style.UserButton}  totalFont  col-3 col-md-2 col-lg-1`}
                 >
-                  Searsh
+                  Search
                 </button>
               </form>
             </div>
@@ -329,25 +331,25 @@ export default function Roles() {
             <table className={`${style.realTable}  table-bordered `}>
               <thead>
                 <tr>
-                  <th  className={` ${style.roleheader} totalFont d-flex align-items-center gap-1`}>
+                  <th
+                    className={` ${style.roleheader} totalFont d-flex align-items-center gap-1`}
+                  >
                     Role Name
                     <span className={`${style.roleheaderbuttons}`}>
-
-                    
-                    <button
-                      type="button"
-                      className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                      onClick={() => handleSort("ASC")}
-                    >
-                      ▲
-                    </button>
-                    <button
-                      type="button"
-                      className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                      onClick={() => handleSort("DESC")}
-                    >
-                      ▼
-                    </button>
+                      <button
+                        type="button"
+                        className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                        onClick={() => handleSort("ASC")}
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                        onClick={() => handleSort("DESC")}
+                      >
+                        ▼
+                      </button>
                     </span>
                   </th>
                   <th className="totalFont" style={{ width: "20%" }}>
@@ -362,16 +364,42 @@ export default function Roles() {
                 {allRoles.map((item) => (
                   <tr key={item.id}>
                     <td>{item.name}</td>
-                    <td
-                      onClick={() => handleEditClick(item.id)}
-                      className={`${style.editTd}`}
-                    >
-                      <i className="fa-regular fa-pen-to-square"></i>
-                      Edit
+                    <td onClick={() => handleEditClick(item.id)}>
+                      <button className={`${style.editTd}`}>
+                        <i className="fa-regular fa-pen-to-square"></i>
+                        Edit
+                      </button>
                     </td>
                     <td>
                       <button
                         onClick={async () => {
+                          const result = await Swal.fire({
+                            title: "Are you sure?",
+                            text: `Do you want to ${
+                              item.isDisabled ? "Unlock" : "Lock"
+                            } this user: ${item.name}?`,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Yes, confirm",
+                            cancelButtonText: "Cancel",
+                            background: "#1f1f1f",
+                            color: "#fff",
+                            confirmButtonColor: "rgb(10, 104, 159)",
+                            cancelButtonColor: "#646262ff",
+                            customClass: {
+                              popup: "custom-popup",
+                            },
+                          });
+                          if (!result.isConfirmed) {
+                            toast(
+                              "Operation cancelled — No changes were made",
+                              {
+                                background: "#1f1f1f",
+                                color: "#fff",
+                              }
+                            );
+                            return;
+                          }
                           try {
                             await api.put(
                               `/Roles/${item.id}/toggle-status`,
@@ -389,6 +417,11 @@ export default function Roles() {
                                   ? { ...u, isDisabled: !u.isDisabled }
                                   : u
                               )
+                            );
+                            toast.success(
+                              `${item.name} is now ${
+                                !item.isDisabled ? "Locked" : "Unlocked"
+                              }`
                             );
                           } catch (err) {
                             console.log("Toggle error:", err);

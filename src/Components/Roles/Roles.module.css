@@ -59,20 +59,16 @@
 }
 
 .UserButton {
-   background-color: rgba(10, 104, 159, 0.884);
-    color: #ffffff;
-    border: 1px solid rgb(53, 61, 74);
-    border-Radius: 8px;
-    cursor: pointer;
-    transition: 0.2s ease-in-out;
-    
+  background-color: rgba(10, 104, 159, 0.884);
+  color: #ffffff;
+  border: 1px solid rgb(53, 61, 74);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
 }
 .UserButton:hover {
-   background-color: rgba(13, 79, 117, 0.884) !important;
-    
+  background-color: rgba(13, 79, 117, 0.884) !important;
 }
-
-
 
 .realTable {
   width: 100%;
@@ -145,8 +141,6 @@
   margin: 0;
 }
 
-
-
 .pageLink {
   color: #fff;
   background-color: #1c1c1c;
@@ -175,64 +169,61 @@
   font-weight: bold;
 }
 
-.editTd{
-  cursor: pointer;
-  
+.editTd {
+  border: none;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  background-color: rgb(10, 104, 159);
+  transition: 0.2s ease-in-out;
 }
-.editTd:hover{
-  text-decoration: underline;
+.editTd:hover {
+  background-color: rgba(10, 104, 159, 0.884);
 }
 
-
-.lockIcon{
+.lockIcon {
   border: none;
   color: white;
   padding: 5px 15px;
   border-radius: 5px;
-  background-color:#7e7e7e6c;
+  background-color: #7e7e7e6c;
   transition: 0.2s ease-in-out;
 }
-.lockIcon:hover{
+.lockIcon:hover {
   background-color: rgba(55, 55, 55, 0.601);
 }
-.openlockIcon{
+.openlockIcon {
   border: none;
   color: white;
   padding: 5px 15px;
   border-radius: 5px;
-  background-color:#cbcbcb6c;
+  background-color: #cbcbcb6c;
   transition: 0.2s ease-in-out;
 }
-.openlockIcon:hover{
+.openlockIcon:hover {
   background-color: rgba(55, 55, 55, 0.479);
 }
 
-
-
-.sortBtn{
-  color:rgba(73, 73, 73, 0.601) !important;
+.sortBtn {
+  color: rgba(73, 73, 73, 0.601) !important;
 }
-.sortBtn:hover{
-  color:rgba(149, 149, 149, 0.601) !important;
+.sortBtn:hover {
+  color: rgba(149, 149, 149, 0.601) !important;
 }
-
 
 /* //////////////////////////////////// */
 
-.allDiv{
+.allDiv {
   width: 100%;
   display: flex;
   justify-content: space-between;
 }
 
-
-
-.inheritableDiv p{
+.inheritableDiv p {
   margin-left: 30px;
 }
 
-
-.saveBtn{
+.saveBtn {
   font-weight: 500;
   border: 1px solid transparent;
   font-size: 1rem;
@@ -242,17 +233,16 @@
   background-color: rgba(10, 104, 159, 0.884);
   color: var(--primary-foreground);
   border-color: var(--primary);
-   font-size: 0.95rem;
+  font-size: 0.95rem;
   height: 42px;
   padding: 0 1rem;
   border-radius: 6px;
 }
 
 .saveBtn:disabled {
-  opacity: 0.6;       
+  opacity: 0.6;
   pointer-events: none;
-  cursor: not-allowed; 
-
+  cursor: not-allowed;
 }
 
 .saveBtn:hover {
@@ -260,7 +250,6 @@
   border-color: var(--secondary);
   color: var(--secondary-foreground);
 }
-
 
 @media (max-width: 576px) {
   .roleheaderbuttons {
