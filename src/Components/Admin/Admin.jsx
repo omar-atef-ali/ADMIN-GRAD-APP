@@ -16,7 +16,7 @@ export default function Admin() {
     const [recentusers, setrecentusers] = useState([]);
     const [recentroles, setrecentroles] = useState([]);
 
-    console.log(userId)
+    // console.log(userId)
     async function getAnalytics() {
         try {
             const response = await api.get(`/Dashboard/${userId}/analytics`, {
@@ -24,7 +24,7 @@ export default function Admin() {
                     Authorization: `Bearer ${userToken}`
                 }
             })
-            console.log(response.data)
+            // console.log(response.data)
             setAnalytics(response.data)
         } catch (error) {
             console.log(error.response?.status, error.response?.data);
@@ -39,7 +39,7 @@ export default function Admin() {
                     Authorization: `Bearer ${userToken}`
                 }
             })
-            console.log(response.data)
+            // console.log(response.data)
             setrecentusers(response.data)
 
         } catch (error) {
@@ -54,7 +54,7 @@ export default function Admin() {
                     Authorization: `Bearer ${userToken}`
                 }
             })
-            console.log(response.data)
+            // console.log(response.data)
             setrecentroles(response.data)
 
         } catch (error) {

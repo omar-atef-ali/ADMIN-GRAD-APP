@@ -175,7 +175,46 @@
   font-weight: bold;
 }
 
+.editTd{
+  cursor: pointer;
+  
+}
+.editTd:hover{
+  text-decoration: underline;
+}
 
+
+.lockIcon{
+  border: none;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  background-color:#7e7e7e6c;
+  transition: 0.2s ease-in-out;
+}
+.lockIcon:hover{
+  background-color: rgba(55, 55, 55, 0.601);
+}
+.openlockIcon{
+  border: none;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  background-color:#cbcbcb6c;
+  transition: 0.2s ease-in-out;
+}
+.openlockIcon:hover{
+  background-color: rgba(55, 55, 55, 0.479);
+}
+
+
+
+.sortBtn{
+  color:rgba(73, 73, 73, 0.601) !important;
+}
+.sortBtn:hover{
+  color:rgba(149, 149, 149, 0.601) !important;
+}
 
 
 /* //////////////////////////////////// */
@@ -223,3 +262,15 @@
 }
 
 
+@media (max-width: 576px) {
+  .roleheaderbuttons {
+    display: flex;
+    gap: 4px;
+  }
+
+  .realTable th,
+  .realTable td {
+    font-size: 12px !important;
+    padding: 6px !important;
+  }
+}

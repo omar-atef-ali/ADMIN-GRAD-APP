@@ -71,6 +71,14 @@ export default function NavBar() {
                     Account
                   </Link>
                 </li>
+                <li className="nav-item mx-2">
+                  <Link
+                    className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
+                    to={"my-permissions"}
+                  >
+                    My Permissions
+                  </Link>
+                </li>
               </ul>
               <li className="nav-item" style={{ listStyle: "none" }}>
                 <Link
