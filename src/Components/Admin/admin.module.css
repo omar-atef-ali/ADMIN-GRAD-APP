@@ -96,8 +96,9 @@
   border-left: none;
   border-right: none;
 }
-.toggleCol{
-    word-break: break-word !important;
+
+.toggleCol {
+  word-break: break-word !important;
   white-space: normal !important;
 }
 
@@ -105,68 +106,92 @@
   border: 1px solid #222222;
 }
 
-.activebtn{
+.activebtn {
   border: none;
   color: white;
   padding: 5px 15px;
   border-radius: 20px;
-  background-color:rgb(10, 104, 159);
+  background-color: rgb(10, 104, 159);
   transition: 0.2s ease-in-out;
 }
-.activebtn:hover{
-  background-color:rgba(10, 104, 159, 0.884);;
+
+.activebtn:hover {
+  background-color: rgba(10, 104, 159, 0.884);
+  ;
 }
-.inactivebtn{
+
+.inactivebtn {
   border: none;
   color: white;
   padding: 5px 15px;
   border-radius: 20px;
-  background-color:#cbcbcb16;
+  background-color: #cbcbcb16;
   transition: 0.2s ease-in-out;
 }
-.inactivebtn:hover{
+
+.inactivebtn:hover {
   background-color: rgba(55, 55, 55, 0.479);
 }
 
-.lockIcon{
+.lockIcon {
   border: none;
   color: white;
   padding: 5px 15px;
   border-radius: 5px;
-  background-color:#cbcbcb15;
+  background-color: #cbcbcb15;
   transition: 0.2s ease-in-out;
 }
-.lockIcon:hover{
+
+.lockIcon:hover {
   background-color: rgba(55, 55, 55, 0.601);
 }
-.openlockIcon{
+
+.openlockIcon {
   border: none;
   color: white;
   padding: 5px 15px;
   border-radius: 5px;
-  background-color:#cbcbcb6c;
+  background-color: #cbcbcb6c;
   transition: 0.2s ease-in-out;
 }
-.openlockIcon:hover{
+
+.openlockIcon:hover {
   background-color: rgba(55, 55, 55, 0.479);
 }
+
+.custom-popup {
+  border-radius: 20px !important;
+  padding: 25px !important;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.activebtn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 @media (max-width:426px) {
-  .parentKpis,.bgTable{
+
+  .parentKpis,
+  .bgTable {
     gap: 10px;
   }
-  .adminTilte{
+
+  .adminTilte {
     text-align: center;
     margin-top: 20px;
   }
-  .toggleCol2{
-     word-break: break-word !important;
-  white-space: normal !important;
+
+  .toggleCol2 {
+    word-break: break-word !important;
+    white-space: normal !important;
   }
 
 }
-@media (min-width:426px) and (max-width:768px) {
-.adminTilte{
-  text-align: center;
-}
-}
 
+@media (min-width:426px) and (max-width:768px) {
+  .adminTilte {
+    text-align: center;
+  }
+}

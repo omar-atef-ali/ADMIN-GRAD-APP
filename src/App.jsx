@@ -11,14 +11,18 @@ import Roles from './Components/Roles/Roles'
 import { Toaster } from 'react-hot-toast'
 import { userContext } from './context/userContext'
 import Admin from './Components/Admin/Admin'
+import Users from './Components/Users/Users'
+import NotFound from './Components/Notfound/NotFound'
 
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/main",element:<Main/>},
   {path:"/dashboard",element:<Layout/>,children:[
     {path:"",element:<Admin/>},
-    {path:"roles",element:<Roles/>}
+    {path:"roles",element:<Roles/>},
+    {path:"users",element:<Users/>}
   ]},
+  {path:"*",element:<NotFound/>}
   
 ])
 

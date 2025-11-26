@@ -1,0 +1,48 @@
+/* NotFound.module.css */
+.notfoundContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #1f1f1f, #3a3a3a);
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+}
+
+.content {
+  max-width: 500px;
+}
+
+.title {
+  font-size: 8rem;
+  margin: 0;
+  color: #0a68af;
+}
+
+.message {
+  font-size: 2rem;
+  margin: 10px 0;
+}
+
+.description {
+  font-size: 1rem;
+  margin-bottom: 30px;
+  color: #ccc;
+}
+
+.homeBtn {
+  padding: 10px 25px;
+  font-size: 1rem;
+  background-color: #0a68af;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.homeBtn:hover {
+  background-color: #074b7a;
+  transform: scale(1.05);
+}

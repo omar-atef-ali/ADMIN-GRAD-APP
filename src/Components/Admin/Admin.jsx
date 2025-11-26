@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import style from './admin.module.css'
-import axios from 'axios'
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 import { userContext } from '../../context/userContext';
 import api from '../../api';
 export default function Admin() {
@@ -61,6 +62,104 @@ export default function Admin() {
             console.log(error.response?.status, error.response?.data);
         }
 
+    }
+
+    async function handleToggleUser(user) {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to ${user.toggle ? "Unlock" : "Lock"} this user: ${user.email}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, confirm",
+            cancelButtonText: "Cancel",
+            background: "#1f1f1f",
+            color: "#fff",
+            confirmButtonColor: "rgb(10, 104, 159)",
+            cancelButtonColor: "#646262ff",
+            customClass: {
+                popup: "custom-popup",
+            }
+
+        });
+
+        if (!result.isConfirmed) {
+            toast("Operation cancelled — No changes were made", {
+
+                background: "#1f1f1f",
+                color: "#fff",
+            });
+            return;
+        }
+
+        try {
+            await api.put(
+                `/users/${user.id}/toggle-status`,
+                {},
+                { headers: { Authorization: `Bearer ${userToken}` } }
+            );
+
+            setrecentusers(prev =>
+                prev.map(u =>
+                    u.id === user.id ? { ...u, toggle: !u.toggle } : u
+                )
+            );
+
+            toast.success(
+                `${user.email} is now ${!user.toggle ? "Locked" : "Unlocked"}`
+            );
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Error updating user status");
+        }
+    }
+
+
+
+    async function handleToggleRole(role) {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to ${role.toggle ? "Enable" : "Disable"} the role: ${role.name}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, confirm",
+            cancelButtonText: "Cancel",
+            background: "#1f1f1f",
+            color: "#fff",
+            confirmButtonColor: "rgb(10, 104, 159)",
+            cancelButtonColor: "#646262ff",
+            customClass: {
+                popup: "custom-popup",
+            }
+        });
+
+        if (!result.isConfirmed) {
+            toast("Operation cancelled — No changes were made", {
+            });
+            return;
+        }
+
+        try {
+            await api.put(
+                `/Roles/${role.id}/toggle-status`,
+                {},
+                { headers: { Authorization: `Bearer ${userToken}` } }
+            );
+
+            setrecentroles(prev =>
+                prev.map(r =>
+                    r.id === role.id ? { ...r, toggle: !r.toggle } : r
+                )
+            );
+
+            toast.success(
+                `Role "${role.name}" is now ${!role.toggle ? "Disabled" : "Enabled"}`
+            );
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Error updating role status");
+        }
     }
 
 
@@ -142,7 +241,7 @@ export default function Admin() {
                                         <th style={{ width: "20%" }}>Name</th>
                                         <th style={{ width: "20%" }}>Email</th>
                                         <th style={{ width: "20%" }}>Status</th>
-                                        <th className={`${style.toggleCol}`} style={{ width: "20%" }}>Is Deleted</th>
+                                        <th className={`${style.toggleCol}`} style={{ width: "20%" }}>Is Disapled</th>
 
                                     </tr>
                                 </thead>
@@ -158,14 +257,34 @@ export default function Admin() {
 
                                             <td>
                                                 <button
+                                                    disabled={user.status === true}
                                                     onClick={async () => {
                                                         try {
+
+                                                            const result = await Swal.fire({
+                                                                title: 'Change Status?',
+                                                                text: `Do you want to change status for ${user.email}?`,
+                                                                icon: 'question',
+                                                                showCancelButton: true,
+                                                                confirmButtonText: 'Yes, change',
+                                                                cancelButtonText: 'Cancel',
+                                                                background: "#1f1f1f",
+                                                                color: "#fff",
+                                                                confirmButtonColor: "rgb(10, 104, 159)",
+                                                                cancelButtonColor: "#646262ff",
+                                                            });
+
+                                                            if (!result.isConfirmed) {
+                                                                toast("Operation cancelled — No changes were made", {
+
+                                                                });
+                                                                return;
+                                                            }
+
                                                             await api.put(
                                                                 `/users/${user.id}/unlock`,
                                                                 {},
-                                                                {
-                                                                    headers: { Authorization: `Bearer ${userToken}` },
-                                                                }
+                                                                { headers: { Authorization: `Bearer ${userToken}` } }
                                                             );
 
                                                             setrecentusers((prev) =>
@@ -173,8 +292,14 @@ export default function Admin() {
                                                                     u.id === user.id ? { ...u, status: !u.status } : u
                                                                 )
                                                             );
+
+                                                            toast.success(
+                                                                `${user.email} is now ${!user.status ? "Active" : "InActive"}`
+                                                            );
+
                                                         } catch (err) {
                                                             console.log("Status error:", err);
+                                                            toast.error("Error updating user status");
                                                         }
                                                     }}
                                                     className={`${user.status ? style.activebtn : style.inactivebtn} totalFont`}
@@ -187,25 +312,7 @@ export default function Admin() {
 
                                             <td>
                                                 <button
-                                                    onClick={async () => {
-                                                        try {
-                                                            await api.put(
-                                                                `/users/${user.id}/toggle-status`,
-                                                                {},
-                                                                {
-                                                                    headers: { Authorization: `Bearer ${userToken}` },
-                                                                }
-                                                            );
-
-                                                            setrecentusers((prev) =>
-                                                                prev.map((u) =>
-                                                                    u.id === user.id ? { ...u, toggle: !u.toggle } : u
-                                                                )
-                                                            );
-                                                        } catch (err) {
-                                                            console.log("Toggle error:", err);
-                                                        }
-                                                    }}
+                                                    onClick={() => handleToggleUser(user)}
                                                     className={`${user.toggle ? style.lockIcon : style.openlockIcon} totalFont`}
                                                 >
                                                     {user.toggle ? (
@@ -215,6 +322,7 @@ export default function Admin() {
                                                     )}
                                                 </button>
                                             </td>
+
                                         </tr>
                                     ))}
                                 </tbody>
@@ -233,7 +341,7 @@ export default function Admin() {
                                     <tr className="sticky-top">
                                         <th style={{ width: "30%" }}>RoleName</th>
 
-                                        <th style={{ width: "30%" }}>Is Deleted</th>
+                                        <th style={{ width: "30%" }}>Is Disapled</th>
 
                                     </tr>
                                 </thead>
@@ -243,29 +351,10 @@ export default function Admin() {
                                             <td>{role.name}</td>
                                             <td>
                                                 <button
-                                                    onClick={async () => {
-                                                        try {
-                                                            await api.put(
-                                                                `/Roles/${role.id}/toggle-status`,
-                                                                {},
-                                                                {
-                                                                    headers: { Authorization: `Bearer ${userToken}` },
-                                                                }
-                                                            );
-
-                                                        
-                                                            setrecentroles((prev) =>
-                                                                prev.map((r) =>
-                                                                    r.id === role.id ? { ...r, isDeleted: !r.isDeleted } : r
-                                                                )
-                                                            );
-                                                        } catch (err) {
-                                                            console.log("Toggle error:", err.response?.data || err.message);
-                                                        }
-                                                    }}
-                                                    className={`${role.isDeleted ? style.lockIcon : style.openlockIcon} totalFont`}
+                                                    onClick={() => handleToggleRole(role)}
+                                                    className={`${role.toggle? style.lockIcon : style.openlockIcon} totalFont`}
                                                 >
-                                                    {role.isDeleted ? (
+                                                    {role.toggle? (
                                                         <i className="fa-solid fa-lock"></i>
                                                     ) : (
                                                         <i className="fa-solid fa-lock-open"></i>

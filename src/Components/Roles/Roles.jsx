@@ -77,8 +77,10 @@ export default function Roles() {
   };
 
   useEffect(() => {
-    getAllRoles();
-  }, [userToken]);
+    if (userToken) {
+      getAllRoles();
+    }
+  }, [userToken]);
 
   ///////////////////////////////////////
   let [loading, setLoading] = useState(false);
@@ -87,7 +89,7 @@ export default function Roles() {
       setLoading(true);
       const permissionsArray = buildPermissionsArray();
       const body = {
-        name: values.roleName, // اسم الرول اللي من الفورم
+        name: values.roleName,
         permissions: permissionsArray,
       };
       const response = await api.post("/Roles", body);
@@ -137,7 +139,7 @@ export default function Roles() {
                 <button
                   className={`${style.UserButton} totalFont  col-3 col-md-2 col-lg-1`}
                 >
-                  Searsh
+                  Search
                 </button>
               </form>
             </div>
