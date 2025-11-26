@@ -178,11 +178,11 @@ export default function Users() {
         }
     }, [userToken])
     useEffect(() => {
-    if (searchtext.trim() === "") {
-        setPropertiesvalue([]);
-        getAllUsers(1);
-    }
-}, [searchtext]);
+        if (searchtext.trim() === "" && userToken) {
+            setPropertiesvalue([]);
+            getAllUsers(1);
+        }
+    }, [searchtext, userToken]);
 
     let [loading, setLoading] = useState(false);
     async function submit(values) {
@@ -324,177 +324,113 @@ export default function Users() {
                             </form>
                         </div>
 
-                        <table className={`${style.realTable}  table-bordered  `}>
-                            <thead>
-                                <tr>
-                                    <th className="totalFont" style={{ width: "13%" }}>
+                        <div className={`${style.tableWrapper}`}>
+                            <table className={`${style.realTable}  table-bordered  `}>
+                                <thead>
+                                    <tr>
+                                        <th className="totalFont " style={{ width: "13%" }}>
 
 
 
-                                        <div className={style.sortingContainer}>
-                                            Name
-                                            <input
-                                                type="checkbox"
-                                                 className={`${style.checkboxx}`}
-                                                style={{ marginLeft: "6px" }}
-                                                checked={Propertiesvalue.includes("firstName") && Propertiesvalue.includes("lastName")}
-                                                onChange={() => {
-                                                    if (Propertiesvalue.includes("firstName") && Propertiesvalue.includes("lastName")) {
-                                                        setPropertiesvalue(prev => prev.filter(i => i !== "firstName" && i !== "lastName"));
-                                                    } else {
-                                                        setPropertiesvalue(prev => [...prev, "firstName", "lastName"]);
-                                                    }
-                                                }}
-                                            />
-                                            <button
-                                                 className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                                                onClick={() => handleSort("name", "ASC")}
-                                            >
-                                                 ▲
-                                            </button>
-                                            <button
-                                                className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                                                onClick={() => handleSort("name", "DESC")}
-                                            >
-                                                ▼
-                                            </button>
-                                        </div>
-                                    </th>
-                                    <th className="totalFont" style={{ width: "13%" }}>
-                                        <div className={style.sortingContainer}>
-                                            Email
-                                            <input
-                                                type="checkbox"
-                                                className={`${style.checkboxx}`}
-                                                style={{ marginLeft: "6px" }}
-                                                checked={Propertiesvalue.includes("email")}
-                                                onChange={() => handleSelect(["email"])}
-                                            />
-
-                                            <button
-                                                 className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                                                onClick={() => handleSort("email", "ASC")}
-                                            >
-                                                 ▲
-                                            </button>
-                                            <button
-                                                className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                                                onClick={() => handleSort("email", "DESC")}
-                                            >
-                                                ▼
-                                            </button>
-                                        </div>
-                                    </th>
-                                    <th className="totalFont" style={{ width: "13%" }}>
-                                        Role
-                                    </th>
-                                    <th className="totalFont" style={{ width: "13%" }}>
-                                        Created On
-                                    </th>
-                                    <th className="totalFont" style={{ width: "13%" }}>
-                                        Edit
-                                    </th>
-                                    <th className="totalFont" style={{ width: "13%" }}>
-                                        Status
-                                    </th>
-                                    <th className="totalFont" style={{ width: "13%" }}>
-                                        Is Disapled
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {allusers.map((user) => (
-                                    <tr key={user.id}>
-                                        <td>{`${user.firstName}  ${user.lastName}`}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.role}</td>
-                                        <td>{user.createdOn}</td>
-                                        <td>
-                                            <button className={`${style.editebtn}`}
-                                                onClick={() => {
-                                                    setSelectedUser(user);
-                                                    formik2.setValues({
-                                                        firstName: user.firstName,
-                                                        lastName: user.lastName,
-                                                        email: user.email,
-
-                                                        role: typeof user.role === "string" ? user.role : user.role?.name || ""
-                                                    });
-                                                    setShowModal2(true);
-                                                }}
-
-                                            ><i class="fa-regular fa-pen-to-square"></i>edit
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <button
-                                                disabled={user.isLocked === false}   // Active → disabled
-                                                onClick={async () => {
-                                                    try {
-                                                        const result = await Swal.fire({
-                                                            title: 'Change Status?',
-                                                            text: `Do you want to change status for ${user.email}?`,
-                                                            icon: 'question',
-                                                            showCancelButton: true,
-                                                            confirmButtonText: 'Yes, change',
-                                                            cancelButtonText: 'Cancel',
-                                                            background: "#1f1f1f",
-                                                            color: "#fff",
-                                                            confirmButtonColor: "rgb(10, 104, 159)",
-                                                            cancelButtonColor: "#646262ff",
-                                                        });
-
-                                                        if (!result.isConfirmed) {
-                                                            toast("Operation cancelled — No changes were made");
-                                                            return;
+                                            <div className={style.sortingContainer}>
+                                                Name
+                                                <input
+                                                    type="checkbox"
+                                                    className={`${style.checkboxx}`}
+                                                    style={{ marginLeft: "6px" }}
+                                                    checked={Propertiesvalue.includes("firstName") && Propertiesvalue.includes("lastName")}
+                                                    onChange={() => {
+                                                        if (Propertiesvalue.includes("firstName") && Propertiesvalue.includes("lastName")) {
+                                                            setPropertiesvalue(prev => prev.filter(i => i !== "firstName" && i !== "lastName"));
+                                                        } else {
+                                                            setPropertiesvalue(prev => [...prev, "firstName", "lastName"]);
                                                         }
+                                                    }}
+                                                />
+                                                <button
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                                                    onClick={() => handleSort("name", "ASC")}
+                                                >
+                                                    ▲
+                                                </button>
+                                                <button
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                                                    onClick={() => handleSort("name", "DESC")}
+                                                >
+                                                    ▼
+                                                </button>
+                                            </div>
+                                        </th>
+                                        <th className="totalFont" style={{ width: "13%" }}>
+                                            <div className={style.sortingContainer}>
+                                                Email
+                                                <input
+                                                    type="checkbox"
+                                                    className={`${style.checkboxx}`}
+                                                    style={{ marginLeft: "6px" }}
+                                                    checked={Propertiesvalue.includes("email")}
+                                                    onChange={() => handleSelect(["email"])}
+                                                />
 
-                                                        await api.put(
-                                                            `/users/${user.id}/unlock`,
-                                                            {},
-                                                            { headers: { Authorization: `Bearer ${userToken}` } }
-                                                        );
-
-                                                        setallusers((prev) =>
-                                                            prev.map((u) =>
-                                                                u.id === user.id ? { ...u, isLocked: !u.isLocked } : u
-                                                            )
-                                                        );
-
-                                                        toast.success(
-                                                            `${user.email} is now ${user.isLocked ? "Active" : "Inactive"}`
-                                                        );
-
-                                                    } catch (err) {
-                                                        console.log("Status error:", err);
-                                                        toast.error("Error updating user status");
-                                                    }
-                                                }}
-                                                className={`${user.isLocked ? style.inactivebtn : style.activebtn} totalFont`}
-                                            >
-                                                {user.isLocked ? "Inactive" : "Active"}
-                                            </button>
-                                        </td>
-
-
-
-
-                                        <td>
-                                            <button
-                                                onClick={() => handleToggleUser(user)}
-                                                className={`${user.isDisabled ? style.lockIcon : style.openlockIcon} totalFont`}
-                                            >
-                                                {user.isDisabled ? (
-                                                    <i className="fa-solid fa-lock"></i>
-                                                ) : (
-                                                    <i className="fa-solid fa-lock-open"></i>
-                                                )}
-                                            </button>
-                                        </td>
+                                                <button
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                                                    onClick={() => handleSort("email", "ASC")}
+                                                >
+                                                    ▲
+                                                </button>
+                                                <button
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                                                    onClick={() => handleSort("email", "DESC")}
+                                                >
+                                                    ▼
+                                                </button>
+                                            </div>
+                                        </th>
+                                        <th className="totalFont" style={{ width: "13%" }}>
+                                            Role
+                                        </th>
+                                        <th className="totalFont" style={{ width: "13%" }}>
+                                            Created On
+                                        </th>
+                                        <th className="totalFont" style={{ width: "13%" }}>
+                                            Edit
+                                        </th>
+                                        <th className="totalFont" style={{ width: "13%" }}>
+                                            Status
+                                        </th>
+                                        <th className="totalFont" style={{ width: "13%" }}>
+                                            Is Disapled
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {allusers.map((user) => (
+                                        <tr key={user.id}>
+                                            <td data-label="Name">{`${user.firstName} ${user.lastName}`}</td>
+                                            <td data-label="Email">{user.email}</td>
+                                            <td data-label="Role">{user.role}</td>
+                                            <td data-label="Created On">{user.createdOn}</td>
+                                            <td data-label="Edit">
+                                                <button className={`${style.editebtn}`} onClick={() => handleEdit(user)}>
+                                                    <i className="fa-regular fa-pen-to-square"></i> Edit
+                                                </button>
+                                            </td>
+                                            <td data-label="Status">
+                                                <button className={`${user.isLocked ? style.inactivebtn : style.activebtn}`}>
+                                                    {user.isLocked ? "Inactive" : "Active"}
+                                                </button>
+                                            </td>
+                                            <td data-label="Is Disabled">
+                                                <button className={`${user.isDisabled ? style.lockIcon : style.openlockIcon}`}>
+                                                    {user.isDisabled ? <i className="fa-solid fa-lock"></i> : <i className="fa-solid fa-lock-open"></i>}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+
+                            </table>
+                        </div>
                     </div>
 
                     {/* ///////////////////////////////////////////// */}

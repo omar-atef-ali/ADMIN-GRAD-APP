@@ -52,6 +52,7 @@
 }
 .realTable {
   width: 97% !important;
+  margin:auto;
 }
 
 .searchContainer {
@@ -318,4 +319,35 @@
 }
 .sortBtn:hover{
   color: rgba(73, 73, 73, 0.864)  !important;
-} 
+}
+.tableWrapper {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .tableWrapper {
+    overflow-x: auto;
+  }
+
+  .realTable {
+    min-width: 700px; /* حجم الجدول حسب محتواه */
+    margin: 0;
+    padding: 0 10px; /* يعطي مساحة للعناصر مثل checkbox والسهم */
+  }
+
+  .sortingContainer {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* يبعد السهم والcheckbox شوي عن بعض */
+  }
+
+  .sortBtn {
+    font-size: 0.8rem; /* تصغير حجم السهم شوية */
+    padding: 0 3px;
+  }
+
+  .checkboxx {
+    width: 12px;
+    height: 12px;
+  }
+}

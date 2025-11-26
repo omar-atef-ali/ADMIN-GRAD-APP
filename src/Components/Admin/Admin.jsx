@@ -186,7 +186,7 @@ export default function Admin() {
                     WebkitTextFillColor: "transparent",
                 }}>Dashboard</h1>
                 <div className={`row g-md-4 ${style.parentKpis}`}>
-                    <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
+                    <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont fa-solid fa-users`}></i>
                             <h5 className="totalFont text-white">+12</h5>
@@ -194,7 +194,7 @@ export default function Admin() {
                         <h3 className={`totalFont text-white ${style.count}`}>{analytics.totalUsers}</h3>
                         <h5 className={`totalFont text-white ${style.kpisRole}`}>Total Users</h5>
                     </div>
-                    <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
+                    <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont fa-solid fa-chart-line`}></i>
                             <h5 className="totalFont text-white">+8</h5>
@@ -204,7 +204,7 @@ export default function Admin() {
                         <h5 className={`totalFont text-white ${style.kpisRole}`}>Active Users</h5>
 
                     </div>
-                    <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
+                    <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont  fa-solid fa-shield`}></i>
                             <h5 className="totalFont text-white">+1</h5>
@@ -212,7 +212,7 @@ export default function Admin() {
                         <h3 className={`totalFont text-white ${style.count}`}>{analytics.roleCount}</h3>
                         <h5 className={`totalFont text-white ${style.kpisRole}`}>Roles Count</h5>
                     </div>
-                    <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
+                    <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont  fa-solid fa-lock `}></i>
                             <h5 className="totalFont text-white">-2</h5>
@@ -220,7 +220,7 @@ export default function Admin() {
                         <h3 className={`totalFont text-white ${style.count}`}>{analytics.lockedUsers}</h3>
                         <h5 className={`totalFont text-white ${style.kpisRole}`}>in Active Users</h5>
                     </div>
-                    <div className={`${style.Kpis} col-12 col-md-6 col-lg-2`}>
+                    <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
                         <div className={`${style.KpisInfo}`}>
                             <i className={`${style.kpisIcon} totalFont fa-solid fa-ban`}></i>
                             <h5 className="totalFont text-white">-2</h5>

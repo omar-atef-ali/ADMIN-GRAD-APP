@@ -195,3 +195,9 @@
     text-align: center;
   }
 }
+@media (max-width:768px) {
+  .realTable th,
+  .realTable td {
+    font-size: 12px !important;
+    padding: 6px !important;}
+}
