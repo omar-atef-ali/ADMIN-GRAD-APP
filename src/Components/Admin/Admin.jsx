@@ -230,7 +230,7 @@ export default function Admin() {
                     </div>
                 </div>
                 <div className={`row mt-5 py-4 ${style.bgTable}`}>
-                    <div className={`${style.rolesTable} col-12 col-md-6`}>
+                    <div className={`${style.rolesTable} col-12 col-md-12 col-lg-6`}>
                         <div className={`${style.innerTable}`}>
                             <h4 className='totalFont text-white'>Recent Users</h4>
                             <table
@@ -331,7 +331,7 @@ export default function Admin() {
                             </table>
                         </div>
                     </div>
-                    <div className={`${style.rolesTable} col-12 col-md-6`}>
+                    <div className={`${style.rolesTable} col-12 col-md-12 col-lg-6`}>
                         <div className={`${style.innerTable}`}>
                             <h4 className='totalFont text-white'>Recent Role</h4>
                             <table
