@@ -185,70 +185,67 @@ export default function Users() {
     }, [searchtext, userToken]);
 
     let [loading, setLoading] = useState(false);
-    async function submit(values) {
-        console.log(values)
-        try {
-            setLoading(true);
-            const response = await api.post("/users", values, {
-                headers: {
-                    Authorization: `Bearer ${userToken}`
-                }
-            });
-            console.log("Success:", response.data);
-            toast.success(
-                "user add successfuly"
-            )
-            getAllUsers()
-        } catch (error) {
-            console.log("Error:", error);
-            toast.error(
-                error.response?.data?.errors[1] ||
-                "Something went wrong while registration.",
-                {
-                    position: "top-center",
-                    duration: 4000,
-                    style: {
-                        background:
-                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        padding: "16px 20px",
-                        color: "#ffffff",
-                        fontSize: "0.95rem",
-                        borderRadius: "5px",
-                        width: "300px",
-                        height: "60px",
-                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
-                    },
-                    iconTheme: {
-                        primary: "#FF4D4F",
-                        secondary: "#ffffff",
-                    },
-                }
-            );
-        } finally {
-            setLoading(false);
-        }
+   async function submit(values, { resetForm }) {
+    console.log(values)
+    try {
+        setLoading(true);
+        const response = await api.post("/users", values, {
+            headers: {
+                Authorization: `Bearer ${userToken}`
+            }
+        });
+
+        toast.success("user add successfully");
+        getAllUsers();
+
+        resetForm();
+    } catch (error) {
+        console.log("Error:", error);
+        toast.error(
+            error.response?.data?.errors?.[1] ||
+            "Something went wrong while registration."
+        );
+    } finally {
+        setLoading(false);
     }
+}
+function openAddModal() {
+    formik.resetForm();
+    setShowModal(true);
+}
 
-    let validationLogin = yup.object({
-        firstName: yup.string().min(3, "first name must be at least 3 characters long").max(100, "first name must be at maximum 100 characters long"),
-        lastName: yup.string().min(3, "last name must be at least 3 characters long").max(100, "last name must be at maximum 100 characters long"),
-        email: yup.string()
-            .email("Please enter a valid email address")
-            .max(256, "email must be at maximum 256 characters long"),
-        role: yup.string().min(3, "first name must be at least 3 characters long").max(100, "first name must be at maximum 100 characters long"),
-    });
 
-    let formik = useFormik({
-        initialValues: {
-            firstName: "",
-            lastName: "",
-            email: "",
-            role: "",
-        },
-        validationSchema: validationLogin,
-        onSubmit: submit,
-    });
+
+    const validationLogin = yup.object({
+  firstName: yup.string()
+    .required("First name is required")
+    .min(3, "first name must be at least 3 characters long")
+    .max(100, "first name must be at maximum 100 characters long"),
+  lastName: yup.string()
+    .required("Last name is required")
+    .min(3, "last name must be at least 3 characters long")
+    .max(100, "last name must be at maximum 100 characters long"),
+  email: yup.string()
+    .required("Email is required")
+    .email("Please enter a valid email address")
+    .max(256, "email must be at maximum 256 characters long"),
+  role: yup.string()
+    .required("Role is required")
+    .min(1, "Role is required") // مجرد تحقق بسيط
+});
+
+  let formik = useFormik({
+    initialValues: {
+        firstName: "",
+        lastName: "",
+        email: "",
+        role: "",
+    },
+    validationSchema: validationLogin,
+    onSubmit: submit, // ← بياخد resetForm تلقائيًا
+    validateOnMount: true
+});
+
     async function EditSubmit(values) {
         try {
             setLoading(true);
@@ -278,15 +275,43 @@ export default function Users() {
 
 
     let formik2 = useFormik({
-        initialValues: {
+    initialValues: selectedUser
+        ? {
+            firstName: selectedUser.firstName || "",
+            lastName: selectedUser.lastName || "",
+            email: selectedUser.email || "",
+            role: selectedUser.role || "",
+        }
+        : {
             firstName: "",
             lastName: "",
             email: "",
             role: "",
         },
-        validationSchema: validationLogin,
-        onSubmit: EditSubmit,
-    });
+    validationSchema: validationLogin,
+    onSubmit: EditSubmit,
+    enableReinitialize: true,
+});
+
+    useEffect(() => {
+    if (showModal2 && selectedUser) {
+
+        formik2.setValues({
+            firstName: selectedUser.firstName || "",
+            lastName: selectedUser.lastName || "",
+            email: selectedUser.email || "",
+            role: selectedUser.role || "",
+        });
+
+        formik2.initialValues = {
+            firstName: selectedUser.firstName || "",
+            lastName: selectedUser.lastName || "",
+            email: selectedUser.email || "",
+            role: selectedUser.role || "",
+        };
+    }
+}, [showModal2, selectedUser]);
+
 
 
     return (
@@ -295,7 +320,7 @@ export default function Users() {
                 <div className=" d-flex justify-content-between">
                     <h2 className={`${style.rolesH} totalFont`}>Users</h2>
                     <button
-                        onClick={() => setShowModal(true)}
+                        onClick={openAddModal}
                         className={`${style.RoleButton} totalFont  col-6 col-md-4 col-lg-2`}
                     >
                         <i className="fa-solid fa-circle-plus"></i> Add User
