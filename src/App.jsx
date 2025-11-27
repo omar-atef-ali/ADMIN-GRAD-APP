@@ -6,7 +6,7 @@ import Login from "./Components/Login/Login"
 import Main from './Components/Main/Main'
 import Layout from './Components/Layout/Layout'
 import Roles from './Components/Roles/Roles'
-
+import MyPermissions from "./Components/MyPermissions/MyPermissions"
 
 import { Toaster } from 'react-hot-toast'
 import { userContext } from './context/userContext'
@@ -20,6 +20,7 @@ let routers = createBrowserRouter([
   {path:"/dashboard",element:<Layout/>,children:[
     {path:"",element:<Admin/>},
     {path:"roles",element:<Roles/>},
+    {path:"my-permissions",element:<MyPermissions/>},
     {path:"users",element:<Users/>}
   ]},
   {path:"*",element:<NotFound/>}

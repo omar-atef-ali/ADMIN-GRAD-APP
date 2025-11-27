@@ -10,6 +10,7 @@ export default function NavBar() {
      setUserToken(null)
      localStorage.removeItem("token");
      localStorage.removeItem("refreshToken")
+     localStorage.removeItem("id")
      navigate("/")
   }
   return (
@@ -78,6 +79,14 @@ export default function NavBar() {
                     to={"#"}
                   >
                    <i className="fa-solid fa-user"></i> Account
+                  </Link>
+                </li>
+                <li className="nav-item mx-2">
+                  <Link
+                    className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
+                    to={"my-permissions"}
+                  >
+                    <i className={`totalFont  fa-solid fa-list-check`}></i> My Permissions
                   </Link>
                 </li>
               </ul>
