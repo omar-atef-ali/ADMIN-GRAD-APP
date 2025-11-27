@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import { useFormik } from "formik";
+import { Link } from "react-router-dom";
 
 export default function Users() {
     const { userToken } = useContext(userContext);
@@ -33,7 +34,7 @@ export default function Users() {
             const trimmedSearch = searchtext.trim();
             const nameParts = trimmedSearch.split(" ");
 
-            // تجهيز search params
+
             if (trimmedSearch) {
                 if (nameParts.length >= 2) {
                     const firstName = nameParts[0].toLowerCase();
@@ -48,7 +49,7 @@ export default function Users() {
                 if (Propertiesvalue.includes("email")) searchParams.push({ property: "Email", value: trimmedSearch.toLowerCase() });
             }
 
-            // إنشاء query string للـ API
+
             let queryString = searchParams
                 .map(p => `SearchProperties=${p.property}&SearchValue=${encodeURIComponent(p.value)}`)
                 .join("&");
@@ -56,14 +57,14 @@ export default function Users() {
             if (queryString) queryString += "&";
             if (column && column !== "name") queryString += `SortColumn=${column}&SortDirection=${direction}`;
 
-            // جلب البيانات من الـ API
+
             const response = await api.get(`/users?pageNumber=${page}&${queryString}`, {
                 headers: { Authorization: `Bearer ${userToken}` },
             });
 
             let filteredUsers = response.data.items;
 
-            // فرز الاسم الكامل في الـ frontend لو المطلوب sort على الاسم
+
             if (column === "name") {
                 filteredUsers.sort((a, b) => {
                     const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
@@ -179,72 +180,72 @@ export default function Users() {
     }, [userToken])
     useEffect(() => {
         if (searchtext.trim() === "" && userToken) {
-            setPropertiesvalue([]);
+            // setPropertiesvalue([]);
             getAllUsers(1);
         }
     }, [searchtext, userToken]);
 
     let [loading, setLoading] = useState(false);
-   async function submit(values, { resetForm }) {
-    console.log(values)
-    try {
-        setLoading(true);
-        const response = await api.post("/users", values, {
-            headers: {
-                Authorization: `Bearer ${userToken}`
-            }
-        });
+    async function submit(values, { resetForm }) {
+        console.log(values)
+        try {
+            setLoading(true);
+            const response = await api.post("/users", values, {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
+            });
 
-        toast.success("user add successfully");
-        getAllUsers();
+            toast.success("user add successfully");
+            getAllUsers();
 
-        resetForm();
-    } catch (error) {
-        console.log("Error:", error);
-        toast.error(
-            error.response?.data?.errors?.[1] ||
-            "Something went wrong while registration."
-        );
-    } finally {
-        setLoading(false);
+            resetForm();
+        } catch (error) {
+            console.log("Error:", error);
+            toast.error(
+                error.response?.data?.errors?.[1] ||
+                "Something went wrong while registration."
+            );
+        } finally {
+            setLoading(false);
+        }
     }
-}
-function openAddModal() {
-    formik.resetForm();
-    setShowModal(true);
-}
+    function openAddModal() {
+        formik.resetForm();
+        setShowModal(true);
+    }
 
 
 
     const validationLogin = yup.object({
-  firstName: yup.string()
-    .required("First name is required")
-    .min(3, "first name must be at least 3 characters long")
-    .max(100, "first name must be at maximum 100 characters long"),
-  lastName: yup.string()
-    .required("Last name is required")
-    .min(3, "last name must be at least 3 characters long")
-    .max(100, "last name must be at maximum 100 characters long"),
-  email: yup.string()
-    .required("Email is required")
-    .email("Please enter a valid email address")
-    .max(256, "email must be at maximum 256 characters long"),
-  role: yup.string()
-    .required("Role is required")
-    .min(1, "Role is required") // مجرد تحقق بسيط
-});
+        firstName: yup.string()
+            .required("First name is required")
+            .min(3, "first name must be at least 3 characters long")
+            .max(100, "first name must be at maximum 100 characters long"),
+        lastName: yup.string()
+            .required("Last name is required")
+            .min(3, "last name must be at least 3 characters long")
+            .max(100, "last name must be at maximum 100 characters long"),
+        email: yup.string()
+            .required("Email is required")
+            .email("Please enter a valid email address")
+            .max(256, "email must be at maximum 256 characters long"),
+        role: yup.string()
+            .required("Role is required")
+            .min(1, "Role is required") // مجرد تحقق بسيط
+    });
 
-  let formik = useFormik({
-    initialValues: {
-        firstName: "",
-        lastName: "",
-        email: "",
-        role: "",
-    },
-    validationSchema: validationLogin,
-    onSubmit: submit, // ← بياخد resetForm تلقائيًا
-    validateOnMount: true
-});
+    let formik = useFormik({
+        initialValues: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            role: "",
+        },
+        validationSchema: validationLogin,
+        onSubmit: submit, // ← بياخد resetForm تلقائيًا
+        validateOnMount: true
+    });
 
     async function EditSubmit(values) {
         try {
@@ -267,7 +268,10 @@ function openAddModal() {
 
         } catch (error) {
             console.log("Error:", error);
-            toast.error("Failed to update user");
+            toast.error(
+                error.response?.data?.errors?.[1] ||
+                "Something went wrong while registration."
+            );
         } finally {
             setLoading(false);
         }
@@ -275,42 +279,42 @@ function openAddModal() {
 
 
     let formik2 = useFormik({
-    initialValues: selectedUser
-        ? {
-            firstName: selectedUser.firstName || "",
-            lastName: selectedUser.lastName || "",
-            email: selectedUser.email || "",
-            role: selectedUser.role || "",
-        }
-        : {
-            firstName: "",
-            lastName: "",
-            email: "",
-            role: "",
-        },
-    validationSchema: validationLogin,
-    onSubmit: EditSubmit,
-    enableReinitialize: true,
-});
+        initialValues: selectedUser
+            ? {
+                firstName: selectedUser.firstName || "",
+                lastName: selectedUser.lastName || "",
+                email: selectedUser.email || "",
+                role: selectedUser.role || "",
+            }
+            : {
+                firstName: "",
+                lastName: "",
+                email: "",
+                role: "",
+            },
+        validationSchema: validationLogin,
+        onSubmit: EditSubmit,
+        enableReinitialize: true,
+    });
 
     useEffect(() => {
-    if (showModal2 && selectedUser) {
+        if (showModal2 && selectedUser) {
 
-        formik2.setValues({
-            firstName: selectedUser.firstName || "",
-            lastName: selectedUser.lastName || "",
-            email: selectedUser.email || "",
-            role: selectedUser.role || "",
-        });
+            formik2.setValues({
+                firstName: selectedUser.firstName || "",
+                lastName: selectedUser.lastName || "",
+                email: selectedUser.email || "",
+                role: selectedUser.role || "",
+            });
 
-        formik2.initialValues = {
-            firstName: selectedUser.firstName || "",
-            lastName: selectedUser.lastName || "",
-            email: selectedUser.email || "",
-            role: selectedUser.role || "",
-        };
-    }
-}, [showModal2, selectedUser]);
+            formik2.initialValues = {
+                firstName: selectedUser.firstName || "",
+                lastName: selectedUser.lastName || "",
+                email: selectedUser.email || "",
+                role: selectedUser.role || "",
+            };
+        }
+    }, [showModal2, selectedUser]);
 
 
 
@@ -431,27 +435,40 @@ function openAddModal() {
                                 <tbody>
                                     {allusers.map((user) => (
                                         <tr key={user.id}>
-                                            <td data-label="Name">{`${user.firstName} ${user.lastName}`}</td>
+                                            <td data-label="Name"><Link className={`${style.userlink}`} to={`/dashboard/users/${user.id}`}>{`${user.firstName} ${user.lastName}`}</Link></td>
                                             <td data-label="Email">{user.email}</td>
                                             <td data-label="Role">{user.role}</td>
-                                            <td data-label="Created On">{user.createdOn}</td>
-                                             <td>
-                                            <button className={`${style.editebtn}`}
-                                                onClick={() => {
-                                                    setSelectedUser(user);
-                                                    formik2.setValues({
-                                                        firstName: user.firstName,
-                                                        lastName: user.lastName,
-                                                        email: user.email,
+                                            <td data-label="Created On">
+                                                {user.createdOn && (() => {
+                                                    const date = new Date(user.createdOn);
+                                                    const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                                                    const formattedDate = date.toLocaleDateString();
+                                                    return (
+                                                        <>
+                                                            <span>{formattedTime}</span><br />
+                                                            <span>{formattedDate}</span>
+                                                        </>
+                                                    );
+                                                })()}
+                                            </td>
 
-                                                        role: typeof user.role === "string" ? user.role : user.role?.name || ""
-                                                    });
-                                                    setShowModal2(true);
-                                                }}
+                                            <td>
+                                                <button className={`${style.editebtn}`}
+                                                    onClick={() => {
+                                                        setSelectedUser(user);
+                                                        formik2.setValues({
+                                                            firstName: user.firstName,
+                                                            lastName: user.lastName,
+                                                            email: user.email,
 
-                                            ><i class="fa-regular fa-pen-to-square"></i>edit
-                                            </button>
-                                        </td>
+                                                            role: typeof user.role === "string" ? user.role : user.role?.name || ""
+                                                        });
+                                                        setShowModal2(true);
+                                                    }}
+
+                                                ><i class="fa-regular fa-pen-to-square"></i>edit
+                                                </button>
+                                            </td>
                                             <td>
                                                 <button
                                                     disabled={user.isLocked === false}   // Active → disabled
@@ -516,471 +533,471 @@ function openAddModal() {
                                             </td>
                                         </tr>
                                     ))}
-                            </tbody>
+                                </tbody>
 
-                        </table>
+                            </table>
+                        </div>
                     </div>
+
+                    {/* ///////////////////////////////////////////// */}
+
+                    <nav
+                        className={style.paginationContainer}
+                        aria-label="Page navigation"
+                    >
+                        <ul className={style.paginationList}>
+                            <li className={style.pageItem}>
+                                <button
+                                    className={style.pageLink}
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    «
+                                </button>
+                            </li>
+
+
+                            {[...Array(totalPages)].map((_, index) => {
+                                const page = index + 1;
+                                return (
+                                    <li key={page} className={style.pageItem}>
+                                        <button
+                                            className={`${style.pageLink} ${currentPage === page ? style.activePageLink : ""
+                                                }`}
+                                            onClick={() => handlePageChange(page)}
+                                        >
+                                            {page}
+                                        </button>
+                                    </li>
+                                );
+                            })}
+
+                            {/* زر التالي */}
+                            <li className={style.pageItem}>
+                                <button
+                                    className={style.pageLink}
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    »
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+
+
+
+
+
+
                 </div>
 
-                {/* ///////////////////////////////////////////// */}
-
-                <nav
-                    className={style.paginationContainer}
-                    aria-label="Page navigation"
-                >
-                    <ul className={style.paginationList}>
-                        <li className={style.pageItem}>
-                            <button
-                                className={style.pageLink}
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            >
-                                «
-                            </button>
-                        </li>
+                {/* /////////////////////////////////////////////// */}
 
 
-                        {[...Array(totalPages)].map((_, index) => {
-                            const page = index + 1;
-                            return (
-                                <li key={page} className={style.pageItem}>
-                                    <button
-                                        className={`${style.pageLink} ${currentPage === page ? style.activePageLink : ""
-                                            }`}
-                                        onClick={() => handlePageChange(page)}
-                                    >
-                                        {page}
-                                    </button>
-                                </li>
-                            );
-                        })}
+                {showModal && (
+                    <>
 
-                        {/* زر التالي */}
-                        <li className={style.pageItem}>
-                            <button
-                                className={style.pageLink}
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                            >
-                                »
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-
-
-
-
-
-
-            </div>
-
-            {/* /////////////////////////////////////////////// */}
-
-
-            {showModal && (
-                <>
-
-                    <div
-                        style={{
-                            position: "fixed",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            background: "rgba(0,0,0,0.65)",
-                            backdropFilter: "blur(2px)",
-                            zIndex: 999,
-                        }}
-                        onClick={() => setShowModal(false)}
-                    />
-
-
-                    <div
-                        style={{
-                            position: "fixed",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            background: "#0f0f0f",
-                            padding: "25px",
-                            borderRadius: "15px",
-                            width: "450px",
-                            maxWidth: "90%",
-                            color: "white",
-                            zIndex: 1000,
-                            boxShadow: "0 0 15px #000",
-                        }}
-                    >
-                        <span
+                        <div
                             style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "15px",
-                                cursor: "pointer",
-                                fontSize: "28px",
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                background: "rgba(0,0,0,0.65)",
+                                backdropFilter: "blur(2px)",
+                                zIndex: 999,
                             }}
                             onClick={() => setShowModal(false)}
-                        >
-                            ×
-                        </span>
-
-                        <h3 className="totalFont" style={{ marginBottom: "20px" }}>
-                            Add User
-                        </h3>
-                        <p>Create a new user account with role assignment</p>
-
-                        <form onSubmit={formik.handleSubmit}>
-
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between position-relative align-items-center mb-2">
-                                    <label className="totalFont" htmlFor="firstName">
-                                        First Name
-                                    </label>
-
-                                </div>
-
-                                <div className="position-relative">
-                                    <input
-                                        name="firstName"
-                                        value={formik.values.firstName}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        id="firstName"
-                                        type="text"
-                                        placeholder="First Name"
-                                        className="form-control my-2"
-                                    />
+                        />
 
 
-                                </div>
-
-                                {formik.touched.firstName && formik.errors.firstName && (
-                                    <div className="text-danger small mt-1">
-                                        {formik.errors.firstName}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between position-relative align-items-center mb-2">
-                                    <label className="totalFont" htmlFor="lastName">
-                                        Last Name
-                                    </label>
-
-                                </div>
-
-                                <div className="position-relative">
-                                    <input
-                                        name="lastName"
-                                        value={formik.values.lastName}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        id="lastName"
-                                        type="text"
-                                        placeholder="Last Name"
-                                        className="form-control my-2"
-                                    />
-
-
-                                </div>
-
-                                {formik.touched.lastName && formik.errors.lastName && (
-                                    <div className="text-danger small mt-1">
-                                        {formik.errors.lastName}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between position-relative align-items-center mb-2">
-                                    <label className="totalFont" htmlFor="email">
-                                        Email
-                                    </label>
-
-                                </div>
-
-                                <div className="position-relative">
-                                    <input
-                                        name="email"
-                                        value={formik.values.email}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        id="email"
-                                        type="text"
-                                        placeholder="Email"
-                                        className="form-control my-2"
-                                    />
-
-
-                                </div>
-
-                                {formik.touched.email && formik.errors.email && (
-                                    <div className="text-danger small mt-1">
-                                        {formik.errors.email}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="dropdown mt-4">
-                                <label className="totalFont mb-2" htmlFor="Role">
-                                    Role
-                                </label>
-                                <button
-                                    className="btn btn-light dropdown-toggle w-100 mb-4 d-flex justify-content-between align-items-center"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    data-bs-display="static"
-                                    aria-expanded="false"
-                                >
-                                    <span>{formik.values.role || "Select a Role"}</span>
-                                </button>
-
-                                <ul className="dropdown-menu w-100"
-                                    style={{
-                                        maxHeight: "150px",
-                                        overflowY: "auto"
-                                    }}
-                                >
-                                    {allRoles.map((role) => (
-                                        <li key={role.id}>
-                                            <a
-                                                className="dropdown-item"
-                                                href="#"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    formik.setFieldValue("role", role.name);
-                                                }}
-                                            >
-                                                {role.name}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-
-                            <button
-                                type="submit"
-                                className={` ${style.saveBtn} totalFont w-100`}
-                                disabled={!(formik.isValid && formik.dirty) || loading}
-                            >
-                                {loading ? (
-                                    <span
-                                        className="spinner-border spinner-border-sm text-light"
-                                        role="status"
-                                    />
-                                ) : (
-                                    "Save"
-                                )}
-                            </button>
-                        </form>
-                    </div>
-                </>
-            )}
-
-            {/* ///////////////////////////////////////// */}
-
-            {showModal2 && (
-                <>
-                    {/* الخلفية المعتمة */}
-                    <div
-                        style={{
-                            position: "fixed",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            background: "rgba(0,0,0,0.65)",
-                            backdropFilter: "blur(2px)",
-                            zIndex: 999,
-                        }}
-                        onClick={() => setShowModal2(false)}
-                    />
-
-                    {/* صندوق الـ Modal */}
-                    <div
-                        style={{
-                            position: "fixed",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            background: "#0f0f0f",
-                            padding: "25px",
-                            borderRadius: "15px",
-                            width: "450px",
-                            maxWidth: "90%",
-                            color: "white",
-                            zIndex: 1000,
-                            boxShadow: "0 0 15px #000",
-                        }}
-                    >
-                        <span
+                        <div
                             style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "15px",
-                                cursor: "pointer",
-                                fontSize: "28px",
+                                position: "fixed",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                background: "#0f0f0f",
+                                padding: "25px",
+                                borderRadius: "15px",
+                                width: "450px",
+                                maxWidth: "90%",
+                                color: "white",
+                                zIndex: 1000,
+                                boxShadow: "0 0 15px #000",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    position: "absolute",
+                                    top: "10px",
+                                    right: "15px",
+                                    cursor: "pointer",
+                                    fontSize: "28px",
+                                }}
+                                onClick={() => setShowModal(false)}
+                            >
+                                ×
+                            </span>
+
+                            <h3 className="totalFont" style={{ marginBottom: "20px" }}>
+                                Add User
+                            </h3>
+                            <p>Create a new user account with role assignment</p>
+
+                            <form onSubmit={formik.handleSubmit}>
+
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between position-relative align-items-center mb-2">
+                                        <label className="totalFont" htmlFor="firstName">
+                                            First Name
+                                        </label>
+
+                                    </div>
+
+                                    <div className="position-relative">
+                                        <input
+                                            name="firstName"
+                                            value={formik.values.firstName}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            id="firstName"
+                                            type="text"
+                                            placeholder="First Name"
+                                            className="form-control my-2"
+                                        />
+
+
+                                    </div>
+
+                                    {formik.touched.firstName && formik.errors.firstName && (
+                                        <div className="text-danger small mt-1">
+                                            {formik.errors.firstName}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between position-relative align-items-center mb-2">
+                                        <label className="totalFont" htmlFor="lastName">
+                                            Last Name
+                                        </label>
+
+                                    </div>
+
+                                    <div className="position-relative">
+                                        <input
+                                            name="lastName"
+                                            value={formik.values.lastName}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            id="lastName"
+                                            type="text"
+                                            placeholder="Last Name"
+                                            className="form-control my-2"
+                                        />
+
+
+                                    </div>
+
+                                    {formik.touched.lastName && formik.errors.lastName && (
+                                        <div className="text-danger small mt-1">
+                                            {formik.errors.lastName}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between position-relative align-items-center mb-2">
+                                        <label className="totalFont" htmlFor="email">
+                                            Email
+                                        </label>
+
+                                    </div>
+
+                                    <div className="position-relative">
+                                        <input
+                                            name="email"
+                                            value={formik.values.email}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            id="email"
+                                            type="text"
+                                            placeholder="Email"
+                                            className="form-control my-2"
+                                        />
+
+
+                                    </div>
+
+                                    {formik.touched.email && formik.errors.email && (
+                                        <div className="text-danger small mt-1">
+                                            {formik.errors.email}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="dropdown mt-4">
+                                    <label className="totalFont mb-2" htmlFor="Role">
+                                        Role
+                                    </label>
+                                    <button
+                                        className="btn btn-light dropdown-toggle w-100 mb-4 d-flex justify-content-between align-items-center"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        data-bs-display="static"
+                                        aria-expanded="false"
+                                    >
+                                        <span>{formik.values.role || "Select a Role"}</span>
+                                    </button>
+
+                                    <ul className="dropdown-menu w-100"
+                                        style={{
+                                            maxHeight: "150px",
+                                            overflowY: "auto"
+                                        }}
+                                    >
+                                        {allRoles.map((role) => (
+                                            <li key={role.id}>
+                                                <a
+                                                    className="dropdown-item"
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        formik.setFieldValue("role", role.name);
+                                                    }}
+                                                >
+                                                    {role.name}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+
+                                <button
+                                    type="submit"
+                                    className={` ${style.saveBtn} totalFont w-100`}
+                                    disabled={!(formik.isValid && formik.dirty) || loading}
+                                >
+                                    {loading ? (
+                                        <span
+                                            className="spinner-border spinner-border-sm text-light"
+                                            role="status"
+                                        />
+                                    ) : (
+                                        "Save"
+                                    )}
+                                </button>
+                            </form>
+                        </div>
+                    </>
+                )}
+
+                {/* ///////////////////////////////////////// */}
+
+                {showModal2 && (
+                    <>
+                        {/* الخلفية المعتمة */}
+                        <div
+                            style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                background: "rgba(0,0,0,0.65)",
+                                backdropFilter: "blur(2px)",
+                                zIndex: 999,
                             }}
                             onClick={() => setShowModal2(false)}
+                        />
+
+                        {/* صندوق الـ Modal */}
+                        <div
+                            style={{
+                                position: "fixed",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                background: "#0f0f0f",
+                                padding: "25px",
+                                borderRadius: "15px",
+                                width: "450px",
+                                maxWidth: "90%",
+                                color: "white",
+                                zIndex: 1000,
+                                boxShadow: "0 0 15px #000",
+                            }}
                         >
-                            ×
-                        </span>
-
-                        <h3 className="totalFont" style={{ marginBottom: "20px" }}>
-                            Edit User
-                        </h3>
-                        <p>Edit user account with role assignment</p>
-
-                        <form onSubmit={formik2.handleSubmit}>
-
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between position-relative align-items-center mb-2">
-                                    <label className="totalFont" htmlFor="firstName">
-                                        First Name
-                                    </label>
-
-                                </div>
-
-                                <div className="position-relative">
-                                    <input
-                                        name="firstName"
-                                        value={formik2.values.firstName}
-                                        onChange={formik2.handleChange}
-                                        onBlur={formik2.handleBlur}
-                                        id="firstName"
-                                        type="text"
-                                        placeholder="First Name"
-                                        className="form-control my-2"
-                                    />
-
-
-                                </div>
-
-                                {formik2.touched.firstName && formik2.errors.firstName && (
-                                    <div className="text-danger small mt-1">
-                                        {formik2.errors.firstName}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between position-relative align-items-center mb-2">
-                                    <label className="totalFont" htmlFor="lastName">
-                                        Last Name
-                                    </label>
-
-                                </div>
-
-                                <div className="position-relative">
-                                    <input
-                                        name="lastName"
-                                        value={formik2.values.lastName}
-                                        onChange={formik2.handleChange}
-                                        onBlur={formik2.handleBlur}
-                                        id="lastName"
-                                        type="text"
-                                        placeholder="Last Name"
-                                        className="form-control my-2"
-                                    />
-
-
-                                </div>
-
-                                {formik2.touched.lastName && formik2.errors.lastName && (
-                                    <div className="text-danger small mt-1">
-                                        {formik2.errors.lastName}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between position-relative align-items-center mb-2">
-                                    <label className="totalFont" htmlFor="email">
-                                        Email
-                                    </label>
-
-                                </div>
-
-                                <div className="position-relative">
-                                    <input
-                                        name="email"
-                                        value={formik2.values.email}
-                                        onChange={formik2.handleChange}
-                                        onBlur={formik2.handleBlur}
-                                        id="email"
-                                        type="text"
-                                        placeholder="Email"
-                                        className="form-control my-2"
-                                    />
-
-
-                                </div>
-
-                                {formik2.touched.email && formik2.errors.email && (
-                                    <div className="text-danger small mt-1">
-                                        {formik2.errors.email}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="dropdown mt-4">
-                                <label className="totalFont mb-2" htmlFor="Role">
-                                    Role
-                                </label>
-                                <button
-                                    className="btn btn-light dropdown-toggle w-100 mb-4 d-flex justify-content-between align-items-center"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    data-bs-display="static"
-                                    aria-expanded="false"
-                                >
-                                    <span>{formik2.values.role || "Select a Role"}</span>
-                                </button>
-
-                                <ul className="dropdown-menu w-100"
-                                    style={{
-                                        maxHeight: "150px",
-                                        overflowY: "auto"
-                                    }}
-                                >
-                                    {allRoles.map((role) => (
-                                        <li key={role.id}>
-                                            <a
-                                                className="dropdown-item"
-                                                href="#"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    formik2.setFieldValue("role", role.name);
-                                                }}
-                                            >
-                                                {role.name}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-
-                            <button
-                                type="submit"
-                                className={` ${style.saveBtn} totalFont w-100`}
-                                disabled={!(formik2.isValid && formik2.dirty) || loading}
+                            <span
+                                style={{
+                                    position: "absolute",
+                                    top: "10px",
+                                    right: "15px",
+                                    cursor: "pointer",
+                                    fontSize: "28px",
+                                }}
+                                onClick={() => setShowModal2(false)}
                             >
-                                {loading ? (
-                                    <span
-                                        className="spinner-border spinner-border-sm text-light"
-                                        role="status"
-                                    />
-                                ) : (
-                                    "Save"
-                                )}
-                            </button>
-                        </form>
-                    </div>
-                </>
-            )}
+                                ×
+                            </span>
+
+                            <h3 className="totalFont" style={{ marginBottom: "20px" }}>
+                                Edit User
+                            </h3>
+                            <p>Edit user account with role assignment</p>
+
+                            <form onSubmit={formik2.handleSubmit}>
+
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between position-relative align-items-center mb-2">
+                                        <label className="totalFont" htmlFor="firstName">
+                                            First Name
+                                        </label>
+
+                                    </div>
+
+                                    <div className="position-relative">
+                                        <input
+                                            name="firstName"
+                                            value={formik2.values.firstName}
+                                            onChange={formik2.handleChange}
+                                            onBlur={formik2.handleBlur}
+                                            id="firstName"
+                                            type="text"
+                                            placeholder="First Name"
+                                            className="form-control my-2"
+                                        />
+
+
+                                    </div>
+
+                                    {formik2.touched.firstName && formik2.errors.firstName && (
+                                        <div className="text-danger small mt-1">
+                                            {formik2.errors.firstName}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between position-relative align-items-center mb-2">
+                                        <label className="totalFont" htmlFor="lastName">
+                                            Last Name
+                                        </label>
+
+                                    </div>
+
+                                    <div className="position-relative">
+                                        <input
+                                            name="lastName"
+                                            value={formik2.values.lastName}
+                                            onChange={formik2.handleChange}
+                                            onBlur={formik2.handleBlur}
+                                            id="lastName"
+                                            type="text"
+                                            placeholder="Last Name"
+                                            className="form-control my-2"
+                                        />
+
+
+                                    </div>
+
+                                    {formik2.touched.lastName && formik2.errors.lastName && (
+                                        <div className="text-danger small mt-1">
+                                            {formik2.errors.lastName}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mb-4">
+                                    <div className="d-flex justify-content-between position-relative align-items-center mb-2">
+                                        <label className="totalFont" htmlFor="email">
+                                            Email
+                                        </label>
+
+                                    </div>
+
+                                    <div className="position-relative">
+                                        <input
+                                            name="email"
+                                            value={formik2.values.email}
+                                            onChange={formik2.handleChange}
+                                            onBlur={formik2.handleBlur}
+                                            id="email"
+                                            type="text"
+                                            placeholder="Email"
+                                            className="form-control my-2"
+                                        />
+
+
+                                    </div>
+
+                                    {formik2.touched.email && formik2.errors.email && (
+                                        <div className="text-danger small mt-1">
+                                            {formik2.errors.email}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="dropdown mt-4">
+                                    <label className="totalFont mb-2" htmlFor="Role">
+                                        Role
+                                    </label>
+                                    <button
+                                        className="btn btn-light dropdown-toggle w-100 mb-4 d-flex justify-content-between align-items-center"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        data-bs-display="static"
+                                        aria-expanded="false"
+                                    >
+                                        <span>{formik2.values.role || "Select a Role"}</span>
+                                    </button>
+
+                                    <ul className="dropdown-menu w-100"
+                                        style={{
+                                            maxHeight: "150px",
+                                            overflowY: "auto"
+                                        }}
+                                    >
+                                        {allRoles.map((role) => (
+                                            <li key={role.id}>
+                                                <a
+                                                    className="dropdown-item"
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        formik2.setFieldValue("role", role.name);
+                                                    }}
+                                                >
+                                                    {role.name}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+
+                                <button
+                                    type="submit"
+                                    className={` ${style.saveBtn} totalFont w-100`}
+                                    disabled={!(formik2.isValid && formik2.dirty) || loading}
+                                >
+                                    {loading ? (
+                                        <span
+                                            className="spinner-border spinner-border-sm text-light"
+                                            role="status"
+                                        />
+                                    ) : (
+                                        "Save"
+                                    )}
+                                </button>
+                            </form>
+                        </div>
+                    </>
+                )}
 
 
 
-        </div >
+            </div >
         </>
     );
 }

@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import { userContext } from "../../context/userContext";
 import api from "../../api";
+import { Link } from "react-router-dom";
 export default function Admin() {
   const userId = localStorage.getItem("id");
   const { userToken } = useContext(userContext);
@@ -20,7 +21,7 @@ export default function Admin() {
   // console.log(userId)
   async function getAnalytics() {
     try {
-      const response = await api.get(`/Dashboard/${userId}/analytics`, {
+      const response = await api.get(`/Dashboard/analytics`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -34,7 +35,7 @@ export default function Admin() {
 
   async function getRecentUsers() {
     try {
-      const response = await api.get(`/Dashboard/${userId}/recent-users`, {
+      const response = await api.get(`/Dashboard/recent-users`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -47,7 +48,7 @@ export default function Admin() {
   }
   async function getRecentRoles() {
     try {
-      const response = await api.get(`/Dashboard/${userId}/recent-roles`, {
+      const response = await api.get(`/Dashboard/recent-roles`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -180,7 +181,6 @@ export default function Admin() {
               <i
                 className={`${style.kpisIcon} totalFont fa-solid fa-users`}
               ></i>
-              <h5 className="totalFont text-white">+12</h5>
             </div>
             <h3 className={`totalFont text-white ${style.count}`}>
               {analytics.totalUsers}
@@ -194,7 +194,6 @@ export default function Admin() {
               <i
                 className={`${style.kpisIcon} totalFont fa-solid fa-chart-line`}
               ></i>
-              <h5 className="totalFont text-white">+8</h5>
             </div>
             <h3 className={`totalFont text-white ${style.count}`}>
               {analytics.activeUsers}
@@ -209,7 +208,7 @@ export default function Admin() {
               <i
                 className={`${style.kpisIcon} totalFont  fa-solid fa-shield`}
               ></i>
-              <h5 className="totalFont text-white">+1</h5>
+             
             </div>
             <h3 className={`totalFont text-white ${style.count}`}>
               {analytics.roleCount}
@@ -223,7 +222,7 @@ export default function Admin() {
               <i
                 className={`${style.kpisIcon} totalFont  fa-solid fa-lock `}
               ></i>
-              <h5 className="totalFont text-white">-2</h5>
+              
             </div>
             <h3 className={`totalFont text-white ${style.count}`}>
               {analytics.lockedUsers}
@@ -235,7 +234,7 @@ export default function Admin() {
           <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
             <div className={`${style.KpisInfo}`}>
               <i className={`${style.kpisIcon} totalFont fa-solid fa-ban`}></i>
-              <h5 className="totalFont text-white">-2</h5>
+             
             </div>
             <h3 className={`totalFont text-white ${style.count}`}>
               {analytics.disabledUsers}
@@ -268,7 +267,7 @@ export default function Admin() {
                 <tbody>
                   {recentusers.map((user) => (
                     <tr key={user.id}>
-                      <td>{user.name}</td>
+                      <td><Link className={`${style.userlink}`} to={`/dashboard/${user.id}`}>{user.name}</Link></td>
 
                       <td
                         className={`${style.toggleCol2}`}
@@ -375,7 +374,7 @@ export default function Admin() {
                 <tbody>
                   {recentroles.map((role) => (
                     <tr key={role.id}>
-                      <td>{role.name}</td>
+                     <td><Link className={`${style.userlink}`} to={`/dashboard/${role.id}`}>{role.name}</Link></td>
                       <td>
                         <button
                           onClick={() => handleToggleRole(role)}
