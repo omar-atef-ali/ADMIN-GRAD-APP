@@ -10,6 +10,7 @@ export default function NavBar() {
      setUserToken(null)
      localStorage.removeItem("token");
      localStorage.removeItem("refreshToken")
+     localStorage.removeItem("id")
      navigate("/")
   }
   return (

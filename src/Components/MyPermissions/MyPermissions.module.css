@@ -12,3 +12,13 @@ position: absolute;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.allDiv {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.inheritableDiv p {
+  margin-left: 30px;
+}

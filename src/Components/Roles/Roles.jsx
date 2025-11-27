@@ -89,7 +89,30 @@ export default function Roles() {
       setShowModal2(true);
     } catch (error) {
       console.log("Error fetching role:", error);
-      toast.error("Failed to fetch role details.");
+      toast.error(
+          "Failed to fetch role details.",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background:
+              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
+      
     }
   };
 
@@ -156,7 +179,29 @@ export default function Roles() {
       getAllRoles();
     } catch (error) {
       console.log("Edit error:", error);
-      toast.error("Failed to update role");
+      toast.error(
+          "Failed to update role",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background:
+              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
     }
   };
 
