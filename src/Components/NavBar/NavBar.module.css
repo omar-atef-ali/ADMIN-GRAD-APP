@@ -76,3 +76,10 @@
   background: inherit; 
 }
 
+.active{
+  color: black !important;
+  transition: 0.3s ease-in-out;
+}
+.active:hover{
+  color: black !important;
+}

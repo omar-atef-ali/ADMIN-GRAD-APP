@@ -1,17 +1,17 @@
 import React, { useContext } from "react";
 import style from "./NavBar.module.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { userContext } from "../../context/userContext";
 
 export default function NavBar() {
-  const {setUserToken}=useContext(userContext)
-  const navigate=useNavigate()
-  function logout(){
-     setUserToken(null)
-     localStorage.removeItem("token");
-     localStorage.removeItem("refreshToken")
-     localStorage.removeItem("id")
-     navigate("/")
+  const { setUserToken } = useContext(userContext)
+  const navigate = useNavigate()
+  function logout() {
+    setUserToken(null)
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken")
+    localStorage.removeItem("id")
+    navigate("/")
   }
   return (
     <>
@@ -20,14 +20,15 @@ export default function NavBar() {
           className={`navbar navbar-expand-lg navbar-dark ${style.navbargradient}`}
         >
           <div className="container px-4">
-            <Link
-              className={`navbar-brand ${style.logo} totalFont mx-1 `}
-              to={"/dashboard"}
+            <NavLink
+              className={({ isActive }) => `${style.logo} totalFont mx-1 navbar-brand ${isActive ? style.active : ""}`}
+
+              to={"/main"}
             >
               AdminHub
-            </Link>
+            </NavLink>
 
-            
+
             <button
               className="navbar-toggler"
               type="button"
@@ -47,52 +48,61 @@ export default function NavBar() {
             >
               <ul className="navbar-nav mx-auto">
                 <li className="nav-item mx-2">
-                  <Link
-                    className={`nav-link totalFont mx-3 mx-lg-3  ${style.mainbtns}`}
-                    to={"/dashboard"}
+                  <NavLink
+                    to="/dashboard"
+                    end
+                    className={({ isActive }) =>
+                      `nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns} ${isActive ? style.active : ""
+                      }`
+                    }
                   >
-                   <i className="fa-solid fa-chart-line totalFont"></i> Dashboard
-                  </Link>
+                    <i className="fa-solid fa-chart-line totalFont"></i> Dashboard
+                  </NavLink>
+
+
                 </li>
 
                 <li className="nav-item mx-2">
-                  <Link
-                    className={`nav-link totalFont mx-3 ${style.mainbtns}`}
+                  <NavLink
+                    className={({isActive})=>`nav-link totalFont mx-3 ${style.mainbtns} ${isActive ? style.active : ""}`}
                     to={"/dashboard/Users"}
                   >
-                   <i className="fa-solid fa-users totalFont"></i> Users
-                  </Link>
+                    <i className="fa-solid fa-users totalFont"></i> Users
+                  </NavLink>
                 </li>
 
                 <li className="nav-item mx-2">
-                  <Link
-                    className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
+                  <NavLink
+                    
+                    className={({isActive})=>`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns} ${isActive ? style.active : ""} `}
                     to={"roles"}
                   >
-                   <i className={"totalFont  fa-solid fa-shield"}></i> Roles
-                  </Link>
+                    <i className={"totalFont  fa-solid fa-shield"}></i> Roles
+                  </NavLink>
                 </li>
 
                 <li className="nav-item mx-2">
-                  <Link
-                    className={`nav-link totalFont mx-3  ${style.mainbtns}`}
-                    to={"#"}
+                  <NavLink
+                    
+                    className={({isActive})=>`nav-link totalFont mx-3  ${style.mainbtns} ${isActive ? style.active : ""} `}
+                    to={"/ds"}
                   >
-                   <i className="fa-solid fa-user"></i> Account
-                  </Link>
+                    <i className="fa-solid fa-user"></i> Account
+                  </NavLink>
                 </li>
                 <li className="nav-item mx-2">
-                  <Link
-                    className={`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}`}
+                  <NavLink
+                    
+                    className={({isActive})=>`nav-link totalFont mx-3 mx-lg-3 ${style.mainbtns}  ${isActive ? style.active : ""}`}
                     to={"my-permissions"}
                   >
                     <i className={`totalFont  fa-solid fa-list-check`}></i> My Permissions
-                  </Link>
+                  </NavLink>
                 </li>
               </ul>
               <li className="nav-item" style={{ listStyle: "none" }}>
                 <button
-                onClick={logout}
+                  onClick={logout}
                   className={` ms-2  totalFont ${style.borderbtn} ${style.logoutbtn}`}
                   style={{
                     marginLeft: "50px",

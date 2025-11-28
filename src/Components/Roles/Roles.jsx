@@ -385,13 +385,16 @@ export default function Roles() {
                         type="button"
                         className={`${style.sortBtn} btn p-0 m-0 border-0 `}
                         onClick={() => handleSort("ASC")}
+                        data-tooltip="Sort ascending"
                       >
                         ▲
                       </button>
                       <button
                         type="button"
                         className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+
                         onClick={() => handleSort("DESC")}
+                        data-tooltip="Sort descending"
                       >
                         ▼
                       </button>
@@ -501,7 +504,7 @@ export default function Roles() {
                 <button
                   className={style.pageLink}
                   onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || totalPages === 0 || allRoles.length === 0}
                 >
                   «
                 </button>
@@ -529,7 +532,7 @@ export default function Roles() {
                 <button
                   className={style.pageLink}
                   onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || totalPages === 0 || allRoles.length === 0}
                 >
                   »
                 </button>
