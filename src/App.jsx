@@ -14,17 +14,20 @@ import Admin from './Components/Admin/Admin'
 import Users from './Components/Users/Users'
 import NotFound from './Components/Notfound/NotFound'
 import RolesDetails from './Components/RolesDetails/RolesDetails'
+import UserDetails from './Components/UserDetails/UserDetails'
 
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/main",element:<Main/>},
   {path:"/dashboard",element:<Layout/>,children:[
+     {path:"/dashboard/:id",element:<UserDetails/>},
     {path:"",element:<Admin/>},
     {path:"roles",element:<Roles/>},
     {path:"my-permissions",element:<MyPermissions/>},
-    {path:"users",element:<Users/>} ,
     {path:"roles/:id",element:<RolesDetails/>} ,
-    {path:"/dashboard/:id",element:<RolesDetails/>},
+    {path:"users",element:<Users/>},
+    {path:"users/:id",element:<UserDetails/>}
+    
   ]},
   {path:"*",element:<NotFound/>}
   

@@ -189,7 +189,15 @@
   }
 
 }
-
+.userlink{
+  color: white;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}
+.userlink:hover{
+  color: rgb(59, 178, 247);
+  text-decoration: underline;
+}
 @media (min-width:426px) and (max-width:768px) {
   .adminTilte {
     text-align: center;
@@ -201,3 +209,4 @@
     font-size: 12px !important;
     padding: 6px !important;}
 }
+
