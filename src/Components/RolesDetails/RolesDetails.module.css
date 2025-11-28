@@ -1,0 +1,204 @@
+.pdPage {
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.941);
+  padding: 24px;
+  padding-top: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdWrapper {
+  width: 100%;
+  max-width: 900px;
+}
+
+.pdCard {
+  background: rgb(0, 0, 0);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Header */
+.pdHeader {
+  background-color: rgb(37, 37, 37);
+  padding: 48px;
+  display: flex;
+  /* flex-direction: column; */
+  justify-content: space-between;
+  align-items: flex-start;
+  color: white;
+}
+
+.pdName {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.pdSub {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.pdBadge {
+  font-size: 16px;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  background-color: #cbcbcb3e !important;
+  border: 1px solid #9897977c !important;
+  color: white !important;
+}
+
+
+/* Content */
+.pdContent {
+  padding: 32px;
+  background-color: rgb(27, 27, 27);
+}
+
+.pdGrid2 {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 568px) {
+  .UserParentInfo {
+    margin-left: -32px;
+  }
+  .pdBadge {
+    font-size: 13px;
+    padding: 4px 13px;
+  }
+  .pdName {
+    font-size: 25px;
+  }
+  .pdSub {
+    font-size: 13px;
+  }
+  .pdGrid {
+    display: flex;
+    justify-content: center;
+  }
+  .pdUserBtn {
+    padding: 5px 30px !important;
+    font-size: 13px;
+  }
+  .pdField {
+    padding: 5px !important;
+  }
+  .pdGrid2 {
+    gap: 10px;
+  }
+}
+
+.pdLabel {
+  font-size: 12px;
+  color: rgba(154, 182, 230, 0.71);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+/* User Buttons */
+.pdUserBtn {
+  display: flex;
+  gap: 12px;
+  padding: 10px 30px;
+  /* padding-left: 18px; */
+  background-color: #cbcbcb0a;
+  border: 1px solid #9897977c;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  align-items: center;
+  color: rgb(255, 255, 255);
+}
+
+.pdUserBtn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: rgba(55, 55, 55, 0.479) !important;
+}
+
+.pdUserBtn.selected {
+  background: #2563eb;
+  color: white;
+  border-color: #1d4ed8;
+}
+
+.pdAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1e40af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Dates */
+.pdBox {
+  padding: 10px 24px;
+  background-color: #cbcbcb3e !important;
+  border: 1px solid #9897977c !important;
+  border-radius: 10px;
+}
+
+.pdBox.blue {
+  color: white !important;
+}
+
+.pdDate {
+  font-size: 26px;
+  font-weight: bold;
+  color: white !important;
+}
+
+.pdDay {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #aeb0b4;
+}
+
+.blueText {
+  color: #1d4ed8;
+}
+
+/* Divider */
+.pdDivider {
+  border-top: 1px solid #e2e8f0;
+  margin: 32px 0;
+}
+
+/* Selected User Box */
+.pdSelectedBox {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 10px;
+  background: linear-gradient(to right, #eff6ff, #faf5ff);
+  border: 1px solid #bfdbfe;
+}
+
+/* Footer */
+.pdFooter {
+  background: #f8fafc;
+  padding: 16px 32px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+
+.userlink{
+  color: white;
+  text-decoration: none;
+  transition: 0.2s ease-in-out;
+}

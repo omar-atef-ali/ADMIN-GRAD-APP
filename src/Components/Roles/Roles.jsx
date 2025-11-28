@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 
 export default function Roles() {
   const { userToken } = useContext(userContext);
@@ -408,7 +409,7 @@ export default function Roles() {
               <tbody>
                 {allRoles.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.name}</td>
+                    <td><Link className={`${style.userlink}`} to={`${item.id}`}>{item.name}</Link></td>
                     <td onClick={() => handleEditClick(item.id)}>
                       <button className={`${style.editTd}`}>
                         <i className="fa-regular fa-pen-to-square"></i>

@@ -13,6 +13,7 @@ import { userContext } from './context/userContext'
 import Admin from './Components/Admin/Admin'
 import Users from './Components/Users/Users'
 import NotFound from './Components/Notfound/NotFound'
+import RolesDetails from './Components/RolesDetails/RolesDetails'
 
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
@@ -21,7 +22,9 @@ let routers = createBrowserRouter([
     {path:"",element:<Admin/>},
     {path:"roles",element:<Roles/>},
     {path:"my-permissions",element:<MyPermissions/>},
-    {path:"users",element:<Users/>}
+    {path:"users",element:<Users/>} ,
+    {path:"roles/:id",element:<RolesDetails/>} ,
+    {path:"/dashboard/:id",element:<RolesDetails/>},
   ]},
   {path:"*",element:<NotFound/>}
   
