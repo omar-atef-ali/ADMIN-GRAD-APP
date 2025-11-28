@@ -320,6 +320,10 @@
 .sortBtn:hover{
   color: rgba(73, 73, 73, 0.864)  !important;
 }
+.sortBtn:focus {
+  color: #09628f !important;  
+  outline: none;              
+}
 .tableWrapper {
   width: 100%;
 }
@@ -359,4 +363,37 @@
 .userlink:hover{
   color: rgb(59, 178, 247);
   text-decoration: underline;
+}
+.sortBtn {
+  position: relative; /* للـ cursor فقط */
+  cursor: pointer;
+}
+
+.sortBtn::after {
+  content: attr(data-tooltip); /* الكلمة اللي عايز تظهر */
+  position: fixed;             /* هنا فرق */
+  z-index: 9999;               /* فوق كل حاجة */
+  
+  background-color: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;        /* عشان ما يمنعش hover على الزر */
+  transition: opacity 0.2s;
+
+  /* المكان */
+  bottom: auto;
+  top: auto;
+  left: auto;
+  transform: translate(-50%, -100%); /* نص الزر فوقه */
+}
+
+/* عرض الـ tooltip عند hover */
+.sortBtn:hover::after {
+  opacity: 1;
+  visibility: visible;
 }

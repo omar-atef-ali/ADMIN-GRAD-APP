@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import style from "./users.module.css";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
@@ -22,6 +22,15 @@ export default function Users() {
     const [Propertiesvalue, setPropertiesvalue] = useState([])
     const [sortColumn, setSortColumn] = useState("");
     const [sortDirection, setSortDirection] = useState("ASC");
+    const placeholderText =
+        Propertiesvalue.length === 0
+            ? "Search Users..."
+            : `Search by ${Propertiesvalue.includes("firstName") && Propertiesvalue.includes("lastName")
+                ? ["name", ...Propertiesvalue.filter(i => i !== "firstName" && i !== "lastName")].join(" & ")
+                : Propertiesvalue.join(" & ")
+            }`;
+    const sortBtnRef = useRef(null);
+
 
     const handleSort = (column, direction) => {
         setSortColumn(column);
@@ -75,6 +84,7 @@ export default function Users() {
 
             setallusers(filteredUsers);
             setTotalPages(response.data.totalPages);
+            console.log(response.data)
 
         } catch (error) {
             console.log(error);
@@ -110,7 +120,7 @@ export default function Users() {
                     Authorization: `Bearer ${userToken}`,
                 },
             });
-            console.log(data);
+            // console.log(data);
             setAllRoles(data.items);
             // setTotalPages(data.totalPages);
         } catch (error) {
@@ -278,6 +288,8 @@ export default function Users() {
     }
 
 
+
+
     let formik2 = useFormik({
         initialValues: selectedUser
             ? {
@@ -318,6 +330,8 @@ export default function Users() {
 
 
 
+
+
     return (
         <>
             <div className={` container-fluid ${style.rolesPage}`}>
@@ -338,7 +352,7 @@ export default function Users() {
                                 <input
                                     className="form-control me-2"
                                     type="search"
-                                    placeholder=" Search Users..."
+                                    placeholder={placeholderText}
                                     aria-label="Search"
                                     onChange={(e) => setsearchtext(e.target.value)}
                                     value={searchtext}
@@ -377,13 +391,16 @@ export default function Users() {
                                                     }}
                                                 />
                                                 <button
-                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                                                    data-tooltip="Sort ascending"
                                                     onClick={() => handleSort("name", "ASC")}
                                                 >
                                                     ▲
                                                 </button>
+
                                                 <button
-                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                                                    data-tooltip="Sort descending"
                                                     onClick={() => handleSort("name", "DESC")}
                                                 >
                                                     ▼
@@ -402,14 +419,17 @@ export default function Users() {
                                                 />
 
                                                 <button
-                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                                                    onClick={() => handleSort("email", "ASC")}
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                                                    data-tooltip="Sort ascending"
+                                                    onClick={() => handleSort("name", "ASC")}
                                                 >
                                                     ▲
                                                 </button>
+
                                                 <button
-                                                    className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                                                    onClick={() => handleSort("email", "DESC")}
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                                                    data-tooltip="Sort descending"
+                                                    onClick={() => handleSort("name", "DESC")}
                                                 >
                                                     ▼
                                                 </button>
@@ -541,29 +561,24 @@ export default function Users() {
 
                     {/* ///////////////////////////////////////////// */}
 
-                    <nav
-                        className={style.paginationContainer}
-                        aria-label="Page navigation"
-                    >
+                    <nav className={style.paginationContainer} aria-label="Page navigation">
                         <ul className={style.paginationList}>
                             <li className={style.pageItem}>
                                 <button
                                     className={style.pageLink}
                                     onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
+                                    disabled={currentPage === 1 || totalPages === 0 || allusers.length === 0}
                                 >
                                     «
                                 </button>
                             </li>
-
 
                             {[...Array(totalPages)].map((_, index) => {
                                 const page = index + 1;
                                 return (
                                     <li key={page} className={style.pageItem}>
                                         <button
-                                            className={`${style.pageLink} ${currentPage === page ? style.activePageLink : ""
-                                                }`}
+                                            className={`${style.pageLink} ${currentPage === page ? style.activePageLink : ""}`}
                                             onClick={() => handlePageChange(page)}
                                         >
                                             {page}
@@ -572,18 +587,18 @@ export default function Users() {
                                 );
                             })}
 
-                            {/* زر التالي */}
                             <li className={style.pageItem}>
                                 <button
                                     className={style.pageLink}
                                     onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
+                                    disabled={currentPage === totalPages || totalPages === 0 || allusers.length === 0}
                                 >
                                     »
                                 </button>
                             </li>
                         </ul>
                     </nav>
+
 
 
 

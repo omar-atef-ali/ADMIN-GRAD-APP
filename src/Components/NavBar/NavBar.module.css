@@ -76,3 +76,11 @@
   background: inherit; 
 }
 
+.active{
+  color: rgb(139, 139, 139) !important;
+  transition: 0.3s ease-in-out;
+  
+}
+.active:hover{
+  color: rgb(139, 139, 139) !important;
+}
