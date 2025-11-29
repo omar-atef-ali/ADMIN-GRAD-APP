@@ -15,18 +15,18 @@ import Users from './Components/Users/Users'
 import NotFound from './Components/Notfound/NotFound'
 import RolesDetails from './Components/RolesDetails/RolesDetails'
 import UserDetails from './Components/UserDetails/UserDetails'
-
+import Protected from './Components/Protected/Protected'
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/main",element:<Main/>},
   {path:"/dashboard",element:<Layout/>,children:[
-     {path:"/dashboard/:id",element:<UserDetails/>},
-    {path:"",element:<Admin/>},
-    {path:"roles",element:<Roles/>},
-    {path:"my-permissions",element:<MyPermissions/>},
-    {path:"roles/:id",element:<RolesDetails/>} ,
-    {path:"users",element:<Users/>},
-    {path:"users/:id",element:<UserDetails/>}
+     {path:"/dashboard/:id",element: <Protected><UserDetails/></Protected> },
+    {path:"",element:<Protected><Admin/></Protected>},
+    {path:"roles",element:<Protected><Roles/></Protected>},
+    {path:"my-permissions",element:<Protected><MyPermissions/></Protected>},
+    {path:"roles/:id",element:<Protected><RolesDetails/></Protected>} ,
+    {path:"users",element:<Protected><Users/></Protected>},
+    {path:"users/:id",element:<Protected><UserDetails/></Protected>}
     
   ]},
   {path:"*",element:<NotFound/>}

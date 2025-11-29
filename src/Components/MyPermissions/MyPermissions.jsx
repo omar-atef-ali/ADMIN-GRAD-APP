@@ -15,7 +15,7 @@ export default function MyPermissions() {
   async function Permissions() {
     try {
       const { data } = await api.get(
-        `/Roles/cc874352-c0b4-43f3-a621-d7189ba87172`,
+        `/Roles/Permissions`,
         {
           headers: { Authorization: `Bearer ${userToken}` },
         }
@@ -24,7 +24,7 @@ export default function MyPermissions() {
       setData(data);
 
       // console.log(data.permissions);
-      setPermissions(data.permissions);
+      setPermissions(data);
       // console.log(permissions);
     } catch (error) {
       console.log(error?.response?.data?.errors[1]);
@@ -103,9 +103,9 @@ export default function MyPermissions() {
                 Permissions
               </h3>
 
-              <label className="totalFont fs-4 mb-2" htmlFor="name">
+              {/* <label className="totalFont fs-4 mb-2" htmlFor="name">
                 {data.name}
-              </label>
+              </label> */}
               <div className={`${style.allDiv}`}>
                 <div className={`${style.PermissionsDiv}`}>
                   <h5 className="totalFont">Permissions</h5>

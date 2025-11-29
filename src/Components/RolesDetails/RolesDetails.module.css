@@ -230,3 +230,52 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.permissionsH {
+position: absolute;
+  top: 120px;
+  color: white;
+  font-size: "2.25rem";
+  background: linear-gradient(to right, white, #bcbcbcff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.allDiv {
+  width: 100% !important;
+  display: flex;
+  justify-content: space-between;
+}
+
+.inheritableDiv p {
+  margin-left: 30px;
+}
+
+
+
+@media (max-width: 568px) {
+  .allDiv {
+    gap: 5px; /* نقلل المسافة */
+    width: 100px !important;
+
+  }
+
+  .PermissionsDiv h5 ,
+  .addDiv h5,
+  .inheritableDiv h5 {
+    font-size: 15px;
+  }
+  .PermissionsDiv {
+    margin-left: -9px;
+  }
+
+  .form-check {
+    transform: scale(0.85); /* نصغّر السويتش */
+  }
+
+}
+
+
+
+
+

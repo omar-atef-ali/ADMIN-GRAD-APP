@@ -17,13 +17,56 @@ export default function Roles() {
   const [totalPages, setTotalPages] = useState(1);
 
   const permissions = [
-    "Users:Read",
-    "Users:Add",
-    "Users:Update",
-    "Roles:Read",
     "Roles:Add",
+    "Roles:Read",
     "Roles:Update",
+    "Users:Add",
+    "Users:Read",
+    "Users:Update",
   ];
+
+  const [addpermissions, setAddPermissions] = useState([]);
+
+  async function getPermissions() {
+    try {
+      const response = await api.get("/Roles/Permissions", {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      console.log(response.data);
+
+      const all = response.data;
+      const filtered = all.filter((p) => p.isInheritable === true);
+      console.log(filtered);
+
+      setAddPermissions(filtered);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  useEffect(() => {
+    if (userToken) {
+      getPermissions();
+    }
+  }, [userToken]);
+
+  useEffect(() => {
+    if (addpermissions.length > 0) {
+      const initial = {};
+
+      addpermissions.forEach((p) => {
+        initial[p.name] = {
+          add: false,
+          inheritable: false, // لأنهم بالفعل true جايين من الـ API
+        };
+      });
+
+      setSelected(initial);
+      console.log(selected);
+    }
+  }, [addpermissions]);
+
   const [selected, setSelected] = useState({});
 
   const handleToggle = (permName, field) => {
@@ -48,13 +91,12 @@ export default function Roles() {
   const buildPermissionsArray = () => {
     const result = [];
 
-    permissions.forEach((perm) => {
-      const item = selected[perm];
+    addpermissions.forEach((perm) => {
+      const item = selected[perm.name];
 
-      // لو Add مش متعلم → متعملش حاجة
       if (item?.add) {
         result.push({
-          name: perm,
+          name: perm.name,
           isInheritable: item.inheritable === true,
         });
       }
@@ -406,7 +448,6 @@ export default function Roles() {
                       <button
                         type="button"
                         className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-
                         onClick={() => handleSort("DESC")}
                         data-tooltip="Sort descending"
                       >
@@ -522,7 +563,11 @@ export default function Roles() {
                 <button
                   className={style.pageLink}
                   onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1 || totalPages === 0 || allRoles.length === 0}
+                  disabled={
+                    currentPage === 1 ||
+                    totalPages === 0 ||
+                    allRoles.length === 0
+                  }
                 >
                   «
                 </button>
@@ -550,7 +595,11 @@ export default function Roles() {
                 <button
                   className={style.pageLink}
                   onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages || totalPages === 0 || allRoles.length === 0}
+                  disabled={
+                    currentPage === totalPages ||
+                    totalPages === 0 ||
+                    allRoles.length === 0
+                  }
                 >
                   »
                 </button>
@@ -633,51 +682,61 @@ export default function Roles() {
                 )}
 
                 <div className={`${style.allDiv}`}>
-                  <div className={`${style.PermissionsDiv}`}>
+                  <div className={style.PermissionsDiv}>
                     <h5 className="totalFont">Permissions</h5>
-                    <p className="totalFont">Users:Read</p>
-                    <p className="totalFont">Users:Add</p>
-                    <p className="totalFont">Users:Update</p>
-                    <p className="totalFont">Roles:Read</p>
-                    <p className="totalFont">Roles:Add</p>
-                    <p className="totalFont">Roles:Update</p>
+
+                    {addpermissions
+                      .filter((p) => p.isInheritable) // ← عرض الـ inheritable بس
+                      .map((perm, index) => (
+                        <p className="totalFont" key={index}>
+                          {perm.name}
+                        </p>
+                      ))}
                   </div>
 
                   {/* ----------------- ADD COLUMN ------------------- */}
                   <div className={style.addDiv}>
                     <h5 className="totalFont">Add</h5>
 
-                    {permissions.map((perm, index) => (
-                      <div className="mb-3" key={index}>
-                        <div className="form-check form-switch">
-                          <input
-                            className="form-check-input"
-                            type="checkbox"
-                            checked={selected[perm]?.add || false}
-                            onChange={() => handleToggle(perm, "add")}
-                          />
+                    {addpermissions
+                      .filter((p) => p.isInheritable)
+                      .map((perm, index) => (
+                        <div className="mb-3" key={index}>
+                          <div className="form-check form-switch">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={selected[perm.name]?.add || false}
+                              onChange={() => handleToggle(perm.name, "add")}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
 
                   {/* ----------------- INHERITABLE COLUMN ------------------- */}
                   <div className={style.inheritableDiv}>
                     <h5 className="totalFont">Inheritable</h5>
 
-                    {permissions.map((perm, index) => (
-                      <div className="mb-3 mx-4" key={index}>
-                        <div className="form-check form-switch">
-                          <input
-                            className="form-check-input"
-                            type="checkbox"
-                            checked={selected[perm]?.inheritable || false}
-                            onChange={() => handleToggle(perm, "inheritable")}
-                            disabled={!selected[perm]?.add}
-                          />
+                    {addpermissions
+                      .filter((p) => p.isInheritable)
+                      .map((perm, index) => (
+                        <div className="mb-3 mx-4" key={index}>
+                          <div className="form-check form-switch">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={
+                                selected[perm.name]?.inheritable || false
+                              }
+                              onChange={() =>
+                                handleToggle(perm.name, "inheritable")
+                              }
+                              disabled={!selected[perm.name]?.add} // لازم add الأول
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
 
@@ -760,30 +819,38 @@ export default function Roles() {
               <div className={`${style.allDiv}`}>
                 <div className={`${style.PermissionsDiv}`}>
                   <h5 className="totalFont">Permissions</h5>
-                  <p className="totalFont">Users:Read</p>
-                  <p className="totalFont">Users:Add</p>
-                  <p className="totalFont">Users:Update</p>
-                  <p className="totalFont">Roles:Read</p>
                   <p className="totalFont">Roles:Add</p>
+                  <p className="totalFont">Roles:Read</p>
                   <p className="totalFont">Roles:Update</p>
+                  <p className="totalFont">Users:Add</p>
+                  <p className="totalFont">Users:Read</p>
+                  <p className="totalFont">Users:Update</p>
                 </div>
 
                 {/* ----------------- ADD COLUMN ------------------- */}
                 <div className={style.addDiv}>
                   <h5 className="totalFont">Add</h5>
 
-                  {permissions.map((perm) => (
-                    <div key={perm} className="mb-3">
-                      <div className="form-check form-switch">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          checked={editSelected[perm]?.add || false}
-                          onChange={() => handleToggleEdit(perm, "add")}
-                        />
+                  {permissions.map((perm) => {
+                    // تحقق هل الـ permission موجودة في addpermissions
+                    const isInAddPermissions = addpermissions.some(
+                      (p) => p.name === perm
+                    );
+
+                    return (
+                      <div key={perm} className="mb-3">
+                        <div className="form-check form-switch">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={editSelected[perm]?.add || false}
+                            onChange={() => handleToggleEdit(perm, "add")}
+                            disabled={!isInAddPermissions} // ← لو مش موجودة تبقى disabled
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* ----------------- INHERITABLE COLUMN ------------------- */}
