@@ -16,7 +16,7 @@ export default function Protected(props) {
   if(userToken !==null){
     return props.children
   }else{
-    return <Navigate to={"/login"} />
+    return <Navigate to={"/"} />
   }
 
 

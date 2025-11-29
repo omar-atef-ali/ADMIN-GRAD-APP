@@ -18,7 +18,7 @@ import UserDetails from './Components/UserDetails/UserDetails'
 import Protected from './Components/Protected/Protected'
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
-  {path:"/main",element:<Main/>},
+  {path:"/main",element:<Protected><Main/></Protected>},
   {path:"/dashboard",element:<Layout/>,children:[
      {path:"/dashboard/:id",element: <Protected><UserDetails/></Protected> },
     {path:"",element:<Protected><Admin/></Protected>},
