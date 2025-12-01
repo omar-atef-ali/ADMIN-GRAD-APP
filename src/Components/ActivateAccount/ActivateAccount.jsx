@@ -5,6 +5,7 @@ import api from "../../api";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import * as yup from "yup";
 import { useFormik } from 'formik';
+import toast from 'react-hot-toast';
 
 export default function ActivateAccount() {
     let [showPassword, setShowPassword] = useState(false);
