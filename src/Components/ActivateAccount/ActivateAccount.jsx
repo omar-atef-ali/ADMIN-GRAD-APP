@@ -17,11 +17,11 @@ export default function ActivateAccount() {
     const UserId = searchParams.get("UserId") ?? "";
     const Code = searchParams.get("Code") ?? "";
     async function SubmitPassword(values) {
-        const { confirmPassword, ...dataToSend } = values;
+        // const { confirmPassword, ...dataToSend } = values;
         const body = {
             UserId,
             Code,
-            ...dataToSend
+            password: values.password
 
         }
         console.log("Activate");
@@ -39,8 +39,10 @@ export default function ActivateAccount() {
             }
         } catch (error) {
             toast.error(
-                error.response?.data?.errors[1] ||
+                error.response?.data?.errors?.[0] ||
+                error.response?.data?.title ||
                 "Something went wrong while activate password",
+
                 {
                     position: "top-center",
                     duration: 4000,
@@ -66,7 +68,7 @@ export default function ActivateAccount() {
         finally {
             setIsSaving(false);
         }
-        console.log(dataToSend)
+        // console.log(dataToSend)
     }
     let validationActivation = yup.object({
         password: yup

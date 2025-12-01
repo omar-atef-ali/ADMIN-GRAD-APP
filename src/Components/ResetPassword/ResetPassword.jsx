@@ -18,12 +18,12 @@ export default function ResetPassword() {
   // console.log(email);
 
   async function SubmitPassword(values) {
-    const { confirmNewPassword, ...dataToSend } = values;
+    // const { confirmNewPassword, ...dataToSend } = values;
     const body = {
       // email: localStorage.getItem('email'),
       email,
       code,
-      ...dataToSend
+      newPassword:values.newPassword
 
     }
     console.log("reset password started");
