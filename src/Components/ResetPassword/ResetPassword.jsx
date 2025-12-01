@@ -11,7 +11,7 @@ export default function ResetPassword() {
   let [showNewPassword, setShowNewPassword] = useState(false);
   let [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   let [isSaving, setIsSaving] = useState(false);
-  const code = searchParams.get("Code") ?? "";
+  const code = searchParams.get("code") ?? "";
   const email = searchParams.get("email") ?? "";
 
   // console.log("Code =>", Code);
@@ -23,9 +23,8 @@ export default function ResetPassword() {
       // email: localStorage.getItem('email'),
       email,
       code,
-      newPassword:values.newPassword
-
-    }
+      newPassword: values.newPassword,
+    };
     console.log("reset password started");
     if (!code) {
       console.log("Missing params → Code is empty");
@@ -33,18 +32,17 @@ export default function ResetPassword() {
     }
 
     try {
-      setIsSaving(true)
-      const response = await api.post("/Auth/reset-password",  body );
-      if (response.status === 200) {
-        console.log("sucessful");
-        navigate("/");
-      }
+      setIsSaving(true);
+      const response = await api.post("/Auth/reset-password", body);
+
+      console.log("sucessful");
+      navigate("/");
     } catch (error) {
-       toast.error(
+      toast.error(
         error.response?.data?.errors[1] ||
           "Something went wrong while reset password",
         {
-          position: "top-center", 
+          position: "top-center",
           duration: 4000,
           style: {
             background:
@@ -63,9 +61,8 @@ export default function ResetPassword() {
             secondary: "#ffffff",
           },
         }
-      )
-    }
-    finally {
+      );
+    } finally {
       setIsSaving(false);
     }
   }
@@ -95,7 +92,6 @@ export default function ResetPassword() {
     onSubmit: SubmitPassword,
     validationSchema: validationResetPass,
   });
-
 
   return (
     <div className={`${style.Resetpasspage}`}>
@@ -179,7 +175,9 @@ export default function ResetPassword() {
                         className="text-danger mt-1"
                         style={{ fontSize: "0.8rem" }}
                       >
-                        {formik2.errors.newPassword !=="required" ? formik2.errors.newPassword  :""}
+                        {formik2.errors.newPassword !== "required"
+                          ? formik2.errors.newPassword
+                          : ""}
                       </div>
                     )}
                 </div>
@@ -218,20 +216,19 @@ export default function ResetPassword() {
                         <i className="fa-solid fa-eye"></i>
                       )}
                     </button>
-                    
                   </div>
                   {formik2.touched.confirmNewPassword &&
-                      formik2.errors.confirmNewPassword && (
-                        <div
-                          className="text-danger mt-1"
-                          style={{ fontSize: "0.8rem" }}
-                        >
-                          {formik2.errors.confirmNewPassword!=="required"?formik2.errors.confirmNewPassword :""}
-                        </div>
-                      )}
+                    formik2.errors.confirmNewPassword && (
+                      <div
+                        className="text-danger mt-1"
+                        style={{ fontSize: "0.8rem" }}
+                      >
+                        {formik2.errors.confirmNewPassword !== "required"
+                          ? formik2.errors.confirmNewPassword
+                          : ""}
+                      </div>
+                    )}
                 </div>
-
-
 
                 <div className="d-flex justify-content-end">
                   <button
