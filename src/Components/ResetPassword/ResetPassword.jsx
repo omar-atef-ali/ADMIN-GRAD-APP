@@ -23,7 +23,7 @@ export default function ResetPassword() {
       // email: localStorage.getItem('email'),
       email,
       code,
-      dataToSend
+      ...dataToSend
 
     }
     console.log("reset password started");
@@ -34,7 +34,7 @@ export default function ResetPassword() {
 
     try {
       setIsSaving(true)
-      const response = await api.post("/Auth/reset-password", { body });
+      const response = await api.post("/Auth/reset-password",  body );
       if (response.status === 200) {
         console.log("sucessful");
         navigate("/");
@@ -153,6 +153,7 @@ export default function ResetPassword() {
                     <input
                       type={showNewPassword ? "text" : "password"}
                       id="newPassword"
+                      name="newPassword"
                       placeholder="New password"
                       className={`${style.custominput}  totalFont form-control pe-5 bg-transparent text-light`}
                       onBlur={formik2.handleBlur}
@@ -196,6 +197,7 @@ export default function ResetPassword() {
                     <input
                       type={showConfirmNewPassword ? "text" : "password"}
                       id="confirmNewPassword"
+                      name="confirmNewPassword"
                       placeholder="Confirm new password"
                       className={`${style.custominput}  totalFont form-control pe-5 bg-transparent text-light`}
                       onBlur={formik2.handleBlur}

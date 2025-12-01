@@ -11,7 +11,7 @@ export default function ActivateAccount() {
     let [showPassword, setShowPassword] = useState(false);
     let [showConfirmPassword, setShowConfirmPassword] = useState(false);
     let [isSaving, setIsSaving] = useState(false);
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
     const [searchParams] = useSearchParams();
     const UserId = searchParams.get("UserId") ?? "";
@@ -19,20 +19,20 @@ export default function ActivateAccount() {
     async function SubmitPassword(values) {
         const { confirmPassword, ...dataToSend } = values;
         const body = {
-           UserId,
+            UserId,
             Code,
-            dataToSend
+            ...dataToSend
 
         }
         console.log("Activate");
-        if (!Code) {
-            console.log("Missing params →UserId && Code is empty");
+        if (!UserId || !Code) {
+            console.log("Missing params → UserId or Code is missing");
             return;
         }
 
         try {
             setIsSaving(true)
-            const response = await api.post("/Auth/activate-account", { body });
+            const response = await api.post("/Auth/activate-account", body);
             if (response.status === 200) {
                 console.log("sucessful");
                 navigate("/");
@@ -40,7 +40,7 @@ export default function ActivateAccount() {
         } catch (error) {
             toast.error(
                 error.response?.data?.errors[1] ||
-                "Something went wrong while reset password",
+                "Something went wrong while activate password",
                 {
                     position: "top-center",
                     duration: 4000,
@@ -160,6 +160,7 @@ export default function ActivateAccount() {
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             id="password"
+                                            name="password"
                                             placeholder="password"
                                             className={`${style.custominput}  totalFont form-control pe-5 bg-transparent text-light`}
                                             onBlur={formik2.handleBlur}
@@ -203,6 +204,7 @@ export default function ActivateAccount() {
                                         <input
                                             type={showConfirmPassword ? "text" : "password"}
                                             id="confirmPassword"
+                                            name="confirmPassword"
                                             placeholder="Confirm password"
                                             className={`${style.custominput}  totalFont form-control pe-5 bg-transparent text-light`}
                                             onBlur={formik2.handleBlur}
