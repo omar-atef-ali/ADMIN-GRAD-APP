@@ -33,7 +33,7 @@ export default function ActivateAccount() {
         try {
             setIsSaving(true)
             const response = await api.post("/Auth/activate-account", body);
-            if (response.status === 200) {
+            if (response.status === 204) {
                 console.log("sucessful");
                 navigate("/");
             }

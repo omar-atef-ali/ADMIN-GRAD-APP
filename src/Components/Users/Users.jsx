@@ -29,7 +29,7 @@ export default function Users() {
                 ? ["name", ...Propertiesvalue.filter(i => i !== "firstName" && i !== "lastName")].join(" & ")
                 : Propertiesvalue.join(" & ")
             }`;
-    const sortBtnRef = useRef(null);
+   
 
 
     const handleSort = (column, direction) => {
@@ -37,59 +37,71 @@ export default function Users() {
         setSortDirection(direction);
         getAllUsers(1, column, direction); // جلب الصفحة الأولى مع الـ sorting
     };
-    async function getAllUsers(page = currentPage, column = sortColumn, direction = sortDirection) {
-        try {
-            let searchParams = [];
-            const trimmedSearch = searchtext.trim();
-            const nameParts = trimmedSearch.split(" ");
+   async function getAllUsers(page = currentPage, column = sortColumn, direction = sortDirection) {
+    try {
+        let searchParams = [];
+        const trimmedSearch = searchtext.trim();
+        const nameParts = trimmedSearch.split(" ");
 
+        
+        let activeProperties = Propertiesvalue.length === 0
+            ? ["firstName", "lastName", "email"]
+            : Propertiesvalue;
 
-            if (trimmedSearch) {
-                if (nameParts.length >= 2) {
-                    const firstName = nameParts[0].toLowerCase();
-                    const lastName = nameParts.slice(1).join(" ").toLowerCase();
-                    if (Propertiesvalue.includes("firstName")) searchParams.push({ property: "FirstName", value: firstName });
-                    if (Propertiesvalue.includes("lastName")) searchParams.push({ property: "LastName", value: lastName });
-                } else {
-                    if (Propertiesvalue.includes("firstName")) searchParams.push({ property: "FirstName", value: nameParts[0].toLowerCase() });
-                    if (Propertiesvalue.includes("lastName")) searchParams.push({ property: "LastName", value: nameParts[0].toLowerCase() });
-                }
+        if (trimmedSearch) {
+            if (nameParts.length >= 2) {
+                const firstName = nameParts[0].toLowerCase();
+                const lastName = nameParts.slice(1).join(" ").toLowerCase();
 
-                if (Propertiesvalue.includes("email")) searchParams.push({ property: "Email", value: trimmedSearch.toLowerCase() });
+                if (activeProperties.includes("firstName"))
+                    searchParams.push({ property: "FirstName", value: firstName });
+
+                if (activeProperties.includes("lastName"))
+                    searchParams.push({ property: "LastName", value: lastName });
+
+            } else {
+                if (activeProperties.includes("firstName"))
+                    searchParams.push({ property: "FirstName", value: nameParts[0].toLowerCase() });
+
+                if (activeProperties.includes("lastName"))
+                    searchParams.push({ property: "LastName", value: nameParts[0].toLowerCase() });
             }
 
-
-            let queryString = searchParams
-                .map(p => `SearchProperties=${p.property}&SearchValue=${encodeURIComponent(p.value)}`)
-                .join("&");
-
-            if (queryString) queryString += "&";
-            if (column && column !== "name") queryString += `SortColumn=${column}&SortDirection=${direction}`;
-
-
-            const response = await api.get(`/users?pageNumber=${page}&${queryString}`, {
-                headers: { Authorization: `Bearer ${userToken}` },
-            });
-
-            let filteredUsers = response.data.items;
-
-
-            if (column === "name") {
-                filteredUsers.sort((a, b) => {
-                    const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
-                    const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
-                    return direction === "ASC" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-                });
-            }
-
-            setallusers(filteredUsers);
-            setTotalPages(response.data.totalPages);
-            console.log(response.data)
-
-        } catch (error) {
-            console.log(error);
+            if (activeProperties.includes("email"))
+                searchParams.push({ property: "Email", value: trimmedSearch.toLowerCase() });
         }
+
+        let queryString = searchParams
+            .map(p => `SearchProperties=${p.property}&SearchValue=${encodeURIComponent(p.value)}`)
+            .join("&");
+
+        if (queryString) queryString += "&";
+        if (column && column !== "name") queryString += `SortColumn=${column}&SortDirection=${direction}`;
+
+        const response = await api.get(`/users?pageNumber=${page}&${queryString}`, {
+            headers: { Authorization: `Bearer ${userToken}` },
+        });
+
+        let filteredUsers = response.data.items;
+
+        if (column === "name") {
+            filteredUsers.sort((a, b) => {
+                const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+                const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+                return direction === "ASC"
+                    ? nameA.localeCompare(nameB)
+                    : nameB.localeCompare(nameA);
+            });
+        }
+
+        setallusers(filteredUsers);
+        setTotalPages(response.data.totalPages);
+
+    } catch (error) {
+        console.log(error);
     }
+}
+
 
     const handleSelect = (items) => {
         setPropertiesvalue((prev) => {
