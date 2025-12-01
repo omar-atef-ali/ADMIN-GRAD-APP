@@ -101,6 +101,8 @@ export default function Admin() {
       toast.success(
         `${user.email} is now ${!user.toggle ? "Locked" : "Unlocked"}`
       );
+      getAnalytics()
+
     } catch (err) {
       console.log(err);
       toast.error("Error updating user status");
@@ -145,6 +147,7 @@ export default function Admin() {
       toast.success(
         `Role "${role.name}" is now ${!role.toggle ? "Disabled" : "Enabled"}`
       );
+      getAnalytics()
     } catch (err) {
       console.log(err);
       toast.error("Error updating role status");
@@ -203,20 +206,7 @@ export default function Admin() {
               Active Users
             </h5>
           </div>
-          <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
-            <div className={`${style.KpisInfo}`}>
-              <i
-                className={`${style.kpisIcon} totalFont  fa-solid fa-shield`}
-              ></i>
-             
-            </div>
-            <h3 className={`totalFont text-white ${style.count}`}>
-              {analytics.roleCount}
-            </h3>
-            <h5 className={`totalFont text-white ${style.kpisRole}`}>
-              Roles Count
-            </h5>
-          </div>
+          
           <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
             <div className={`${style.KpisInfo}`}>
               <i
@@ -228,7 +218,7 @@ export default function Admin() {
               {analytics.lockedUsers}
             </h3>
             <h5 className={`totalFont text-white ${style.kpisRole}`}>
-              in Active Users
+              InActive Users
             </h5>
           </div>
           <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
@@ -241,6 +231,20 @@ export default function Admin() {
             </h3>
             <h5 className={`totalFont text-white ${style.kpisRole}`}>
               Disapled Users
+            </h5>
+          </div>
+          <div className={`${style.Kpis} col-10 col-md-5 col-lg-2`}>
+            <div className={`${style.KpisInfo}`}>
+              <i
+                className={`${style.kpisIcon} totalFont  fa-solid fa-shield`}
+              ></i>
+             
+            </div>
+            <h3 className={`totalFont text-white ${style.count}`}>
+              {analytics.roleCount}
+            </h3>
+            <h5 className={`totalFont text-white ${style.kpisRole}`}>
+              Roles Count
             </h5>
           </div>
         </div>
@@ -325,6 +329,7 @@ export default function Admin() {
                                   !user.status ? "Active" : "InActive"
                                 }`
                               );
+                              getAnalytics()
                             } catch (err) {
                               console.log("Status error:", err);
                               toast.error("Error updating user status");

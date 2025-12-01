@@ -15,9 +15,18 @@ import Users from './Components/Users/Users'
 import NotFound from './Components/Notfound/NotFound'
 import RolesDetails from './Components/RolesDetails/RolesDetails'
 import UserDetails from './Components/UserDetails/UserDetails'
+import ForgetPassword from './Components/ForgetPassword/ForgetPassword'
+// import ConfirmEmail from './Components/ConfirmEmail/ConfirmEmail'
+import ResetPassword from './Components/ResetPassword/ResetPassword'
+import CheckEmail from './Components/CheckEmail/CheckEmail'
+import ActivateAccount from './Components/ActivateAccount/ActivateAccount'
 import Protected from './Components/Protected/Protected'
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
+  {path:"/forget-password",element:<ForgetPassword/>},
+  {path:"/check-email",element:<CheckEmail/>},
+   {path:"/reset-password",element:<ResetPassword/>},
+   {path:"/activate-account",element:<ActivateAccount/>},
   {path:"/main",element:<Protected><Main/></Protected>},
   {path:"/dashboard",element:<Layout/>,children:[
      {path:"/dashboard/:id",element: <Protected><UserDetails/></Protected> },

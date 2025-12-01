@@ -83,6 +83,32 @@ export default function Login() {
         }
       );
       }
+      else{
+         toast.error(
+        error.response?.data?.errors[1],
+        {
+          position: "top-center", 
+          duration: 4000,
+          style: {
+            background:
+              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      )
+      }
+      
       
     }
   }
@@ -90,11 +116,13 @@ export default function Login() {
   let validationLogin = yup.object({
     email: yup
       .string()
+      .required("required")
       .email("Please enter a valid email address")
       .min(5, "Email must be at least 5 characters long"),
 
     password: yup
       .string()
+      .required("required")
       .min(4, "Password must be at least 4 characters long"),
   });
 
@@ -178,7 +206,7 @@ export default function Login() {
               />
               {formik.touched.email && formik.errors.email && (
                 <div className="text-danger small mt-1">
-                  {formik.errors.email}
+                  {formik.errors.email !=="required" ? formik.errors.email :""}
                 </div>
               )}
             </div>
@@ -234,7 +262,7 @@ export default function Login() {
 
               {formik.touched.password && formik.errors.password && (
                 <div className="text-danger small mt-1">
-                  {formik.errors.password}
+                  {formik.errors.password !=="required" ? formik.errors.password:""}
                 </div>
               )}
             </div>
@@ -254,20 +282,7 @@ export default function Login() {
             </button>
             
 
-            {/* Signup link */}
-            <p
-              className="mt-3 text-center totalFont"
-              style={{ fontSize: "0.875rem", color: "#dcdcdc" }}
-            >
-              Don't have an account?
-              <Link
-                className={`ms-1 totalFont ${style.Free}`}
-                to={"/register"}
-                style={{ color: "white" }}
-              >
-                Sign up
-              </Link>
-            </p>
+           
           </form>
         </div>
       </div>
