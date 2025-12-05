@@ -5,14 +5,14 @@ export default function CheckEmail() {
     const [showResend, setShowResend] = useState(false);
      const [counter, setCounter] = useState(60);
 
-     useEffect(() => {
-        if (counter === 0) {
-          setShowResend(true);
-          return;
-        }
-        const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
-        return () => clearInterval(timer);
-      }, [counter]);
+    //  useEffect(() => {
+    //     if (counter === 0) {
+    //       setShowResend(true);
+    //       return;
+    //     }
+    //     const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
+    //     return () => clearInterval(timer);
+    //   }, [counter]);
   return (
      <div className={`container-fluid p-0  ${style.checkemailpage} `}>
        <div
@@ -21,8 +21,8 @@ export default function CheckEmail() {
            marginTop: "120px",
            width: "100%",
            maxWidth: "470px",
-           minHeight: "400px",
-           maxHeight: "400px",
+           minHeight: "300px",
+           maxHeight: "350px",
            overflow: "hidden",
            background: `
                  radial-gradient(
@@ -60,7 +60,7 @@ export default function CheckEmail() {
              your email
            </p>
  
-           <div className="mt-5">
+           {/* <div className="mt-5">
              {!showResend ? (
                <button disabled className="btn btn-secondary w-100 totalFont">
                  Wait {counter}s
@@ -72,7 +72,7 @@ export default function CheckEmail() {
                  Resend Check Email
                </button>
              )}
-           </div>
+           </div> */}
          </div>
        </div>
      </div>

@@ -45,20 +45,20 @@ export default function UserDetails() {
         <div className={style.pdCard}>
           <div className={style.pdHeader}>
             <div className={`${style.UserParentInfo}`}>
-              <h1 className={style.pdName}>{`${userDetails.firstName} ${userDetails.lastName}`}</h1>
-              <p className={style.pdSub}>{userDetails.email}</p>
-              <p className={style.pdSub}>Role : {userDetails.role}</p>
+              <h1 className={`totalFont ${style.pdName}`}>{`${userDetails.firstName} ${userDetails.lastName}`}</h1>
+              <p className={` ${style.pdSub}`}>{userDetails.email}</p>
+              <p className={`totalFont ${style.pdSub}`}>Role : {userDetails.role}</p>
             </div>
 
             <div className=" d-flex flex-column gap-2">
               <span
-                className={`${style.pdBadge} ${style.active
+                className={`totalFont ${style.pdBadge} ${style.active
                   }`}
               >
                 {userDetails.isDisabled ? "Disapled" : "Enapled"}
               </span>
               <span
-                className={`${style.pdBadge} ${style.active
+                className={`totalFont ${style.pdBadge} ${style.active
                   }`}
               >
                 {userDetails.isLocked ? "InActvie" : "Active"}
@@ -73,7 +73,7 @@ export default function UserDetails() {
               {userDetails.createdById ? (
                 <div className={`${style.pdField}`}>
                   <button
-                    className={`${style.pdUserBtn}`}
+                    className={`totalFont ${style.pdUserBtn}`}
                     onClick={() => {
                       if (userDetails.createdById === userDetails.id) {
                         
@@ -98,7 +98,7 @@ export default function UserDetails() {
               {userDetails.updatedById ? (
                 <div className={`${style.pdField}`}>
                   <button
-                    className={`${style.pdUserBtn}`}
+                    className={`totalFont ${style.pdUserBtn}`}
                     onClick={() => {
                       if (userDetails.updatedById === userDetails.id) {
 

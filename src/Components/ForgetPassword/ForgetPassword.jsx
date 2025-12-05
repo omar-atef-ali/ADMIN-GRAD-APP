@@ -10,10 +10,10 @@ import toast from "react-hot-toast";
 
 export default function ForgetPassword() {
   let [loading, setLoading] = useState(false);
-  const naviagte=useNavigate()
+  const naviagte = useNavigate();
 
   async function submit(values) {
-     console.log(values)
+    console.log(values);
     try {
       setLoading(true);
       const response = await api.post("/Auth/forget-password", values);
@@ -21,7 +21,7 @@ export default function ForgetPassword() {
       Swal.fire({
         icon: "success",
         title: "Email Sent!",
-        text: "We've sent you a link to reset your password. Please check your inbox.",
+        text: "We've sent you a link to reset your password. Please check your email.",
         background: "#0d1117",
         color: "#ffffff",
         confirmButtonColor: "rgba(0, 71, 171, 0.2)",
@@ -31,50 +31,37 @@ export default function ForgetPassword() {
           confirmButton: "custom-btn",
           htmlContainer: "custom-text",
         },
-        
       });
       // localStorage.setItem('email',values.email)
-      naviagte('/check-email')
+      naviagte("/check-email");
 
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      Swal.fire({
-        icon: "error",
-        title: "Email Not Confirmed!",
-        text: "You need to register or confirm your email address before performing any actions on your account.",
-        background: "#0d1117",
-        color: "#ffffff",
-        confirmButtonColor: "rgba(0, 71, 171, 0.2)",
-        customClass: {
-          popup: "custom-popup",
-          title: "custom-title",
-          confirmButton: "custom-btn",
-          htmlContainer: "custom-text",
-        },
-      });
-      toast.error("the selected email is invalid", {
-        position: "top-center", // يظهر من اليمين
-        duration: 4000,
-        style: {
-          background:
-            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          padding: "16px 20px",
-          color: "#ffffff",
-          fontSize: "0.95rem",
-          borderRadius: "5px",
-          width: "300px",
-          height: "60px",
-          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
-        },
-        iconTheme: {
-          primary: "#FF4D4F",
-          secondary: "#ffffff",
-        },
-      });
+      toast.error(
+        error.response?.data?.errors[1] || "the selected email is invalid",
+        {
+          position: "top-center", // يظهر من اليمين
+          duration: 4000,
+          style: {
+            background:
+              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
     }
-   
   }
 
   let validationforget = yup.object({
@@ -171,7 +158,8 @@ export default function ForgetPassword() {
                 style={{ color: "white", fontSize: "0.95rem", fontWeight: 500 }}
               >
                 Email address
-              </label> <span className={`${style.reqStar}`}>*</span>
+              </label>{" "}
+              <span className={`${style.reqStar}`}>*</span>
               <input
                 name="email"
                 value={formik.values.email}

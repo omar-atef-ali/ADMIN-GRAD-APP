@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 
 export default function RolesDetails() {
-  const [selectedUser, setSelectedUser] = useState(null);
   const [information, setInformation] = useState([]);
   const myId = localStorage.getItem("id");
   const [loading, setlaoding] = useState(false);
@@ -16,6 +15,9 @@ export default function RolesDetails() {
 
   const { userToken } = useContext(userContext);
   const { id } = useParams();
+
+  //////////////////////////////////////////////////////////////
+
   async function getInfo() {
     try {
       setlaoding(true);
@@ -134,78 +136,51 @@ export default function RolesDetails() {
           <div className={style.pdCard}>
             <div className={style.pdHeader}>
               <div className={`${style.UserParentInfo}`}>
-                <h1 className={style.pdName}>{information.name} </h1>
-                {/* <p className={style.pdSub}>oatef266sdsdsdsd@gmail.com</p> */}
+                <h1 className={`totalFont ${style.pdName}`}>{information.name} </h1>
               </div>
 
               <div className=" d-flex flex-column gap-2">
-                <span className={`${style.pdBadge} ${style.active}`}>
+                <span className={`totalFont ${style.pdBadge} ${style.active}`}>
                   {information.isDisabled ? "Disabled" : "Enabled"}
                 </span>
               </div>
             </div>
 
             <div className={style.pdContent}>
-              <div className={`${style.pdGrid} row`}>
-                {information.updatedById ? (
-                  <div className={`${style.pdField} col-6 col-md-4`}>
+              <div className={`${style.pdGrid} d-flex justify-content-around`}>
+                {information.createdById ? (
+                  <div className={`${style.pdField} `}>
                     <button
                       className={`${style.pdUserBtn}`}
                       onClick={() => {
-                        if (information.createdById === myId) {
-                          Swal.fire({
-                            icon: "info",
-                            title: "Notice",
-                            text: "You are the one who created this role!",
-                            confirmButtonColor: "#373838ff",
-                            background: "#1f1f1f",
-                            color: "#fff",
-                          });
-                        } else {
-                          navigate(
-                            `/dashboard/roles/${information.createdById}`
-                          );
-                        }
+                        navigate(`/dashboard/users/${information.createdById}`);
                       }}
                     >
                       <i className="fa-solid fa-user"></i>
-                      <span>Created By</span>
+                      <span className="totalFont">Created By</span>
                     </button>
                   </div>
                 ) : (
                   ""
                 )}
                 {information.updatedById ? (
-                  <div className={`${style.pdField} col-6 col-md-4`}>
+                  <div className={`${style.pdField} `}>
                     <button
                       className={`${style.pdUserBtn} `}
                       onClick={() => {
-                        if (information.updatedById === myId) {
-                          Swal.fire({
-                            icon: "info",
-                            title: "Notice",
-                            text: "You are the one who updated this role!",
-                            confirmButtonColor: "#373838ff",
-                            background: "#1f1f1f",
-                            color: "#fff",
-                          });
-                        } else {
-                          navigate(
-                            `/dashboard/roles/${information.updatedById}`
-                          );
-                        }
+                        navigate(`/dashboard/users/${information.updatedById}`);
                       }}
                     >
                       <i className="fa-solid fa-user"></i>
-                      <span>Updated By</span>
+                      <span className="totalFont">Updated By</span>
                     </button>
                   </div>
-                ) : (
-                  ""
-                )}
+                 ) : (
+                   ""
+                 )} 
 
                 {information.managededById ? (
-                  <div className={`${style.pdField} col-6 col-md-4`}>
+                  <div className={`${style.pdField} `}>
                     <button
                       className={`${style.pdUserBtn}`}
                       onClick={() => {
@@ -225,8 +200,8 @@ export default function RolesDetails() {
                         }
                       }}
                     >
-                      <i className="fa-solid fa-user"></i>
-                      <span>Managed By</span>
+                      <i className={"totalFont  fa-solid fa-shield"}></i>
+                      <span className="totalFont">Managed By</span>
                     </button>
                   </div>
                 ) : (
@@ -356,14 +331,6 @@ export default function RolesDetails() {
                   <p className={`${style.pdDay} `}></p>
                 </div>
               </div>
-
-              {selectedUser && (
-                <div className={style.pdSelectedBox}>
-                  <p>
-                    <strong>Selected User:</strong> {selectedUser}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
