@@ -11,6 +11,7 @@ export default function NavBar() {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("id")
+    localStorage.removeItem("email")
     navigate("/")
   }
   return (

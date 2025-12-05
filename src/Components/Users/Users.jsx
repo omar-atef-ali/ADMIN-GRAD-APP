@@ -19,9 +19,14 @@ export default function Users() {
     const [totalPages, setTotalPages] = useState(1);
 
     const [searchtext, setsearchtext] = useState('')
+
     const [Propertiesvalue, setPropertiesvalue] = useState([])
     const [sortColumn, setSortColumn] = useState("");
     const [sortDirection, setSortDirection] = useState("ASC");
+
+    // const [accountStatus, setAccountStatus] = useState("");
+    // const [activeStatus, setActiveStatus] = useState("");
+
     const placeholderText =
         Propertiesvalue.length === 0
             ? "Search Users..."
@@ -29,78 +34,90 @@ export default function Users() {
                 ? ["name", ...Propertiesvalue.filter(i => i !== "firstName" && i !== "lastName")].join(" & ")
                 : Propertiesvalue.join(" & ")
             }`;
-   
+
 
 
     const handleSort = (column, direction) => {
         setSortColumn(column);
         setSortDirection(direction);
-        getAllUsers(1, column, direction); // جلب الصفحة الأولى مع الـ sorting
+        getAllUsers(1, column, direction);
     };
-   async function getAllUsers(page = currentPage, column = sortColumn, direction = sortDirection) {
-    try {
-        let searchParams = [];
-        const trimmedSearch = searchtext.trim();
-        const nameParts = trimmedSearch.split(" ");
+    async function getAllUsers(page = currentPage, column = sortColumn, direction = sortDirection) {
+        try {
+            let searchParams = [];
+            const trimmedSearch = searchtext.trim();
+            const nameParts = trimmedSearch.split(" ");
 
-        
-        let activeProperties = Propertiesvalue.length === 0
-            ? ["firstName", "lastName", "email"]
-            : Propertiesvalue;
 
-        if (trimmedSearch) {
-            if (nameParts.length >= 2) {
-                const firstName = nameParts[0].toLowerCase();
-                const lastName = nameParts.slice(1).join(" ").toLowerCase();
+            let activeProperties = Propertiesvalue.length === 0
+                ? ["firstName", "lastName", "email"]
+                : Propertiesvalue;
 
-                if (activeProperties.includes("firstName"))
-                    searchParams.push({ property: "FirstName", value: firstName });
+            if (trimmedSearch) {
+                if (nameParts.length >= 2) {
+                    const firstName = nameParts[0].toLowerCase();
+                    const lastName = nameParts.slice(1).join(" ").toLowerCase();
 
-                if (activeProperties.includes("lastName"))
-                    searchParams.push({ property: "LastName", value: lastName });
+                    if (activeProperties.includes("firstName"))
+                        searchParams.push({ property: "FirstName", value: firstName });
 
-            } else {
-                if (activeProperties.includes("firstName"))
-                    searchParams.push({ property: "FirstName", value: nameParts[0].toLowerCase() });
+                    if (activeProperties.includes("lastName"))
+                        searchParams.push({ property: "LastName", value: lastName });
 
-                if (activeProperties.includes("lastName"))
-                    searchParams.push({ property: "LastName", value: nameParts[0].toLowerCase() });
+                } else {
+                    if (activeProperties.includes("firstName"))
+                        searchParams.push({ property: "FirstName", value: nameParts[0].toLowerCase() });
+
+                    if (activeProperties.includes("lastName"))
+                        searchParams.push({ property: "LastName", value: nameParts[0].toLowerCase() });
+                }
+
+                if (activeProperties.includes("email"))
+                    searchParams.push({ property: "Email", value: trimmedSearch.toLowerCase() });
+                // if (activeProperties.includes("role"))
+                //     searchParams.push({ property: "Role", value: trimmedSearch.toLowerCase() });
+            }
+            // if (accountStatus && accountStatus !== "all") {
+            //     if (accountStatus === "enabled") searchParams.push({ property: "isDisabled", value: false });
+            //     else if (accountStatus === "disabled") searchParams.push({ property: "isDisabled", value: true });
+            // }
+
+            // // activeStatus: "all" | "active" | "inactive"
+            // if (activeStatus && activeStatus !== "all") {
+            //     if (activeStatus === "active") searchParams.push({ property: "isActive", value: true });
+            //     else if (activeStatus === "inactive") searchParams.push({ property: "isActive", value: false });
+            // }
+
+            let queryString = searchParams
+                .map(p => `SearchProperties=${p.property}&SearchValue=${encodeURIComponent(p.value)}`)
+                .join("&");
+
+            if (queryString) queryString += "&";
+            if (column && column !== "name") queryString += `SortColumn=${column}&SortDirection=${direction}`;
+
+            const response = await api.get(`/users?pageNumber=${page}&${queryString}`, {
+                headers: { Authorization: `Bearer ${userToken}` },
+            });
+
+            let filteredUsers = response.data.items;
+
+            if (column === "name") {
+                filteredUsers.sort((a, b) => {
+                    const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+                    const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+                    return direction === "ASC"
+                        ? nameA.localeCompare(nameB)
+                        : nameB.localeCompare(nameA);
+                });
             }
 
-            if (activeProperties.includes("email"))
-                searchParams.push({ property: "Email", value: trimmedSearch.toLowerCase() });
+            setallusers(filteredUsers);
+            setTotalPages(response.data.totalPages);
+
+        } catch (error) {
+            console.log(error);
         }
-
-        let queryString = searchParams
-            .map(p => `SearchProperties=${p.property}&SearchValue=${encodeURIComponent(p.value)}`)
-            .join("&");
-
-        if (queryString) queryString += "&";
-        if (column && column !== "name") queryString += `SortColumn=${column}&SortDirection=${direction}`;
-
-        const response = await api.get(`/users?pageNumber=${page}&${queryString}`, {
-            headers: { Authorization: `Bearer ${userToken}` },
-        });
-
-        let filteredUsers = response.data.items;
-
-        if (column === "name") {
-            filteredUsers.sort((a, b) => {
-                const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
-                const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
-                return direction === "ASC"
-                    ? nameA.localeCompare(nameB)
-                    : nameB.localeCompare(nameA);
-            });
-        }
-
-        setallusers(filteredUsers);
-        setTotalPages(response.data.totalPages);
-
-    } catch (error) {
-        console.log(error);
     }
-}
 
 
     const handleSelect = (items) => {
@@ -265,7 +282,7 @@ export default function Users() {
             role: "",
         },
         validationSchema: validationLogin,
-        onSubmit: submit, // ← بياخد resetForm تلقائيًا
+        onSubmit: submit,
         validateOnMount: true
     });
 
@@ -433,7 +450,7 @@ export default function Users() {
                                                 <button
                                                     className={`${style.sortBtn} btn p-0 m-0 border-0`}
                                                     data-tooltip="Sort ascending"
-                                                    onClick={() => handleSort("name", "ASC")}
+                                                    onClick={() => handleSort("email", "ASC")}
                                                 >
                                                     ▲
                                                 </button>
@@ -441,14 +458,39 @@ export default function Users() {
                                                 <button
                                                     className={`${style.sortBtn} btn p-0 m-0 border-0`}
                                                     data-tooltip="Sort descending"
-                                                    onClick={() => handleSort("name", "DESC")}
+                                                    onClick={() => handleSort("email", "DESC")}
                                                 >
                                                     ▼
                                                 </button>
                                             </div>
                                         </th>
                                         <th className="totalFont" style={{ width: "13%" }}>
-                                            Role
+                                            <div className={style.sortingContainer}>
+                                                Role
+                                                {/* <input
+                                                    type="checkbox"
+                                                    className={`${style.checkboxx}`}
+                                                    style={{ marginLeft: "6px" }}
+                                                    checked={Propertiesvalue.includes("role")}
+                                                    onChange={() => handleSelect(["role"])}
+                                                />
+
+                                                <button
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                                                    data-tooltip="Sort ascending"
+                                                    onClick={() => handleSort("role", "ASC")}
+                                                >
+                                                    ▲
+                                                </button>
+
+                                                <button
+                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                                                    data-tooltip="Sort descending"
+                                                    onClick={() => handleSort("role", "DESC")}
+                                                >
+                                                    ▼
+                                                </button> */}
+                                            </div>
                                         </th>
                                         <th className="totalFont" style={{ width: "13%" }}>
                                             Created On
@@ -458,9 +500,46 @@ export default function Users() {
                                         </th>
                                         <th className="totalFont" style={{ width: "13%" }}>
                                             Status
+                                            {/* <select
+                                                value={activeStatus}
+                                                onChange={e => setActiveStatus(e.target.value)}
+                                                style={{
+                                                    backgroundColor: "#555",
+                                                    color: "#fff",
+                                                    borderRadius: "8px",
+                                                    border: "1px solid #444",
+                                                    padding: "5px 10px",
+                                                    outline: "none",
+                                                    width: "65px",   // عرض أصغر
+                                                    marginLeft:"4px"
+                                                }}
+                                            >
+                                                <option value="all">All</option>
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                            </select> */}
+
                                         </th>
                                         <th className="totalFont" style={{ width: "13%" }}>
                                             Is Disapled
+                                            {/* <select 
+                                            value={accountStatus} 
+                                            onChange={e => setAccountStatus(e.target.value)}
+                                             style={{
+                                                    backgroundColor: "#555",
+                                                    color: "#fff",
+                                                    borderRadius: "8px",
+                                                    border: "1px solid #444",
+                                                    padding: "5px 10px",
+                                                    outline: "none",
+                                                    width: "65px" ,  // عرض أصغر
+                                                     marginLeft:"4px"
+                                                }}
+                                            >
+                                                <option value="all">All</option>
+                                                <option value="enabled">Enabled</option>
+                                                <option value="disabled">Disabled</option>
+                                            </select> */}
                                         </th>
                                     </tr>
                                 </thead>

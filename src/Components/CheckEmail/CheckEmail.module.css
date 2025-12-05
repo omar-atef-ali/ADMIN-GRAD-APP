@@ -7,10 +7,37 @@
   background: radial-gradient(circle at bottom, #001f3f, #000000 70%);
   font-family: "Poppins", sans-serif;
   color: #fff;
-  height: 1030px;
+  height: 100vh;
 }
+.checkemailCard {
+  margin-top: 120px;
+  width: 100%;
+  max-width: 470px;
+  min-height: 400px;
+  max-height: 400px;
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 2% 50%,       
+    rgba(5, 53, 121, 0.6) 0%, 
+    rgba(0, 71, 171, 0.2) 20%, 
+    rgba(0, 0, 0, 0.9) 70%, 
+    rgba(13, 13, 13, 1) 100%
+  );
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
+}
+
 .locki{
     font-size: 60px;
     color: gray;
     opacity: .6;
+}
+
+@media (max-width:425px) {
+  .checkemailCard {
+    max-height: 500px;
+  }
 }

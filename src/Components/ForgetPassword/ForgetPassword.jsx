@@ -33,7 +33,7 @@ export default function ForgetPassword() {
         },
         
       });
-      // localStorage.setItem('email',values.email)
+      localStorage.setItem('email',values.email)
       naviagte('/check-email')
 
       setLoading(false);
