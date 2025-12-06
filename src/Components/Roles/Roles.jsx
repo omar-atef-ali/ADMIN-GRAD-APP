@@ -402,11 +402,11 @@ export default function Roles() {
   return (
     <>
       <div className={` container-fluid ${style.rolesPage}`}>
-        {pageLoading ? (
+        {/* {pageLoading ? (
           <div className={style.overlay}>
             <div className={style.spinner}></div>
           </div>
-        ) : (
+        ) : ( */}
           <>
             <div className=" d-flex justify-content-between">
               <h2 className={`${style.rolesH} totalFont`}>Roles</h2>
@@ -934,7 +934,7 @@ export default function Roles() {
               </>
             )}
           </>
-        )}
+        {/* )}   */}
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import style from "./Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
@@ -134,6 +134,17 @@ export default function Login() {
     validationSchema: validationLogin,
     onSubmit: submit,
   });
+  useEffect(() => {
+  const emailInput = document.querySelector('input[name="email"]');
+  const passwordInput = document.querySelector('input[name="password"]');
+
+  if (emailInput.value && !formik.values.email) {
+    formik.setFieldValue("email", emailInput.value, true);
+  }
+  if (passwordInput.value && !formik.values.password) {
+    formik.setFieldValue("password", passwordInput.value, true);
+  }
+}, []);
 
   return (
     <>
@@ -272,7 +283,7 @@ export default function Login() {
               type="submit"
               className={`${style.btn_deeb} w-100 mt-2 py-1 totalFont`}
               style={{ fontSize: "0.95rem", marginBottom: "5px" }}
-              disabled={!(formik.isValid && formik.dirty) || loading}
+              disabled={!(formik.isValid) || loading}
             >
               {loading ? (
                 <span className="spinner-border spinner-border-sm text-light"role="status"/>
