@@ -14,7 +14,7 @@ export default function NotFound() {
         <p className={style.description}>
           The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
         </p>
-        <button className={style.homeBtn} onClick={() => navigate("/")}>
+        <button className={style.homeBtn} onClick={() => navigate("/dashboard")}>
           Go to Home
         </button>
       </div>

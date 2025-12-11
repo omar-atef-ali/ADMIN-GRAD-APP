@@ -118,8 +118,8 @@ export default function Users() {
       if (column && column !== "name")
         queryString += `SortColumn=${column}&SortDirection=${direction}`;
 
-      const response = await api.get(
-        `/users?pageNumber=${page}&${queryString}`,
+      const response = await api.post(
+        `/users/search?pageNumber=${page}&${queryString}`,
         {
           headers: { Authorization: `Bearer ${userToken}` },
         }
@@ -166,7 +166,7 @@ export default function Users() {
 
   async function getAllRoles(page = currentPage) {
     try {
-      const { data } = await api.get(`/Roles?pageNumber=${page}`, {
+      const { data } = await api.post(`/Roles/search?pageNumber=${page}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -396,6 +396,7 @@ export default function Users() {
                   aria-label="Search"
                   onChange={(e) => setsearchtext(e.target.value)}
                   value={searchtext}
+                  style={{ width: "65%" }}
                 />
                 <button
                   onClick={search}
@@ -403,6 +404,43 @@ export default function Users() {
                 >
                   Search
                 </button>
+                <select
+                  // value={accountStatus}
+                  // onChange={(e) => setAccountStatus(e.target.value)}
+                  style={{
+                    backgroundColor: "#555",
+                    color: "#fff",
+                    borderRadius: "8px",
+                    border: "1px solid #444",
+                    padding: "5px 10px",
+                    outline: "none",
+                    width: "105px", // عرض أصغر
+                    marginLeft: "40px",
+                  }}
+                
+                >
+                  <option value="all">All</option>
+                  <option value="enabled">Enabled</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+                <select
+                  // value={activeStatus}
+                  // onChange={(e) => setActiveStatus(e.target.value)}
+                  style={{
+                    backgroundColor: "#555",
+                    color: "#fff",
+                    borderRadius: "8px",
+                    border: "1px solid #444",
+                    padding: "5px 10px",
+                    outline: "none",
+                    width: "105px", // عرض أصغر
+                    marginLeft: "15px",
+                  }}
+                >
+                  <option value="all">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
               </form>
             </div>
 
@@ -539,24 +577,6 @@ export default function Users() {
                     </th>
                     <th className="totalFont" style={{ width: "13%" }}>
                       Is Disapled
-                      {/* <select 
-                                            value={accountStatus} 
-                                            onChange={e => setAccountStatus(e.target.value)}
-                                             style={{
-                                                    backgroundColor: "#555",
-                                                    color: "#fff",
-                                                    borderRadius: "8px",
-                                                    border: "1px solid #444",
-                                                    padding: "5px 10px",
-                                                    outline: "none",
-                                                    width: "65px" ,  // عرض أصغر
-                                                     marginLeft:"4px"
-                                                }}
-                                            >
-                                                <option value="all">All</option>
-                                                <option value="enabled">Enabled</option>
-                                                <option value="disabled">Disabled</option>
-                                            </select> */}
                     </th>
                   </tr>
                 </thead>

@@ -247,8 +247,8 @@ export default function Roles() {
   async function getAllRoles(page = currentPage) {
     try {
       setPageLaoding(true);
-      const { data } = await api.get(
-        `/Roles?pageNumber=${page}&includeDisabledRoles=true&SearchProperties=name&SearchValue=${searchText}&SortColumn=Name&SortDirection=${sortDirection}`,
+      const { data } = await api.post(
+        `/Roles/search?pageNumber=${page}&includeDisabledRoles=true&SearchProperties=name&SearchValue=${searchText}&SortColumn=Name&SortDirection=${sortDirection}`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`,

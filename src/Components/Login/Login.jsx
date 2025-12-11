@@ -26,7 +26,7 @@ export default function Login() {
       localStorage.setItem("id", data.id);
       console.log(data.id)
       setUserToken(data.token);
-      navigate("/main");
+      navigate("/dashboard");
 
       setLoading(false);
 

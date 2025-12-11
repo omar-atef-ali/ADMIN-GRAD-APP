@@ -27,7 +27,7 @@ let routers = createBrowserRouter([
   {path:"/check-email",element:<CheckEmail/>},
    {path:"/reset-password",element:<ResetPassword/>},
    {path:"/activate-account",element:<ActivateAccount/>},
-  {path:"/main",element:<Protected><Main/></Protected>},
+  // {path:"/main",element:<Protected><Main/></Protected>},
   {path:"/dashboard",element:<Layout/>,children:[
      {path:"/dashboard/:id",element: <Protected><UserDetails/></Protected> },
     {path:"",element:<Protected><Admin/></Protected>},
