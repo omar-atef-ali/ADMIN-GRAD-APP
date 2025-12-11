@@ -42,6 +42,7 @@ export default function Users() {
         setSortDirection(direction);
         getAllUsers(1, column, direction);
     };
+
     async function getAllUsers(page = currentPage, column = sortColumn, direction = sortDirection) {
         try {
             let searchParams = [];
@@ -385,6 +386,7 @@ export default function Users() {
                                     aria-label="Search"
                                     onChange={(e) => setsearchtext(e.target.value)}
                                     value={searchtext}
+                                    
                                 />
                                 <button
                                     onClick={search}
