@@ -10,10 +10,10 @@ import toast from "react-hot-toast";
 
 export default function ForgetPassword() {
   let [loading, setLoading] = useState(false);
-  const naviagte=useNavigate()
+  const naviagte = useNavigate();
 
   async function submit(values) {
-     console.log(values)
+    console.log(values);
     try {
       setLoading(true);
       const response = await api.post("/Auth/forget-password", values);
@@ -31,10 +31,9 @@ export default function ForgetPassword() {
           confirmButton: "custom-btn",
           htmlContainer: "custom-text",
         },
-        
       });
-      localStorage.setItem('email',values.email)
-      naviagte('/check-email')
+      localStorage.setItem("email", values.email);
+      naviagte("/check-email");
 
       setLoading(false);
     } catch (error) {
@@ -74,7 +73,6 @@ export default function ForgetPassword() {
         },
       });
     }
-   
   }
 
   let validationforget = yup.object({
@@ -125,7 +123,7 @@ export default function ForgetPassword() {
               to="/"
               className={`${style.Free} totalFont d-inline-flex align-items-center text-decoration-none mb-3 small`}
               style={{
-                color: "var(--accent)",
+                color: "white",
                 fontSize: "0.85rem",
                 gap: "4px",
               }}
@@ -171,7 +169,8 @@ export default function ForgetPassword() {
                 style={{ color: "white", fontSize: "0.95rem", fontWeight: 500 }}
               >
                 Email address
-              </label> <span className={`${style.reqStar}`}>*</span>
+              </label>{" "}
+              <span className={`${style.reqStar}`}>*</span>
               <input
                 name="email"
                 value={formik.values.email}
