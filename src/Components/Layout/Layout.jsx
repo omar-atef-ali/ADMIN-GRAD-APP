@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+
 import React from "react";
 import { userContext } from "../../context/userContext";
 import styles from "./Layout.module.css";
@@ -29,6 +30,7 @@ export default function Layout() {
   }
 
 
+
   return (
     <>
       {/* Sidebar */}
@@ -40,6 +42,7 @@ export default function Layout() {
         >
           {mobileOpen ? <FaTimes /> : <FaBars />}
         </button>
+
 
         <div className={styles.logoSection}>
           <h4 className={styles.logoText}>DeebAI</h4>
@@ -68,6 +71,7 @@ export default function Layout() {
           <button onClick={logout} className="btn btn-danger w-100">Logout</button>
         </div>
       </nav>
+
 
       {/* Overlay */}
       <div

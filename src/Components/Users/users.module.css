@@ -67,6 +67,7 @@
     border-Radius: 8px;
     cursor: pointer;
     transition: 0.2s ease-in-out;
+    padding: 0px 15px;
     
 }
 .UserButton:hover {
@@ -329,33 +330,7 @@
   width: 100%;
 }
 
-@media (max-width: 1024px) {
-  .tableWrapper {
-    overflow-x: auto;
-  }
 
-  .realTable {
-    min-width: 700px; /* حجم الجدول حسب محتواه */
-    margin: 0;
-    padding: 0 10px; /* يعطي مساحة للعناصر مثل checkbox والسهم */
-  }
-
-  .sortingContainer {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* يبعد السهم والcheckbox شوي عن بعض */
-  }
-
-  .sortBtn {
-    font-size: 0.8rem; /* تصغير حجم السهم شوية */
-    padding: 0 3px;
-  }
-
-  .checkboxx {
-    width: 12px;
-    height: 12px;
-  }
-}
 .userlink{
   color: white;
   text-decoration: none;
@@ -422,7 +397,39 @@
   height: 40px;
   animation: spin 1s linear infinite;
 }
+@media (max-width: 430px) {
+  .selection{
+    padding-top: 10px;
 
+  }
+}
+@media (max-width: 1024px) {
+  .tableWrapper {
+    overflow-x: auto;
+  }
+
+  .realTable {
+    min-width: 700px; /* حجم الجدول حسب محتواه */
+    margin: 0;
+    padding: 0 10px; /* يعطي مساحة للعناصر مثل checkbox والسهم */
+  }
+
+  .sortingContainer {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* يبعد السهم والcheckbox شوي عن بعض */
+  }
+
+  .sortBtn {
+    font-size: 0.8rem; /* تصغير حجم السهم شوية */
+    padding: 0 3px;
+  }
+
+  .checkboxx {
+    width: 12px;
+    height: 12px;
+  }
+}
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

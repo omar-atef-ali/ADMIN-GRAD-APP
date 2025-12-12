@@ -1,3 +1,4 @@
+
 import React, { useContext, useEffect, useRef, useState } from "react";
 import style from "./users.module.css";
 import api from "../../api";
@@ -21,128 +22,267 @@ export default function Users() {
   const [searchtext, setsearchtext] = useState("");
 
   const [Propertiesvalue, setPropertiesvalue] = useState([]);
+
   const [sortColumn, setSortColumn] = useState("");
   const [sortDirection, setSortDirection] = useState("ASC");
 
-  // const [accountStatus, setAccountStatus] = useState("");
-  // const [activeStatus, setActiveStatus] = useState("");
+  const [accountStatus, setAccountStatus] = useState("");
+  const [activeStatus, setActiveStatus] = useState("");
 
   const placeholderText =
     Propertiesvalue.length === 0
       ? "Search Users..."
-      : `Search by ${
-          Propertiesvalue.includes("firstName") &&
-          Propertiesvalue.includes("lastName")
-            ? [
-                "name",
-                ...Propertiesvalue.filter(
-                  (i) => i !== "firstName" && i !== "lastName"
-                ),
-              ].join(" & ")
-            : Propertiesvalue.join(" & ")
-        }`;
+      : `Search by ${Propertiesvalue.includes("firstName") &&
+        Propertiesvalue.includes("lastName")
+        ? [
+          "name",
+          ...Propertiesvalue.filter(
+            (i) => i !== "firstName" && i !== "lastName"
+          ),
+        ].join(" & ")
+        : Propertiesvalue.join(" & ")
+      }`;
+
+
+
+
+  useEffect(() => {
+    getAllUsers(1);
+  }, [accountStatus, activeStatus, sortColumn, sortDirection, Propertiesvalue]);
+
+
 
   const handleSort = (column, direction) => {
-    setSortColumn(column);
-    setSortDirection(direction);
-    getAllUsers(1, column, direction);
+    const col = column.toLowerCase();
+    const dir = direction.toLowerCase();
+
+    setSortColumn(col);
+    setSortDirection(dir);
+
+
+    getAllUsers(1, col, dir);
   };
+
+  // async function getAllUsers(
+  //   page = currentPage,
+  //   column = sortColumn,
+  //   direction = sortDirection,
+  //   searchValue = searchtext,
+  //   activeProps = Propertiesvalue
+  // ) {
+  //   try {
+  //     const trimmedSearch = searchValue.trim();
+
+
+  //     let activeProperties =
+  //       activeProps.length === 0
+  //         ? ["FirstName", "LastName", "Email","Role"]
+  //         : activeProps.map(p =>
+  //             p.toLowerCase() === "firstname" ? "FirstName" :
+  //             p.toLowerCase() === "lastname" ? "LastName" :
+  //             p.toLowerCase() === "email" ? "Email" :
+  //             p.toLowerCase() === "role" ? "Role" : p
+  //           );
+
+  //     let searchProperties = [];
+  //     let searchValueString = "";
+  //     if (trimmedSearch !== "") {
+  //       searchValueString = trimmedSearch;
+  //       if (activeProperties.includes("FirstName")) searchProperties.push("FirstName");
+  //       if (activeProperties.includes("LastName")) searchProperties.push("LastName");
+  //       if (activeProperties.includes("Email")) searchProperties.push("Email");
+  //       if (activeProperties.includes("Role")) searchProperties.push("Role");
+  //     }
+
+  //     const boolProperties = {};
+  //     const complexProperties = {};
+  //     if (accountStatus && accountStatus !== "all") boolProperties["IsDisabled"] = accountStatus === "disabled";
+  //     if (activeStatus && activeStatus !== "all") complexProperties["IsLocked"] = activeStatus === "inactive";
+
+  //     const body = {
+  //       PageNumber: page,
+  //       PageSize: 10,
+  //       SearchProperties: searchProperties,
+  //       SearchValue: searchValueString,
+  //       BoolProperties: boolProperties,
+  //       ComplexProperties: complexProperties,
+  //       SortDirection: direction.toUpperCase(), 
+  //       SortColumn: column === "name" ? null : column, 
+  //     };
+
+  //     console.log("Payload sent to backend:", body); 
+  //     const response = await api.post(`/users/search`, body, {
+  //       headers: { Authorization: `Bearer ${userToken}` },
+  //     });
+
+  //     let filteredUsers = response.data.items;
+
+  //     if (column === "name") {
+  //       filteredUsers.sort((a, b) => {
+  //         const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+  //         const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+  //         return direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+  //       });
+  //     }
+
+  //     if (column === "email") {
+  //       filteredUsers.sort((a, b) => {
+  //         return direction === "asc"
+  //           ? a.email.localeCompare(b.email)
+  //           : b.email.localeCompare(a.email);
+  //       });
+  //     }
+  //     if (column === "Role") {
+  //       filteredUsers.sort((a, b) => {
+  //         return direction === "asc"
+  //           ? a.Role.localeCompare(b.Role)
+  //           : b.Role.localeCompare(a.Role);
+  //       });
+  //     }
+  //     if (column === "createdOn") {
+  //       filteredUsers.sort((a, b) => {
+  //         return direction === "asc"
+  //           ? a.createdOn.localeCompare(b.createdOn)
+  //           : b.createdOn.localeCompare(a.createdOn);
+  //       });
+  //     }
+
+  //     setallusers(filteredUsers);
+  //     setTotalPages(response.data.totalPages);
+
+  //   } catch (error) {
+  //     console.log("ERROR:", error.response?.data || error.message);
+  //   }
+  // }
+
   async function getAllUsers(
     page = currentPage,
     column = sortColumn,
-    direction = sortDirection
+    direction = sortDirection,
+    searchValue = searchtext,
+    activeProps = Propertiesvalue
   ) {
     try {
-      let searchParams = [];
-      const trimmedSearch = searchtext.trim();
-      const nameParts = trimmedSearch.split(" ");
-
+      const trimmedSearch = searchValue.trim();
       let activeProperties =
-        Propertiesvalue.length === 0
-          ? ["firstName", "lastName", "email"]
-          : Propertiesvalue;
+        activeProps.length === 0
+          ? ["FirstName", "LastName", "Email", "Role"]
+          : activeProps.map(p =>
+            p.toLowerCase() === "firstname" ? "FirstName" :
+              p.toLowerCase() === "lastname" ? "LastName" :
+                p.toLowerCase() === "email" ? "Email" :
+                  p.toLowerCase() === "role" ? "Role" : p
+          );
 
-      if (trimmedSearch) {
-        if (nameParts.length >= 2) {
-          const firstName = nameParts[0].toLowerCase();
-          const lastName = nameParts.slice(1).join(" ").toLowerCase();
 
-          if (activeProperties.includes("firstName"))
-            searchParams.push({ property: "FirstName", value: firstName });
+      const nameParts = trimmedSearch.split(" ").filter(Boolean);
 
-          if (activeProperties.includes("lastName"))
-            searchParams.push({ property: "LastName", value: lastName });
-        } else {
-          if (activeProperties.includes("firstName"))
-            searchParams.push({
-              property: "FirstName",
-              value: nameParts[0].toLowerCase(),
-            });
 
-          if (activeProperties.includes("lastName"))
-            searchParams.push({
-              property: "LastName",
-              value: nameParts[0].toLowerCase(),
-            });
-        }
+      if (
+        nameParts.length >= 2 &&
+        activeProperties.includes("FirstName") &&
+        activeProperties.includes("LastName")
+      ) {
+        const first = nameParts[0];
+        const last = nameParts[1];
 
-        if (activeProperties.includes("email"))
-          searchParams.push({
-            property: "Email",
-            value: trimmedSearch.toLowerCase(),
-          });
-        // if (activeProperties.includes("role"))
-        //     searchParams.push({ property: "Role", value: trimmedSearch.toLowerCase() });
+
+        const res1 = await api.post(`/users/search`, {
+          PageNumber: page,
+          PageSize: 10,
+          SearchProperties: ["FirstName"],
+          SearchValue: first,
+          BoolProperties: accountStatus && accountStatus !== "all" ? { IsDisabled: accountStatus === "disabled" } : {},
+          ComplexProperties: activeStatus && activeStatus !== "all" ? { IsLocked: activeStatus === "inactive" } : {},
+          SortDirection: direction.toUpperCase(),
+          SortColumn: column === "name" ? null : column
+        });
+
+
+        const res2 = await api.post(`/users/search`, {
+          PageNumber: page,
+          PageSize: 10,
+          SearchProperties: ["LastName"],
+          SearchValue: last,
+          BoolProperties: accountStatus && accountStatus !== "all" ? { IsDisabled: accountStatus === "disabled" } : {},
+          ComplexProperties: activeStatus && activeStatus !== "all" ? { IsLocked: activeStatus === "inactive" } : {},
+          SortDirection: direction.toUpperCase(),
+          SortColumn: column === "name" ? null : column
+        });
+
+
+        const merged = [...res1.data.items, ...res2.data.items];
+        const unique = merged.filter(
+          (v, i, a) => a.findIndex(t => t.id === v.id) === i
+        );
+
+        setallusers(unique);
+        setTotalPages(1);
+        return;
       }
-      // if (accountStatus && accountStatus !== "all") {
-      //     if (accountStatus === "enabled") searchParams.push({ property: "isDisabled", value: false });
-      //     else if (accountStatus === "disabled") searchParams.push({ property: "isDisabled", value: true });
-      // }
 
-      // // activeStatus: "all" | "active" | "inactive"
-      // if (activeStatus && activeStatus !== "all") {
-      //     if (activeStatus === "active") searchParams.push({ property: "isActive", value: true });
-      //     else if (activeStatus === "inactive") searchParams.push({ property: "isActive", value: false });
-      // }
 
-      let queryString = searchParams
-        .map(
-          (p) =>
-            `SearchProperties=${p.property}&SearchValue=${encodeURIComponent(
-              p.value
-            )}`
-        )
-        .join("&");
+      let searchProperties = [];
+      let searchValueString = "";
+      if (trimmedSearch !== "") {
+        searchValueString = trimmedSearch;
+        if (activeProperties.includes("FirstName")) searchProperties.push("FirstName");
+        if (activeProperties.includes("LastName")) searchProperties.push("LastName");
+        if (activeProperties.includes("Email")) searchProperties.push("Email");
+        if (activeProperties.includes("Role")) searchProperties.push("Role");
+      }
 
-      if (queryString) queryString += "&";
-      if (column && column !== "name")
-        queryString += `SortColumn=${column}&SortDirection=${direction}`;
+      const boolProperties = {};
+      const complexProperties = {};
+      if (accountStatus && accountStatus !== "all") boolProperties["IsDisabled"] = accountStatus === "disabled";
+      if (activeStatus && activeStatus !== "all") complexProperties["IsLocked"] = activeStatus === "inactive";
 
-      const response = await api.post(
-        `/users/search?pageNumber=${page}&${queryString}`,
-        {
-          headers: { Authorization: `Bearer ${userToken}` },
-        }
-      );
+      const body = {
+        PageNumber: page,
+        PageSize: 10,
+        SearchProperties: searchProperties,
+        SearchValue: searchValueString,
+        BoolProperties: boolProperties,
+        ComplexProperties: complexProperties,
+        SortDirection: direction.toUpperCase(),
+        SortColumn: column === "name" ? null : column
+      };
+
+      console.log("Payload sent to backend:", body);
+      const response = await api.post(`/users/search`, body, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      });
 
       let filteredUsers = response.data.items;
+
 
       if (column === "name") {
         filteredUsers.sort((a, b) => {
           const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
           const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
-          return direction === "ASC"
-            ? nameA.localeCompare(nameB)
-            : nameB.localeCompare(nameA);
+          return direction === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
         });
       }
+      if (column === "email") filteredUsers.sort((a, b) =>
+        direction === "asc" ? a.email.localeCompare(b.email) : b.email.localeCompare(a.email)
+      );
+      if (column === "Role") filteredUsers.sort((a, b) =>
+        direction === "asc" ? a.Role.localeCompare(b.Role) : b.Role.localeCompare(a.Role)
+      );
+      if (column === "createdOn") filteredUsers.sort((a, b) =>
+        direction === "asc" ? a.createdOn.localeCompare(b.createdOn) : b.createdOn.localeCompare(a.createdOn)
+      );
 
       setallusers(filteredUsers);
       setTotalPages(response.data.totalPages);
+
     } catch (error) {
-      console.log(error);
+      console.log("ERROR:", error.response?.data || error.message);
     }
   }
+
+
+
 
   const handleSelect = (items) => {
     setPropertiesvalue((prev) => {
@@ -187,9 +327,8 @@ export default function Users() {
   async function handleToggleUser(user) {
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: `Do you want to ${user.isDisapled ? "Unlock" : "Lock"} this user: ${
-        user.email
-      }?`,
+      text: `Do you want to ${user.isDisapled ? "Unlock" : "Lock"} this user: ${user.email
+        }?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, confirm",
@@ -264,7 +403,7 @@ export default function Users() {
       console.log("Error:", error);
       toast.error(
         error.response?.data?.errors?.[1] ||
-          "Something went wrong while registration."
+        "Something went wrong while registration."
       );
     } finally {
       setLoading(false);
@@ -328,7 +467,7 @@ export default function Users() {
       console.log("Error:", error);
       toast.error(
         error.response?.data?.errors?.[1] ||
-          "Something went wrong while registration."
+        "Something went wrong while registration."
       );
     } finally {
       setLoading(false);
@@ -338,17 +477,17 @@ export default function Users() {
   let formik2 = useFormik({
     initialValues: selectedUser
       ? {
-          firstName: selectedUser.firstName || "",
-          lastName: selectedUser.lastName || "",
-          email: selectedUser.email || "",
-          role: selectedUser.role || "",
-        }
+        firstName: selectedUser.firstName || "",
+        lastName: selectedUser.lastName || "",
+        email: selectedUser.email || "",
+        role: selectedUser.role || "",
+      }
       : {
-          firstName: "",
-          lastName: "",
-          email: "",
-          role: "",
-        },
+        firstName: "",
+        lastName: "",
+        email: "",
+        role: "",
+      },
     validationSchema: validationLogin,
     onSubmit: EditSubmit,
     enableReinitialize: true,
@@ -388,25 +527,33 @@ export default function Users() {
         <div className={`${style.rolesTable}`}>
           <div className={`${style.innerTable}`}>
             <div className={`${style.searchContainer} `}>
-              <form className="d-flex">
-                <input
-                  className="form-control me-2"
-                  type="search"
-                  placeholder={placeholderText}
-                  aria-label="Search"
-                  onChange={(e) => setsearchtext(e.target.value)}
-                  value={searchtext}
-                  style={{ width: "65%" }}
-                />
-                <button
-                  onClick={search}
-                  className={`${style.UserButton} totalFont  col-3 col-md-2 col-lg-1`}
-                >
-                  Search
-                </button>
+              <div className="d-flex row">
+                <form className={` ${style.formm} d-flex col-12 col-md-8`} >
+                  <input
+                    className="form-control me-2"
+                    type="search"
+                    placeholder={placeholderText}
+                    aria-label="Search"
+                    onChange={(e) => setsearchtext(e.target.value)}
+                    value={searchtext}
+                    // style={{ width: "65%" }}
+                   
+                  />
+                  <button
+                    onClick={search}
+                    className={`${style.UserButton} totalFont`}
+                  
+                  >
+                    Search
+                  </button>
+
+
+                </form>
+
+                <div className={`d-flex col-4 col-md-4 ${style.selection}`}>
                 <select
-                  // value={accountStatus}
-                  // onChange={(e) => setAccountStatus(e.target.value)}
+                  value={activeStatus}
+                  onChange={(e) => setActiveStatus(e.target.value)}
                   style={{
                     backgroundColor: "#555",
                     color: "#fff",
@@ -414,34 +561,38 @@ export default function Users() {
                     border: "1px solid #444",
                     padding: "5px 10px",
                     outline: "none",
-                    width: "105px", // عرض أصغر
-                    marginLeft: "40px",
-                  }}
-                
-                >
-                  <option value="all">All</option>
-                  <option value="enabled">Enabled</option>
-                  <option value="disabled">Disabled</option>
-                </select>
-                <select
-                  // value={activeStatus}
-                  // onChange={(e) => setActiveStatus(e.target.value)}
-                  style={{
-                    backgroundColor: "#555",
-                    color: "#fff",
-                    borderRadius: "8px",
-                    border: "1px solid #444",
-                    padding: "5px 10px",
-                    outline: "none",
-                    width: "105px", // عرض أصغر
-                    marginLeft: "15px",
+                    // width: "105px", // عرض أصغر
+                    // marginLeft: "15px",
+                    
                   }}
                 >
                   <option value="all">All</option>
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
-              </form>
+                <select
+                  value={accountStatus}
+                  onChange={(e) => setAccountStatus(e.target.value)}
+                  style={{
+                    backgroundColor: "#555",
+                    color: "#fff",
+                    borderRadius: "8px",
+                    border: "1px solid #444",
+                    padding: "5px 10px",
+                    outline: "none",
+                    // width: "105px", // عرض أصغر
+                    marginLeft: "15px",
+                  }}
+
+                >
+                  <option value="all">All</option>
+                  <option value="enabled">Enabled</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+                </div>
+              </div>
+
+              
             </div>
 
             <div className={`${style.tableWrapper}`}>
@@ -523,57 +674,56 @@ export default function Users() {
                     <th className="totalFont" style={{ width: "13%" }}>
                       <div className={style.sortingContainer}>
                         Role
-                        {/* <input
-                                                    type="checkbox"
-                                                    className={`${style.checkboxx}`}
-                                                    style={{ marginLeft: "6px" }}
-                                                    checked={Propertiesvalue.includes("role")}
-                                                    onChange={() => handleSelect(["role"])}
-                                                />
+                        <input
+                          type="checkbox"
+                          className={`${style.checkboxx}`}
+                          style={{ marginLeft: "6px" }}
+                          checked={Propertiesvalue.includes("Role")}
+                          onChange={() => handleSelect(["Role"])}
+                        />
 
-                                                <button
-                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
-                                                    data-tooltip="Sort ascending"
-                                                    onClick={() => handleSort("role", "ASC")}
-                                                >
-                                                    ▲
-                                                </button>
+                        <button
+                          className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                          data-tooltip="Sort ascending"
+                          onClick={() => handleSort("Role", "ASC")}
+                        >
+                          ▲
+                        </button>
 
-                                                <button
-                                                    className={`${style.sortBtn} btn p-0 m-0 border-0`}
-                                                    data-tooltip="Sort descending"
-                                                    onClick={() => handleSort("role", "DESC")}
-                                                >
-                                                    ▼
-                                                </button> */}
+                        <button
+                          className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                          data-tooltip="Sort descending"
+                          onClick={() => handleSort("Role", "DESC")}
+                        >
+                          ▼
+                        </button>
                       </div>
                     </th>
-                    <th className="totalFont" style={{ width: "13%" }}>
+
+                    <th className="totalFont" style={{ width: "15%" }}>
                       Created On
+
+                      <button
+                        className={`${style.sortBtn} btn p-0 m-0 border-0 ms-1`}
+                        data-tooltip="Sort ascending"
+                        onClick={() => handleSort("createdOn", "ASC")}
+                      >
+                        ▲
+                      </button>
+
+                      <button
+                        className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                        data-tooltip="Sort descending"
+                        onClick={() => handleSort("createdOn", "DESC")}
+                      >
+                        ▼
+                      </button>
                     </th>
                     <th className="totalFont" style={{ width: "13%" }}>
                       Edit
                     </th>
                     <th className="totalFont" style={{ width: "13%" }}>
                       Status
-                      {/* <select
-                                                value={activeStatus}
-                                                onChange={e => setActiveStatus(e.target.value)}
-                                                style={{
-                                                    backgroundColor: "#555",
-                                                    color: "#fff",
-                                                    borderRadius: "8px",
-                                                    border: "1px solid #444",
-                                                    padding: "5px 10px",
-                                                    outline: "none",
-                                                    width: "65px",   // عرض أصغر
-                                                    marginLeft:"4px"
-                                                }}
-                                            >
-                                                <option value="all">All</option>
-                                                <option value="active">Active</option>
-                                                <option value="inactive">Inactive</option>
-                                            </select> */}
                     </th>
                     <th className="totalFont" style={{ width: "13%" }}>
                       Is Disapled
@@ -676,8 +826,7 @@ export default function Users() {
                               );
 
                               toast.success(
-                                `${user.email} is now ${
-                                  user.isLocked ? "Active" : "Inactive"
+                                `${user.email} is now ${user.isLocked ? "Active" : "Inactive"
                                 }`
                               );
                             } catch (err) {
@@ -685,9 +834,8 @@ export default function Users() {
                               toast.error("Error updating user status");
                             }
                           }}
-                          className={`${
-                            user.isLocked ? style.inactivebtn : style.activebtn
-                          } totalFont`}
+                          className={`${user.isLocked ? style.inactivebtn : style.activebtn
+                            } totalFont`}
                         >
                           {user.isLocked ? "Inactive" : "Active"}
                         </button>
@@ -696,11 +844,10 @@ export default function Users() {
                       <td>
                         <button
                           onClick={() => handleToggleUser(user)}
-                          className={`${
-                            user.isDisabled
-                              ? style.lockIcon
-                              : style.openlockIcon
-                          } totalFont`}
+                          className={`${user.isDisabled
+                            ? style.lockIcon
+                            : style.openlockIcon
+                            } totalFont`}
                         >
                           {user.isDisabled ? (
                             <i className="fa-solid fa-lock"></i>
@@ -742,9 +889,8 @@ export default function Users() {
                 return (
                   <li key={page} className={style.pageItem}>
                     <button
-                      className={`${style.pageLink} ${
-                        currentPage === page ? style.activePageLink : ""
-                      }`}
+                      className={`${style.pageLink} ${currentPage === page ? style.activePageLink : ""
+                        }`}
                       onClick={() => handlePageChange(page)}
                     >
                       {page}
@@ -1153,3 +1299,4 @@ export default function Users() {
     </>
   );
 }
+

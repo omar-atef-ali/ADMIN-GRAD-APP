@@ -67,6 +67,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: 0.2s ease-in-out;
+   padding: 0px 15px;
 }
 .UserButton:hover {
   background-color: rgba(13, 79, 117, 0.884) !important;
@@ -290,6 +291,15 @@
   color: var(--secondary-foreground);
 }
 
+@media (max-width: 430px) {
+  .selection{
+    margin-top: 10px !important;
+    
+
+  }
+  
+}
+
 @media (max-width: 576px) {
   .roleheaderbuttons {
     display: flex;
@@ -346,3 +356,6 @@
   padding-top: 80px;
 }
 } 
+
+
+

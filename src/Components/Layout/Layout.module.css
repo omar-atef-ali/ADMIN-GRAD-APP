@@ -19,7 +19,9 @@ html, body {
 .sidebar {
     width: var(--sidebar-width);
     height: 100vh;
+
     background: linear-gradient(135deg, #1a1c2e 0%, rgb(2, 23, 36));
+
     transition: width 0.3s ease, left 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -185,6 +187,7 @@ html, body {
 
 
 
+
 /* زرار الموبايل */
 .mobileToggle {
     display: none; /* مخفي على الديسكتوب */
@@ -299,6 +302,3 @@ html, body {
   display: none;
 }
 
-
-
-    

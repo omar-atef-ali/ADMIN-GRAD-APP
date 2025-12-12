@@ -450,7 +450,8 @@ export default function Roles() {
           <div className={`${style.rolesTable} `}>
             <div className={`${style.innerTable} `}>
               <div className={`${style.searchContainer} `}>
-                <form className="d-flex">
+                <div className="d-flex row">
+                    <form className="d-flex col-12 col-md-8">
                   <input
                     className="form-control me-2"
                     type="search"
@@ -462,16 +463,19 @@ export default function Roles() {
                   <button
                     type="button"
                     onClick={Search}
-                    className={`${style.UserButton}  totalFont  col-3 col-md-2 col-lg-1`}
+                    className={`${style.UserButton}  totalFont `}
                   >
                     Search
                   </button>
-                  <select
+                  
+                </form>
+                <select
                     value={disabledSearch}
                     onChange={(e) => {
                       setDisabledSearch(e.target.value);
                       
                     }}
+                    className={`d-flex col-4  mx-2 ${style.selection}`}
                     style={{
                       backgroundColor: "#555",
                       color: "#fff",
@@ -480,24 +484,25 @@ export default function Roles() {
                       padding: "5px 10px",
                       outline: "none",
                       width: "105px", // عرض أصغر
-                      marginLeft: "40px",
+                      
                     }}
                   >
                     <option value="all">All</option>
                     <option value="enabled">Enabled</option>
                     <option value="disabled">Disabled</option>
                   </select>
-                </form>
+                </div>
+                
               </div>
 
               <table className={`${style.realTable}  table-bordered `}>
                 <thead>
                   <tr>
                     <th
-                      className={` ${style.roleheader} totalFont d-flex align-items-center gap-1`}
+                      className={` ${style.roleheader} totalFont  gap-1`}
                     >
                       Role Name
-                      <span className={`${style.roleheaderbuttons}`}>
+                      <span className={`${style.roleheaderbuttons} mx-1`}>
                         <button
                           type="button"
                           className={`${style.sortBtn} btn p-0 m-0 border-0 `}
@@ -516,7 +521,7 @@ export default function Roles() {
                         </button>
                       </span>
                     </th>
-                    <th className="totalFont" style={{ width: "20%" }}>
+                    <th className="totalFont" style={{ width: "25%" }}>
                       Created On
                        <span className={`${style.roleheaderbuttons} mx-1`}>
                         <button
