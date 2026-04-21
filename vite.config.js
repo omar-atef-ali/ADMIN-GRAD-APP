@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://deebai-staging.runasp.net",
+        target: "https://deebai.runasp.net",
         changeOrigin: true,
         secure: false,
       },

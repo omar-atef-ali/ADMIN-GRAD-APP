@@ -13,32 +13,34 @@ export default function Login() {
   let navigate = useNavigate();
 
   let [loading, setLoading] = useState(false);
-  let { setUserToken} = useContext(userContext);
+  let { setUserToken } = useContext(userContext);
   let [showPassword, setShowPassword] = useState(false);
 
   async function submit(values) {
     try {
       setLoading(true);
-      const { data } = await api.post("/Auth", values);
-      
+      const { data } = await api.post("/Auth", values, {
+        withCredentials: true,
+      });
+
       localStorage.setItem("token", data.token);
-      localStorage.setItem("refreshToken", data.refreshToken);
-      localStorage.setItem("id", data.id);
-      console.log(data.id)
+      // localStorage.setItem("id", data.id);
+      // console.log(data.id)
       setUserToken(data.token);
       navigate("/dashboard");
 
       setLoading(false);
+      
+      
 
     } catch (error) {
       setLoading(false);
       console.error("Login Error:", error);
-      if(error.response?.data?.status == 401){
-        toast.error(
+      toast.error(
         error.response?.data?.errors[1] ||
-          "Something went wrong while registration.",
+        "Something went wrong while registration.",
         {
-          position: "top-center", 
+          position: "top-center",
           duration: 4000,
           style: {
             background:
@@ -49,67 +51,15 @@ export default function Login() {
             fontSize: "0.95rem",
             borderRadius: "5px",
             width: "300px",
-            height: "60px",
+            height: "100%",
             boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
           },
           iconTheme: {
             primary: "#FF4D4F",
             secondary: "#ffffff",
           },
-        }
+        },
       );
-      }else if(error.response?.data?.status == 500){
-        toast.error(
-          "Something went wrong in server.",
-        {
-          position: "top-center", 
-          duration: 4000,
-          style: {
-            background:
-              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            padding: "16px 20px",
-            color: "#ffffff",
-            fontSize: "0.95rem",
-            borderRadius: "5px",
-            width: "300px",
-            height: "60px",
-            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
-          },
-          iconTheme: {
-            primary: "#FF4D4F",
-            secondary: "#ffffff",
-          },
-        }
-      );
-      }
-      else{
-         toast.error(
-        error.response?.data?.errors[1],
-        {
-          position: "top-center", 
-          duration: 4000,
-          style: {
-            background:
-              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            padding: "16px 20px",
-            color: "#ffffff",
-            fontSize: "0.95rem",
-            borderRadius: "5px",
-            width: "300px",
-            height: "60px",
-            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
-          },
-          iconTheme: {
-            primary: "#FF4D4F",
-            secondary: "#ffffff",
-          },
-        }
-      )
-      }
-      
-      
     }
   }
 
@@ -130,21 +80,22 @@ export default function Login() {
     initialValues: {
       email: "",
       password: "",
+      rememberMe: false,
     },
     validationSchema: validationLogin,
     onSubmit: submit,
   });
   useEffect(() => {
-  const emailInput = document.querySelector('input[name="email"]');
-  const passwordInput = document.querySelector('input[name="password"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    const passwordInput = document.querySelector('input[name="password"]');
 
-  if (emailInput.value && !formik.values.email) {
-    formik.setFieldValue("email", emailInput.value, true);
-  }
-  if (passwordInput.value && !formik.values.password) {
-    formik.setFieldValue("password", passwordInput.value, true);
-  }
-}, []);
+    if (emailInput.value && !formik.values.email) {
+      formik.setFieldValue("email", emailInput.value, true);
+    }
+    if (passwordInput.value && !formik.values.password) {
+      formik.setFieldValue("password", passwordInput.value, true);
+    }
+  }, []);
 
   return (
     <>
@@ -152,7 +103,7 @@ export default function Login() {
         <div
           className="px-4 shadow-lg d-flex flex-column py-5"
           style={{
-            marginTop :"120px",
+            marginTop: "120px",
             width: "100%",
             maxWidth: "470px",
             minHeight: "450px",
@@ -204,7 +155,7 @@ export default function Login() {
                 className="form-label totalFont"
                 style={{ color: "white", fontSize: "0.95rem", fontWeight: 500 }}
               >
-                Email 
+                Email
               </label> <span className={`${style.reqStar1}`}>*</span>
               <input
                 name="email"
@@ -217,13 +168,13 @@ export default function Login() {
               />
               {formik.touched.email && formik.errors.email && (
                 <div className="text-danger small mt-1">
-                  {formik.errors.email !=="required" ? formik.errors.email :""}
+                  {formik.errors.email !== "required" ? formik.errors.email : ""}
                 </div>
               )}
             </div>
 
             {/* Password */}
-            <div className="mb-4">
+            <div className="mb-3">
               <div className="d-flex justify-content-between position-relative align-items-center mb-2">
                 <label
                   htmlFor="password"
@@ -234,7 +185,7 @@ export default function Login() {
                     fontWeight: 500,
                   }}
                 >
-                  Password 
+                  Password
                 </label> <span className={`${style.reqStar2}`}>*</span>
                 <Link
                   to={"/forget-password"}
@@ -273,27 +224,39 @@ export default function Login() {
 
               {formik.touched.password && formik.errors.password && (
                 <div className="text-danger small mt-1">
-                  {formik.errors.password !=="required" ? formik.errors.password:""}
+                  {formik.errors.password !== "required" ? formik.errors.password : ""}
                 </div>
               )}
             </div>
+            <label className={`${style.rememberMe}`}>
+              <input
+                type="checkbox"
+                name="rememberMe"
+                className={`${style.checkbox}`}
+                checked={formik.values.rememberMe}
+                onChange={formik.handleChange}
+              />
+              <span className={`${style.rememberText}`}>
+                Remember Me
+              </span>
+            </label>
 
             {/* Submit */}
             <button
               type="submit"
               className={`${style.btn_deeb} w-100 mt-2 py-1 totalFont`}
               style={{ fontSize: "0.95rem", marginBottom: "5px" }}
-              disabled={!(formik.isValid) || loading}
+              disabled={!(formik.isValid && formik.dirty) || loading}
             >
               {loading ? (
-                <span className="spinner-border spinner-border-sm text-light"role="status"/>
+                <span className="spinner-border spinner-border-sm text-light" role="status" />
               ) : (
                 "login"
               )}
             </button>
-            
 
-           
+
+
           </form>
         </div>
       </div>
