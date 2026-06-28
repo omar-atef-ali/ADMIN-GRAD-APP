@@ -17,14 +17,7 @@ export default function Roles() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const permissions = [
-    "Roles:Add",
-    "Roles:Read",
-    "Roles:Update",
-    "Users:Add",
-    "Users:Read",
-    "Users:Update",
-  ];
+  
 
   const [addpermissions, setAddPermissions] = useState([]);
 
@@ -51,6 +44,11 @@ export default function Roles() {
       getPermissions();
     }
   }, [userToken]);
+
+
+  const permissions = [
+    ...addpermissions.map(item => item.name)
+  ];
 
   useEffect(() => {
     if (addpermissions.length > 0) {
@@ -262,7 +260,7 @@ export default function Roles() {
         },
 
         SortDirection: sortDirection,
-        SortColumn: sortCol=="Name"?"Name":"CreatedOn",
+        SortColumn: sortCol == "Name" ? "Name" : "CreatedOn",
       };
 
       const { data } = await api.post(`/Roles/search`, body2, {
@@ -312,7 +310,7 @@ export default function Roles() {
     if (userToken) {
       getAllRoles();
     }
-  }, [userToken , disabledSearch]);
+  }, [userToken, disabledSearch]);
 
   //////////////////////////////////////////////////////////////////////
 
@@ -326,7 +324,7 @@ export default function Roles() {
 
         permissions: permissionsArray,
       };
-      console.log(body);
+      // console.log(body);
 
       const response = await api.post("/Roles", body, {
         headers: {
@@ -340,7 +338,7 @@ export default function Roles() {
     } catch (error) {
       toast.error(
         error.response?.data?.errors[1] ||
-          "Something went wrong while adding a role.",
+        "Something went wrong while adding a role.",
         {
           position: "top-center",
           duration: 4000,
@@ -426,7 +424,7 @@ export default function Roles() {
     if (sortDirection && userToken) {
       getAllRoles();
     }
-  }, [sortDirection, userToken , sortCol]);
+  }, [sortDirection, userToken, sortCol]);
 
   return (
     <>
@@ -447,86 +445,75 @@ export default function Roles() {
             </button>
           </div>
 
-          <div className={`${style.rolesTable} `}>
-            <div className={`${style.innerTable} `}>
-              <div className={`${style.searchContainer} `}>
-                <div className="d-flex row">
-                    <form className="d-flex col-12 col-md-8">
-                  <input
-                    className="form-control me-2"
-                    type="search"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    placeholder=" Search Roles..."
-                    aria-label="Search"
-                  />
-                  <button
-                    type="button"
-                    onClick={Search}
-                    className={`${style.UserButton}  totalFont `}
+          <div className={`${style.rolesTable}`}>
+            <div className={`${style.innerTable}`}>
+              <div className={style.searchContainer}>
+                <div className="d-flex flex-wrap gap-3 align-items-center w-100">
+                  <form
+                    className="d-flex flex-grow-1"
+                    style={{ minWidth: "280px", gap: "10px" }}
+                    
                   >
-                    Search
-                  </button>
-                  
-                </form>
-                <select
+                    <input
+                      className={style.searchInput}
+                      type="search"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                      placeholder="Search Roles..."
+                      aria-label="Search"
+                    />
+                    <button
+                      type="button"
+                      onClick={Search}
+                      className={`${style.UserButton}  totalFont `}
+                    >
+                      Search
+                    </button>
+                  </form>
+
+                  <select
                     value={disabledSearch}
-                    onChange={(e) => {
-                      setDisabledSearch(e.target.value);
-                      
-                    }}
-                    className={`d-flex col-4  mx-2 ${style.selection}`}
-                    style={{
-                      backgroundColor: "#555",
-                      color: "#fff",
-                      borderRadius: "8px",
-                      border: "1px solid #444",
-                      padding: "5px 10px",
-                      outline: "none",
-                      width: "105px", // عرض أصغر
-                      
-                    }}
+                    onChange={(e) => setDisabledSearch(e.target.value)}
+                    className={style.filterSelect}
                   >
-                    <option value="all">All</option>
+                    <option value="all">All Statuses</option>
                     <option value="enabled">Enabled</option>
                     <option value="disabled">Disabled</option>
                   </select>
                 </div>
-                
               </div>
 
-              <table className={`${style.realTable}  table-bordered `}>
-                <thead>
-                  <tr>
-                    <th
-                      className={` ${style.roleheader} totalFont  gap-1`}
-                    >
-                      Role Name
-                      <span className={`${style.roleheaderbuttons} mx-1`}>
+              <div className={style.tableWrapper}>
+                <table className={style.realTable}>
+                  <thead>
+                    <tr>
+                      <th className="totalFont" style={{ width: "40%" }}>
+                        <div className={style.sortingContainer}>
+                          Role Name
+                          <button
+                            type="button"
+                            className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                            onClick={() => handleSort("ASC")}
+                            data-tooltip="Sort ascending"
+                          >
+                            ▲
+                          </button>
+                          <button
+                            type="button"
+                            className={`${style.sortBtn} btn p-0 m-0 border-0`}
+                            onClick={() => handleSort("DESC")}
+                            data-tooltip="Sort descending"
+                          >
+                            ▼
+                          </button>
+                        </div>
+                      </th>
+                    <th className="totalFont" style={{ width: "30%" }}>
+                      <div className={style.sortingContainer}>
+                        Created On
                         <button
                           type="button"
-                          className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                          onClick={() => handleSort("ASC")}
-                          data-tooltip="Sort ascending"
-                        >
-                          ▲
-                        </button>
-                        <button
-                          type="button"
-                          className={`${style.sortBtn} btn p-0 m-0 border-0 `}
-                          onClick={() => handleSort("DESC")}
-                          data-tooltip="Sort descending"
-                        >
-                          ▼
-                        </button>
-                      </span>
-                    </th>
-                    <th className="totalFont" style={{ width: "25%" }}>
-                      Created On
-                       <span className={`${style.roleheaderbuttons} mx-1`}>
-                        <button
-                          type="button"
-                          className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                          className={`${style.sortBtn} btn p-0 m-0 border-0`}
                           onClick={() => handleSort2("ASC")}
                           data-tooltip="Sort ascending"
                         >
@@ -534,18 +521,18 @@ export default function Roles() {
                         </button>
                         <button
                           type="button"
-                          className={`${style.sortBtn} btn p-0 m-0 border-0 `}
+                          className={`${style.sortBtn} btn p-0 m-0 border-0`}
                           onClick={() => handleSort2("DESC")}
                           data-tooltip="Sort descending"
                         >
                           ▼
                         </button>
-                      </span>
+                      </div>
                     </th>
-                    <th className="totalFont" style={{ width: "20%" }}>
+                    <th className="totalFont" style={{ width: "15%" }}>
                       Edit
                     </th>
-                    <th className="totalFont" style={{ width: "20%" }}>
+                    <th className="totalFont" style={{ width: "15%" }}>
                       Is Disabled
                     </th>
                   </tr>
@@ -588,17 +575,15 @@ export default function Roles() {
                           onClick={async () => {
                             const result = await Swal.fire({
                               title: "Are you sure?",
-                              text: `Do you want to ${
-                                item.isDisabled ? "Unlock" : "Lock"
-                              } this user: ${item.name}?`,
+                              text: `Do you want to ${item.isDisabled ? "Unlock" : "Lock"} this user: ${item.name}?`,
                               icon: "warning",
                               showCancelButton: true,
                               confirmButtonText: "Yes, confirm",
                               cancelButtonText: "Cancel",
-                              background: "#1f1f1f",
-                              color: "#fff",
-                              confirmButtonColor: "rgb(10, 104, 159)",
-                              cancelButtonColor: "#646262ff",
+                              background: "#FAF8F6",
+                              color: "#1C1814",
+                              confirmButtonColor: "#2D0B14",
+                              cancelButtonColor: "#8C8581",
                               customClass: {
                                 popup: "custom-popup",
                               },
@@ -607,8 +592,8 @@ export default function Roles() {
                               toast(
                                 "Operation cancelled — No changes were made",
                                 {
-                                  background: "#1f1f1f",
-                                  color: "#fff",
+                                  background: "#FAF8F6",
+                                  color: "#1C1814",
                                 }
                               );
                               return;
@@ -632,19 +617,17 @@ export default function Roles() {
                                 )
                               );
                               toast.success(
-                                `${item.name} is now ${
-                                  !item.isDisabled ? "Locked" : "Unlocked"
+                                `${item.name} is now ${!item.isDisabled ? "Locked" : "Unlocked"
                                 }`
                               );
                             } catch (err) {
                               console.log("Toggle error:", err);
                             }
                           }}
-                          className={`${
-                            item.isDisabled
-                              ? style.lockIcon
-                              : style.openlockIcon
-                          } totalFont mx-3`}
+                          className={`${item.isDisabled
+                            ? style.lockIcon
+                            : style.openlockIcon
+                            } totalFont mx-3`}
                         >
                           {item.isDisabled ? (
                             <i className="fa-solid fa-lock"></i>
@@ -658,6 +641,7 @@ export default function Roles() {
                 </tbody>
               </table>
             </div>
+          </div>
 
             {/* ////////////////////////////////////////// */}
 
@@ -687,9 +671,8 @@ export default function Roles() {
                   return (
                     <li key={page} className={style.pageItem}>
                       <button
-                        className={`${style.pageLink} ${
-                          currentPage === page ? style.activePageLink : ""
-                        }`}
+                        className={`${style.pageLink} ${currentPage === page ? style.activePageLink : ""
+                          }`}
                         onClick={() => handlePageChange(page)}
                       >
                         {page}
@@ -719,132 +702,97 @@ export default function Roles() {
           {/* ////////////////////////////////////////////////////// */}
 
           {showModal && (
-            <>
-              {/* الخلفية المعتمة */}
-              <div
-                style={{
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  background: "rgba(0,0,0,0.65)",
-                  backdropFilter: "blur(2px)",
-                  zIndex: 999,
-                }}
-                onClick={() => setShowModal(false)}
-              />
+            <div className={style.modalOverlay} onClick={() => setShowModal(false)}>
+              <div className={style.modalContent} onClick={(e) => e.stopPropagation()}>
+                <button className={style.closeModalBtn} onClick={() => setShowModal(false)}>
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
 
-              {/* صندوق الـ Modal */}
-              <div
-                style={{
-                  position: "fixed",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  background: "#0f0f0f",
-                  padding: "25px",
-                  borderRadius: "15px",
-                  width: "450px",
-                  maxWidth: "90%",
-                  color: "white",
-                  zIndex: 1000,
-                  boxShadow: "0 0 15px #000",
-                }}
-              >
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "15px",
-                    cursor: "pointer",
-                    fontSize: "28px",
-                  }}
-                  onClick={() => setShowModal(false)}
-                >
-                  ×
-                </span>
-
-                <h3 className="totalFont" style={{ marginBottom: "20px" }}>
+                <h3 className="totalFont" style={{ color: "#2D0B14", marginBottom: "8px" }}>
                   Add Role
                 </h3>
+                <p className="totalFont text-muted small mb-4">Create a new administration role with defined access privileges</p>
 
                 <form onSubmit={formik.handleSubmit}>
-                  <label className="totalFont" htmlFor="name">
-                    Role Name
-                  </label>
-                  <input
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    id="name"
-                    type="text"
-                    placeholder="Role Name"
-                    className="form-control my-2"
-                  />
-                  {formik.touched.name && formik.errors.name && (
-                    <div className="text-danger small mt-1">
-                      {formik.errors.name}
-                    </div>
-                  )}
+                  <div className="mb-3">
+                    <label className={style.modalLabel} htmlFor="name">
+                      Role Name
+                    </label>
+                    <input
+                      name="name"
+                      value={formik.values.name}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      id="name"
+                      type="text"
+                      placeholder="Role Name"
+                      className={style.modalInput}
+                    />
+                    {formik.touched.name && formik.errors.name && (
+                      <div className="text-danger small mt-1">
+                        {formik.errors.name}
+                      </div>
+                    )}
+                  </div>
 
-                  <div className={`${style.allDiv}`}>
-                    <div className={style.PermissionsDiv}>
-                      <h5 className="totalFont">Permissions</h5>
+                  <div className={style.permissionsScrollContainer}>
+                    <div className={`${style.allDiv}`}>
+                      <div className={style.PermissionsDiv}>
+                        <h5 className="totalFont">Permissions</h5>
 
-                      {addpermissions
-                        .filter((p) => p.isInheritable) // ← عرض الـ inheritable بس
-                        .map((perm, index) => (
-                          <p className="totalFont" key={index}>
-                            {perm.name}
-                          </p>
-                        ))}
-                    </div>
+                        {addpermissions
+                          .filter((p) => p.isInheritable) // ← عرض الـ inheritable بس
+                          .map((perm, index) => (
+                            <p className="totalFont" key={index}>
+                              {perm.name}
+                            </p>
+                          ))}
+                      </div>
 
-                    {/* ----------------- ADD COLUMN ------------------- */}
-                    <div className={style.addDiv}>
-                      <h5 className="totalFont">Add</h5>
+                      {/* ----------------- ADD COLUMN ------------------- */}
+                      <div className={style.addDiv}>
+                        <h5 className="totalFont" style={{ textAlign: "center" }}>Add</h5>
 
-                      {addpermissions
-                        .filter((p) => p.isInheritable)
-                        .map((perm, index) => (
-                          <div className="mb-3" key={index}>
-                            <div className="form-check form-switch">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={selected[perm.name]?.add || false}
-                                onChange={() => handleToggle(perm.name, "add")}
-                              />
+                        {addpermissions
+                          .filter((p) => p.isInheritable)
+                          .map((perm, index) => (
+                            <div key={index} style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <div className="form-check form-switch m-0 p-0">
+                                <input
+                                  className="form-check-input m-0"
+                                  type="checkbox"
+                                  checked={selected[perm.name]?.add || false}
+                                  onChange={() => handleToggle(perm.name, "add")}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                    </div>
+                          ))}
+                      </div>
 
-                    {/* ----------------- INHERITABLE COLUMN ------------------- */}
-                    <div className={style.inheritableDiv}>
-                      <h5 className="totalFont">Inheritable</h5>
+                      {/* ----------------- INHERITABLE COLUMN ------------------- */}
+                      <div className={style.inheritableDiv}>
+                        <h5 className="totalFont" style={{ textAlign: "center" }}>Inheritable</h5>
 
-                      {addpermissions
-                        .filter((p) => p.isInheritable)
-                        .map((perm, index) => (
-                          <div className="mb-3 mx-4" key={index}>
-                            <div className="form-check form-switch">
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={
-                                  selected[perm.name]?.inheritable || false
-                                }
-                                onChange={() =>
-                                  handleToggle(perm.name, "inheritable")
-                                }
-                                disabled={!selected[perm.name]?.add} // لازم add الأول
-                              />
+                        {addpermissions
+                          .filter((p) => p.isInheritable)
+                          .map((perm, index) => (
+                            <div key={index} style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <div className="form-check form-switch m-0 p-0">
+                                <input
+                                  className="form-check-input m-0"
+                                  type="checkbox"
+                                  checked={
+                                    selected[perm.name]?.inheritable || false
+                                  }
+                                  onChange={() =>
+                                    handleToggle(perm.name, "inheritable")
+                                  }
+                                  disabled={!selected[perm.name]?.add} // لازم add الأول
+                                />
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                      </div>
                     </div>
                   </div>
 
@@ -868,120 +816,79 @@ export default function Roles() {
                   </button>
                 </form>
               </div>
-            </>
+            </div>
           )}
 
           {/* //////////////////////////////////////////////////////// */}
           {showModal2 && (
-            <>
-              {/* الخلفية المعتمة */}
-              <div
-                style={{
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  background: "rgba(0,0,0,0.65)",
-                  backdropFilter: "blur(2px)",
-                  zIndex: 999,
-                }}
-                onClick={() => setShowModal2(false)}
-              />
+            <div className={style.modalOverlay} onClick={() => setShowModal2(false)}>
+              <div className={style.modalContent} onClick={(e) => e.stopPropagation()}>
+                <button className={style.closeModalBtn} onClick={() => setShowModal2(false)}>
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
 
-              {/* صندوق الـ Modal */}
-              <div
-                style={{
-                  position: "fixed",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  background: "#0f0f0f",
-                  padding: "25px",
-                  borderRadius: "15px",
-                  width: "450px",
-                  maxWidth: "90%",
-                  color: "white",
-                  zIndex: 1000,
-                  boxShadow: "0 0 15px #000",
-                }}
-              >
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "15px",
-                    cursor: "pointer",
-                    fontSize: "28px",
-                  }}
-                  onClick={() => setShowModal2(false)}
-                >
-                  ×
-                </span>
-
-                <h3 className="totalFont" style={{ marginBottom: "20px" }}>
+                <h3 className="totalFont" style={{ color: "#2D0B14", marginBottom: "4px" }}>
                   Edit Role
                 </h3>
-                <p className=" fw-medium fs-4">{currentRole.name}</p>
+                <p className=" fw-medium fs-4 text-muted mb-4">{currentRole.name}</p>
 
-                <div className={`${style.allDiv}`}>
-                  <div className={`${style.PermissionsDiv}`}>
-                    <h5 className="totalFont">Permissions</h5>
-                    <p className="totalFont">Roles:Add</p>
-                    <p className="totalFont">Roles:Read</p>
-                    <p className="totalFont">Roles:Update</p>
-                    <p className="totalFont">Users:Add</p>
-                    <p className="totalFont">Users:Read</p>
-                    <p className="totalFont">Users:Update</p>
-                  </div>
-
-                  {/* ----------------- ADD COLUMN ------------------- */}
-                  <div className={style.addDiv}>
-                    <h5 className="totalFont">Add</h5>
-
-                    {permissions.map((perm) => {
-                      // تحقق هل الـ permission موجودة في addpermissions
-                      const isInAddPermissions = addpermissions.some(
-                        (p) => p.name === perm
-                      );
-
-                      return (
-                        <div key={perm} className="mb-3">
-                          <div className="form-check form-switch">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              checked={editSelected[perm]?.add || false}
-                              onChange={() => handleToggleEdit(perm, "add")}
-                              disabled={!isInAddPermissions} // ← لو مش موجودة تبقى disabled
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* ----------------- INHERITABLE COLUMN ------------------- */}
-                  <div className={style.inheritableDiv}>
-                    <h5 className="totalFont">Inheritable</h5>
-
-                    {permissions.map((perm) => (
-                      <div key={perm} className="mb-3 mx-4">
-                        <div className="form-check form-switch">
-                          <input
-                            type="checkbox"
-                            className="form-check-input"
-                            checked={editSelected[perm]?.inheritable || false}
-                            onChange={() =>
-                              handleToggleEdit(perm, "inheritable")
-                            }
-                            disabled={!editSelected[perm]?.add}
-                          />
-                        </div>
+                  <div className={style.permissionsScrollContainer}>
+                    <div className={`${style.allDiv}`}>
+                      <div className={`${style.PermissionsDiv}`}>
+                        <h5 className="totalFont">Permissions</h5>
+                        {addpermissions.map((perm) => (
+                          <p className="totalFont">{perm.name}</p>
+                        ))}
                       </div>
-                    ))}
+
+                      {/* ----------------- ADD COLUMN ------------------- */}
+                      <div className={style.addDiv}>
+                        <h5 className="totalFont" style={{ textAlign: "center" }}>Add</h5>
+
+                        {permissions.map((perm) => {
+                          // تحقق هل الـ permission موجودة في addpermissions
+                          const isInAddPermissions = addpermissions.some(
+                            (p) => p.name === perm
+                          );
+
+                          return (
+                            <div key={perm} style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <div className="form-check form-switch m-0 p-0">
+                                <input
+                                  type="checkbox"
+                                  className="form-check-input m-0"
+                                  checked={editSelected[perm]?.add || false}
+                                  onChange={() => handleToggleEdit(perm, "add")}
+                                  disabled={!isInAddPermissions} // ← لو مش موجودة تبقى disabled
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* ----------------- INHERITABLE COLUMN ------------------- */}
+                      <div className={style.inheritableDiv}>
+                        <h5 className="totalFont" style={{ textAlign: "center" }}>Inheritable</h5>
+
+                        {permissions.map((perm) => (
+                          <div key={perm} style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <div className="form-check form-switch m-0 p-0">
+                              <input
+                                type="checkbox"
+                                className="form-check-input m-0"
+                                checked={editSelected[perm]?.inheritable || false}
+                                onChange={() =>
+                                  handleToggleEdit(perm, "inheritable")
+                                }
+                                disabled={!editSelected[perm]?.add}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
                 <button
                   className={`${style.saveBtn} totalFont w-100`}
@@ -998,7 +905,7 @@ export default function Roles() {
                   )}
                 </button>
               </div>
-            </>
+            </div>
           )}
         </>
         {/* )}   */}

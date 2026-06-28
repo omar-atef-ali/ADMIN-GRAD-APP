@@ -11,7 +11,7 @@ export default function UserDetails() {
   const { userToken } = useContext(userContext)
   const [userDetails, setuserDetails] = useState([])
   const [loading, setlaoding] = useState(false)
-  console.log(id)
+  // console.log(id)
 
   async function getUserDetails() {
     try {
@@ -21,7 +21,7 @@ export default function UserDetails() {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      console.log(response.data)
+      // console.log(response.data)
       setuserDetails(response.data)
     }
     catch (error) {

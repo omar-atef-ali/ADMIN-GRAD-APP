@@ -21,6 +21,7 @@ import ResetPassword from './Components/ResetPassword/ResetPassword'
 import CheckEmail from './Components/CheckEmail/CheckEmail'
 import ActivateAccount from './Components/ActivateAccount/ActivateAccount'
 import Protected from './Components/Protected/Protected'
+import ViewServies from './Components/ViewServies/ViewServies'
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/forget-password",element:<ForgetPassword/>},
@@ -29,14 +30,14 @@ let routers = createBrowserRouter([
    {path:"/activate-account",element:<ActivateAccount/>},
   // {path:"/main",element:<Protected><Main/></Protected>},
   {path:"/dashboard",element:<Layout/>,children:[
-     {path:"/dashboard/:id",element: <Protected><UserDetails/></Protected> },
-    {path:"",element:<Protected><Admin/></Protected>},
-    {path:"roles",element:<Protected><Roles/></Protected>},
-    {path:"my-permissions",element:<Protected><MyPermissions/></Protected>},
-    {path:"roles/:id",element:<Protected><RolesDetails/></Protected>} ,
-    {path:"users",element:<Protected><Users/></Protected>},
-    {path:"users/:id",element:<Protected><UserDetails/></Protected>}
-    
+     {path:"/dashboard/:id",element: <UserDetails/> },
+    {path:"",element:<Admin/>},
+    {path:"roles",element:<Roles/>},
+    {path:"my-permissions",element:<MyPermissions/>},
+    {path:"roles/:id",element:<RolesDetails/>} ,
+    {path:"users",element:<Users/>},
+    {path:"users/:id",element:<UserDetails/>},
+    {path:"services/:id",element:<ViewServies/>}
   ]},
   {path:"*",element:<NotFound/>}
   

@@ -26,7 +26,7 @@ export default function RolesDetails() {
           Authorization: `Bearer ${userToken}`,
         },
       });
-      console.log(data);
+      // console.log(data);
       setInformation(data);
     } catch (error) {
       console.log(error);
@@ -133,6 +133,12 @@ export default function RolesDetails() {
         </div>
       ) : (
         <div className={style.pdWrapper}>
+          {/* Back link */}
+          <Link to="/admin/roles" className={style.backLink}>
+            <i className="fa-solid fa-arrow-left"></i>
+            <span className="totalFont">Back to Roles</span>
+          </Link>
+
           <div className={style.pdCard}>
             <div className={style.pdHeader}>
               <div className={`${style.UserParentInfo}`}>
@@ -140,7 +146,7 @@ export default function RolesDetails() {
               </div>
 
               <div className=" d-flex flex-column gap-2">
-                <span className={`totalFont ${style.pdBadge} ${style.active}`}>
+                <span className={`totalFont ${style.pdBadge} ${information.isDisabled ? style.disabled : style.active}`}>
                   {information.isDisabled ? "Disabled" : "Enabled"}
                 </span>
               </div>
@@ -175,9 +181,9 @@ export default function RolesDetails() {
                       <span className="totalFont">Updated By</span>
                     </button>
                   </div>
-                 ) : (
-                   ""
-                 )} 
+                ) : (
+                  ""
+                )}
 
                 {information.managededById ? (
                   <div className={`${style.pdField} `}>
@@ -187,11 +193,16 @@ export default function RolesDetails() {
                         if (information.managededById === myId) {
                           Swal.fire({
                             icon: "info",
-                            title: "Notice",
+                            title: "Noticeeee",
                             text: "You are the one who updated this role!",
-                            confirmButtonColor: "#373838ff",
-                            background: "#1f1f1f",
-                            color: "#fff",
+                            confirmButtonColor: "#2D0B14",
+                            background: "#FAF8F6",
+                            color: "#1C1814",
+                            confirmButtonColor: "#2D0B14",
+                            cancelButtonColor: "#8C8581",
+                            customClass: {
+                              popup: "custom-popup",
+                            },
                           });
                         } else {
                           navigate(
@@ -208,28 +219,14 @@ export default function RolesDetails() {
                   ""
                 )}
               </div>
+
               <div className={style.pdDivider} />
-              <div
-                style={{
-                  margin: "auto",
-                  background: "#0f0f0f",
-                  padding: "25px",
-                  borderRadius: "15px",
-                  maxWidth: "100%",
-                  color: "white",
-                  boxShadow: "0 0 7px #000",
-                }}
-              >
-                <h3
-                  className={` ${style.permissionsH3} totalFont`}
-                  style={{ marginBottom: "20px" }}
-                >
+
+              <div className={style.permissionsSection}>
+                <h3 className={`${style.permissionsH3} totalFont`}>
                   Permissions
                 </h3>
 
-                {/* <label className="totalFont fs-4 mb-2" htmlFor="name">
-                              {data.name}
-                            </label> */}
                 <div className={`${style.allDiv}`}>
                   <div className={`${style.PermissionsDiv}`}>
                     <h5 className="totalFont">Permissions</h5>
@@ -242,13 +239,13 @@ export default function RolesDetails() {
 
                   {/* ----------------- ADD COLUMN ------------------- */}
                   <div className={style.addDiv}>
-                    <h5 className="totalFont">Add</h5>
+                    <h5 className="totalFont" style={{ textAlign: "center" }}>Add</h5>
 
                     {permissions.map((perm, index) => (
-                      <div key={index} className="mb-3">
-                        <div className="form-check form-switch">
+                      <div key={index} style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div className="form-check form-switch m-0 p-0">
                           <input
-                            className="form-check-input"
+                            className="form-check-input m-0"
                             type="checkbox"
                             checked={true} // Add
                             disabled
@@ -260,13 +257,13 @@ export default function RolesDetails() {
 
                   {/* ----------------- INHERITABLE COLUMN ------------------- */}
                   <div className={style.inheritableDiv}>
-                    <h5 className="totalFont">Inheritable</h5>
+                    <h5 className="totalFont" style={{ textAlign: "center" }}>Inheritable</h5>
 
                     {permissions.map((perm, index) => (
-                      <div key={index} className="mb-3 mx-4">
-                        <div className="form-check form-switch">
+                      <div key={index} style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div className="form-check form-switch m-0 p-0">
                           <input
-                            className="form-check-input"
+                            className="form-check-input m-0"
                             type="checkbox"
                             checked={perm.isInheritable}
                             disabled
@@ -281,39 +278,13 @@ export default function RolesDetails() {
               <div className={style.pdDivider} />
 
               <div className={`${style.pdGrid2} row `}>
-                <div className={`${style.pdBox} col-12  col-md-5`}>
+                <div className={`${style.pdBox} col-12 col-md-5`}>
                   <label className={style.pdLabel}>Created On</label>
-                  <p className={style.pdDate}>
-                    {information.updatedOn &&
-                      (() => {
-                        const date = new Date(information.updatedOn);
-                        const formattedDate = date.toLocaleDateString(); // YYYY-MM-DD حسب لغة الجهاز
-                        const formattedTime = date.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true,
-                        });
-                        return (
-                          <>
-                            <span>{formattedDate}</span>
-                            <br />
-                            <span>{formattedTime}</span>
-                          </>
-                        );
-                      })()}
-                  </p>
-                  <p className={style.pdDay}></p>
-                </div>
-
-                <div
-                  className={`${style.pdBox} col-12  col-md-5 ${style.blue}`}
-                >
-                  <label className={style.pdLabel}>Updated On</label>
                   <p className={style.pdDate}>
                     {information.createdOn &&
                       (() => {
                         const date = new Date(information.createdOn);
-                        const formattedDate = date.toLocaleDateString(); // YYYY-MM-DD حسب لغة الجهاز
+                        const formattedDate = date.toLocaleDateString();
                         const formattedTime = date.toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -321,14 +292,34 @@ export default function RolesDetails() {
                         });
                         return (
                           <>
-                            <span>{formattedDate}</span>
-                            <br />
-                            <span>{formattedTime}</span>
+                            <span className={style.dateText}>{formattedDate}</span>
+                            <span className={style.timeText}>{formattedTime}</span>
                           </>
                         );
                       })()}
                   </p>
-                  <p className={`${style.pdDay} `}></p>
+                </div>
+
+                <div className={`${style.pdBox} col-12 col-md-5`}>
+                  <label className={style.pdLabel}>Updated On</label>
+                  <p className={style.pdDate}>
+                    {information.updatedOn &&
+                      (() => {
+                        const date = new Date(information.updatedOn);
+                        const formattedDate = date.toLocaleDateString();
+                        const formattedTime = date.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        });
+                        return (
+                          <>
+                            <span className={style.dateText}>{formattedDate}</span>
+                            <span className={style.timeText}>{formattedTime}</span>
+                          </>
+                        );
+                      })()}
+                  </p>
                 </div>
               </div>
             </div>

@@ -1,0 +1,490 @@
+/* ============================================================
+   ViewServies Page — ViewServies.module.css
+   Off-white background with premium card layout
+   ============================================================ */
+
+.viewPage {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeUp 0.4s ease-out;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header Area styling */
+.headerArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  background: transparent;
+  border: none;
+  color: #6C7383;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: none;
+  font-size: 20px;
+  padding: 8px;
+}
+
+.backBtn:hover {
+  background: transparent;
+  color: #4E3074;
+  transform: translateX(-3px);
+}
+
+.titleMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #9C9A97;
+  font-weight: 500;
+}
+
+.breadcrumbs .divider {
+  color: #E8E2DE;
+}
+
+.breadcrumbs .activePath {
+  color: #72706E;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mainTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 25px;
+  font-weight: 600;
+  color: #4E3074;
+  margin: 0;
+  line-height: 1.1;
+}
+
+/* Badges */
+.statusBadge {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.activeBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 5px 10px;
+    border: none;
+    border-radius: 999px;
+
+    background: #E8F8F0;
+    color: #0A8F4D;
+
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+}
+
+.inactiveBadge {
+  background-color: #FFF0F0;
+  color: #C0392B;
+}
+
+.dot {
+    width: 7px;
+    height: 7px;
+    background: #22C55E;
+    border-radius: 50%;
+}
+
+/* Edit Button */
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #4E3074;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 22px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(127, 86, 217, 0.12);
+}
+
+.editBtn:hover {
+  background-color: #4E3074;
+  transform: translateY(-1px);
+}
+
+/* Cards Container */
+.cardsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Card General Styling */
+.detailsCard {
+  background-color: #FFFFFF;
+  border: 1px solid #F1EDE9;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(180, 160, 150, 0.06);
+}
+
+.cardTitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1C1814;
+  margin: 0 0 20px 0;
+  border-bottom: 1px solid #FDFCFB;
+  padding-bottom: 10px;
+}
+
+.cardHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #FDFCFB;
+  padding-bottom: 10px;
+}
+
+.cardHeaderRow .cardTitle {
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+.countBadge {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: #9C9A97;
+  font-weight: 500;
+}
+
+/* Basic Info Grid */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+.gridItemFull {
+  grid-column: span 12;
+}
+
+.gridItemHalf {
+  grid-column: span 6;
+}
+
+.gridItemThird {
+  grid-column: span 4;
+}
+
+.infoLabel {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #838282;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+}
+
+.infoValue {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #1C1814;
+  margin: 0;
+  font-weight: 500;
+}
+
+.infoValueDescription {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: #4a4745b7;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.priorityBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  background-color: #FAF8F6;
+  border: 1px solid #E8E2DE;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1C1814;
+  padding: 0 8px;
+}
+
+.statusValue {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: #23503B;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+/* Benefits Section */
+.benefitsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.benefitRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #FDFCFB;
+  border: 1px solid #FAF8F6;
+  border-radius: 8px;
+  padding: 12px 18px;
+  transition: all 0.2s ease;
+}
+
+.benefitRow:hover {
+  background-color: #F4F0FD;
+  border-color: rgba(127, 86, 217, 0.08);
+}
+
+.checkIcon {
+  color: #4E3074;
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+.benefitText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #4A4745;
+}
+
+/* Pricing Plans Section */
+.plansList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.planRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #FFFFFF;
+  border: 1px solid #F1EDE9;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+
+
+.planLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.planDurationBadge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #F4F0FD;
+  color: #4E3074;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.planName {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1C1814;
+  margin: 0;
+}
+
+.planSubtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  color: #9C9A97;
+  margin: 0;
+}
+
+.planRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.planPrice {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4E3074;
+}
+
+.discountWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.originalPrice {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #9C9A97;
+  text-decoration: line-through;
+}
+
+.discountTag {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: #D48C27;
+  font-weight: 600;
+  background-color: rgba(212, 140, 39, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Spinner loading overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(127, 86, 217, 0.15);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  border: 4px solid rgba(127, 86, 217, 0.08);
+  border-top: 4px solid #4E3074;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .headerArea {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .editBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .gridItemHalf, .gridItemThird {
+    grid-column: span 12;
+  }
+  
+  .planRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .planRight {
+    align-items: flex-start;
+    width: 100%;
+    border-top: 1px solid #F1EDE9;
+    padding-top: 12px;
+  }
+}

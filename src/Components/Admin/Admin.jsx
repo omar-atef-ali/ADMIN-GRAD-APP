@@ -42,12 +42,15 @@ export default function Admin({ users = [], roles = [] }) {
           Authorization: `Bearer ${userToken}`,
         },
       });
-      // console.log(response.data)
+      console.log(response.data)
       setAnalytics(response.data);
     } catch (error) {
       console.log(error.response?.status, error.response?.data);
     }
   }
+  useEffect(() => {
+    getAnalytics();
+  }, [userToken]);
 
   /////////////////////////////////////////////////////////////////////
 
@@ -57,7 +60,7 @@ export default function Admin({ users = [], roles = [] }) {
     { name: "InActive", value: (analytics.lockedUsers / total) * 100 },
     { name: "Disabled", value: (analytics.disabledUsers / total) * 100 },
   ];
-  const COLORS = ["#4a90e2", "#f5a623", "#7ed321"]; // نفس ألوان الشارت اللي طلّعتها
+  const COLORS = ["#4a90e2", "#f5a623", "#b63228ff"]; // نفس ألوان الشارت اللي طلّعتها
 
   async function getAllUsers() {
     try {
@@ -397,10 +400,10 @@ export default function Admin({ users = [], roles = [] }) {
                       }) => {
                         const RADIAN = Math.PI / 175;
                         const radius =
-                          outerRadius + (window.innerWidth < 768 ? 37 : 55); // المسافة عن الدائرة
+                          outerRadius + (window.innerWidth < 768 ? 20 : 10); // المسافة عن الدائرة
                         const x = cx + radius * Math.cos(-midAngle * RADIAN);
                         const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                        const fontSize = window.innerWidth < 768 ? 10 : 15; // حجم الخط للموبايل أصغر
+                        const fontSize = window.innerWidth < 768 ? 10 : 10; // حجم الخط للموبايل أصغر
                         return (
                           <text
                             x={x}
@@ -487,11 +490,13 @@ export default function Admin({ users = [], roles = [] }) {
 
                             const padding = 4;
                             const total = RoleChartData.reduce(
-                              (sum, r) => sum + r.size,
+                              (sum, r) => sum + (r.size || 0),
                               0
                             );
-                            const percent =
-                              total > 0 ? ((size / total) * 100).toFixed(1) : 0;
+                            
+                            const nodeSize = Number(size) || Number(props.value) || 0;
+                            const percentVal = total > 0 ? (nodeSize / total) * 100 : 0;
+                            const percent = isNaN(percentVal) ? "0.0" : percentVal.toFixed(1);
 
                             return (
                               <g>
@@ -502,7 +507,7 @@ export default function Admin({ users = [], roles = [] }) {
                                   height={height - padding}
                                   fill={fill}
                                 />
-                                {width > 50 && height > 30 && (
+                                {name && nodeSize > 0 && width > 50 && height > 30 && (
                                   <text
                                     x={x + width / 2}
                                     y={y + height / 2}
