@@ -117,7 +117,7 @@ export default function ViewServies() {
             </div>
           </div>
         </div>
-        <button className={style.editBtn}>
+        <button className={style.editBtn} onClick={() => navigate(`/dashboard/services/${id}/edit`)}>
           <i className="fa-regular fa-pen-to-square"></i>
           <span>Edit Service</span>
         </button>
