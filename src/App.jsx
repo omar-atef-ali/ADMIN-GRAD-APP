@@ -23,6 +23,8 @@ import ActivateAccount from './Components/ActivateAccount/ActivateAccount'
 import Protected from './Components/Protected/Protected'
 import ViewServies from './Components/ViewServies/ViewServies'
 import EditServies from './Components/EditServies/EditServies'
+import Services from './Components/Services/Services'
+import AddServices from './Components/AddServices/AddServices'
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/forget-password",element:<ForgetPassword/>},
@@ -37,8 +39,11 @@ let routers = createBrowserRouter([
     {path:"roles/:id",element:<RolesDetails/>} ,
     {path:"users",element:<Users/>},
     {path:"users/:id",element:<UserDetails/>},
+    {path:"services",element:<Protected><Services/></Protected>},
+    {path:"services/add",element:<Protected><AddServices/></Protected>},
     {path:"services/:id",element:<ViewServies/>},
     {path:"services/:id/edit",element:<EditServies/>}
+
   ]},
   {path:"*",element:<NotFound/>}
   

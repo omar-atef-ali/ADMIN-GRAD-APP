@@ -1,0 +1,419 @@
+.container {
+    /* padding: 32px; */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 992px) {
+    .container {
+        padding: 80px 16px 24px 16px;
+    }
+}
+
+/* Header Section */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.headerText {
+    flex: 1;
+}
+
+.title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 6px 0;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.addButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #4E3074;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(78, 48, 116, 0.15);
+    white-space: nowrap;
+}
+
+.addButton:hover {
+    background-color: #3C245C;
+    box-shadow: 0 4px 8px rgba(78, 48, 116, 0.25);
+}
+
+.addButton:active {
+    transform: scale(0.98);
+}
+
+/* Filter Bar Section */
+.filterBar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.searchWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 0 16px;
+    width: 240px;
+    height: 38px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchWrapper:focus-within {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.1);
+}
+
+.searchIcon {
+    color: #9ca3af;
+    margin-right: 8px;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.searchInput {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 14px;
+    color: #374151;
+}
+
+.searchInput::placeholder {
+    color: #9ca3af;
+}
+
+.selectWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    height: 38px;
+    padding: 0 16px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.selectWrapper:hover {
+    border-color: #d1d5db;
+}
+
+.selectElement {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    padding-right: 20px;
+    appearance: none; /* Hide default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.selectChevron {
+    position: absolute;
+    right: 14px;
+    color: #6b7280;
+    font-size: 10px;
+    pointer-events: none;
+}
+
+@media (max-width: 480px) {
+    .filterBar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .searchWrapper {
+        width: auto;
+    }
+    .selectWrapper {
+        width: auto;
+    }
+    .selectElement {
+        width: 100%;
+    }
+}
+
+/* Table Card & Scroll Wrapper */
+.tableCard {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+/* internal scroll container for responsive table */
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 950px; /* Keep layout crisp on mobile with scroll */
+}
+
+/* Table Headers */
+.th {
+    padding: 16px 24px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #8a8d9f;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #f1f2f4;
+    background-color: #fafafa;
+}
+
+/* Table Row and Data Cells */
+.row {
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+.row:last-child {
+    border-bottom: none;
+}
+
+.row:hover {
+    background-color: #fcfcfd;
+}
+
+.td {
+    padding: 16px 24px;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+/* Service Column */
+.serviceCell {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #4E3074; /* Default fallback purple */
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-right: 14px;
+    flex-shrink: 0;
+}
+
+.serviceInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.serviceName {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 3px 0;
+}
+
+.serviceDesc {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Pricing Plans Column */
+.plansCount {
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 2px 0;
+}
+
+.plansPrice {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* Key Benefits Column */
+.benefitsText {
+    font-weight: 500;
+    color: #4b5563;
+}
+
+/* Priority Badge */
+.priorityBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Status Badges */
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.statusBadge.active {
+    background-color: #ecfdf5;
+    color: #10b981;
+}
+
+.statusBadge.inactive {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.statusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.statusDot.active {
+    background-color: #10b981;
+}
+
+.statusDot.inactive {
+    background-color: #9ca3af;
+}
+
+/* Last Updated Column */
+.dateText {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Actions Column */
+.actionsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.editButton {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.editButton:hover {
+    color: #4E3074;
+    transform: scale(1.1);
+}
+
+/* Custom Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1e293b; /* Dark switch background when inactive */
+    transition: 0.3s ease;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: 0.3s ease;
+    border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+    background-color: #4E3074; /* Purple background when active */
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(16px);
+}

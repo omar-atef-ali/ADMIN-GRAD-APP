@@ -1,0 +1,1055 @@
+.container {
+    /* padding: 32px; */
+    padding-bottom: 32px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 992px) {
+    .container {
+        padding: 80px 16px 24px 16px;
+    }
+}
+
+/* Breadcrumb Header styling */
+.breadcrumbHeader {
+    padding: 10px 35px;
+    background-color: rgba(255, 255, 255, 0.449);
+    margin-bottom: 28px;
+    border-bottom: 1px solid rgba(203, 203, 203, 0.341);
+}
+
+.breadcrumbRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.backBtn {
+    background: none;
+    border: none;
+    color: #4E3074;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    margin-right: 4px;
+}
+
+.backBtn:hover {
+    background-color: #F0E9F6;
+}
+
+.breadcrumbLink {
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+    color: #4E3074;
+}
+
+.breadcrumbSeparator {
+    color: #d1d5db;
+}
+
+.breadcrumbActive {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.pageTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4E3074;
+    margin: 0;
+}
+
+/* Form Container */
+.formContainer {
+    max-width: 1150px;
+    width: 100%;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Premium Card Design */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(203, 203, 203, 0.341);
+}
+
+/* Row styling */
+.row {
+    display: flex;
+    /* gap: 16px; */
+    gap: 100px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 0;
+    }
+}
+
+/* Form Groups and Inputs */
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+    .formGroup {
+        margin-bottom: 16px;
+    }
+}
+
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.charCount {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.input {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #374151;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.input::placeholder {
+    color: #9ca3af;
+    opacity: 0.8;
+}
+
+.textarea {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #374151;
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textarea:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.textarea::placeholder {
+    color: #9ca3af;
+    opacity: 0.8;
+}
+
+.helperText {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+/* Custom Toggle Switch */
+.toggleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1e293b;
+    transition: 0.3s ease;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: 0.3s ease;
+    border-radius: 50%;
+}
+
+.switch input:checked+.slider {
+    background-color: #4E3074;
+}
+
+.switch input:checked+.slider:before {
+    transform: translateX(16px);
+}
+
+.toggleLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4E3074;
+}
+
+/* Media Assets Layout */
+.mediaContainer {
+    /* display: grid;
+    grid-template-columns: 2fr 1fr; */
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .mediaContainer {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+.specText {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* Banner Drag & Drop Zone */
+.dropzone {
+    border: 1px dashed #d1d5db;
+    border-radius: 12px;
+    background-color: #fafafa;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.dropzone:hover {
+    border-color: #4E3074;
+    background-color: #F4EFFF;
+}
+
+.dropzoneContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    text-align: center;
+}
+
+.uploadIcon {
+    font-size: 32px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+    transition: color 0.2s ease;
+}
+
+.dropzone:hover .uploadIcon {
+    color: #4E3074;
+}
+
+.dropText {
+    font-size: 14px;
+    color: #4b5563;
+    margin: 0 0 4px 0;
+    font-weight: 500;
+}
+
+.browseText {
+    color: #4E3074;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.formatsText {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.previewWrapper {
+    width: 100%;
+    height: 100%;
+    min-height: 160px;
+    position: relative;
+}
+
+.bannerPreviewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    max-height: 160px;
+    display: block;
+}
+
+.previewOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.previewWrapper:hover .previewOverlay {
+    opacity: 1;
+}
+
+/* Service Icon Upload Group */
+.iconUploadRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.iconSquare {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    border: 1px dashed #d1d5db;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.iconSquare:hover {
+    border-color: #4E3074;
+    background-color: #F4EFFF;
+}
+
+.miniUploadIcon {
+    font-size: 18px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+.iconUploadPrompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.iconPreviewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.iconHintText {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Key Benefits tags */
+.cardHeaderWithButton {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.inlineAddBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #F0E9F6;
+    color: #4E3074;
+    border: 1px solid #e2d5ed;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.inlineAddBtn:hover {
+    background-color: #e2d5ed;
+}
+
+.benefitInputWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.benefitInputWrapper input {
+    width: 100%;
+}
+
+.tagsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.benefitTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #F0E9F6;
+    color: #4E3074;
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.tagRemoveBtn {
+    background: none;
+    border: none;
+    color: #4E3074;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.tagRemoveBtn:hover {
+    background-color: rgba(78, 48, 116, 0.15);
+}
+
+/* Pricing Configuration empty & filled state */
+.emptyStateContainer {
+    border: 1px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 16px;
+    background-color: #ffffff;
+}
+
+.emptyStateText {
+    color: #9ca3af;
+    font-size: 14px;
+    margin: 0;
+}
+
+.tableResponsive {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.plansTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.plansTable th {
+    background-color: #fafafa;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #8a8d9f;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.plansTable td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f2f4;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.plansTable tr:last-child td {
+    border-bottom: none;
+}
+
+.tableDuration {
+    color: #374151;
+    font-weight: 500;
+}
+
+.tablePrice {
+    color: #111827;
+    font-weight: 700;
+}
+
+.activeSaleBadge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #FEE2E2;
+    color: #EF4444;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.noSaleText {
+    color: #9ca3af;
+}
+
+.tableRemoveBtn {
+    background: none;
+    border: none;
+    color: #EF4444;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.tableRemoveBtn:hover {
+    background-color: #FEE2E2;
+    transform: scale(1.05);
+}
+
+/* Sales & Discounts empty & accordion states */
+/* .disabledSalesContainer {
+    background-color: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: left;
+} */
+
+.disabledSalesText {
+    color: #9ca3af;
+    font-size: 14px;
+    margin: 0;
+}
+
+.salesAccordionList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.accordionItem {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.accordionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: #fcfcfd;
+}
+
+.accordionHeaderText {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.addSaleToggleBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #F0E9F6;
+    color: #4E3074;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.addSaleToggleBtn:hover {
+    background-color: #e2d5ed;
+}
+
+.boltIcon {
+    font-size: 11px;
+}
+
+/* Accordion Panel Transitions */
+.accordionPanel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    background-color: #ffffff;
+}
+
+.accordionPanel.expanded {
+    max-height: 800px;
+    overflow-y: auto;
+    border-top: 1px solid #f1f2f4;
+}
+
+.accordionPanelContent {
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .accordionHeader {
+        padding: 14px 16px;
+        gap: 8px;
+    }
+
+    .accordionPanelContent {
+        padding: 16px 12px;
+    }
+
+    .applySaleActionRow {
+        padding-bottom: 4px;
+    }
+}
+
+.salesFieldsRow {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .salesFieldsRow {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+/* Custom Styled Datepicker Inputs */
+.datepickerWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dateInput {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #374151;
+    outline: none;
+    width: 100%;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    padding-right: 38px;
+}
+
+/* Overlay native calendar trigger indicator over entire input */
+.dateInput::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.dateInput:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.dateIcon {
+    position: absolute;
+    right: 14px;
+    color: #9ca3af;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* Calculation summary panel styling */
+.calcSummaryBox {
+    background-color: #f9fafb;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #f1f2f4;
+}
+
+@media (max-width: 576px) {
+    .calcSummaryBox {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 14px 12px;
+    }
+}
+
+.calcItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calcLabel {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.calcValueOriginal {
+    font-size: 14px;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.calcValueDiscount {
+    font-size: 14px;
+    color: #EF4444;
+    font-weight: 700;
+}
+
+.calcValueFinal {
+    font-size: 15px;
+    color: #4E3074;
+    font-weight: 700;
+}
+
+.calcValueSavings {
+    font-size: 15px;
+    color: #10B981;
+    font-weight: 700;
+}
+
+.applySaleActionRow {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.applySaleBtn {
+    background-color: #4E3074;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.applySaleBtn:hover {
+    background-color: #3C245C;
+}
+
+.applySaleBtn:active {
+    transform: scale(0.98);
+}
+
+/* Secondary & primary action buttons */
+.secondaryThemeBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #F0E9F6;
+    color: #4E3074;
+    border: 1px solid #e2d5ed;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.secondaryThemeBtn:hover {
+    background-color: #e2d5ed;
+}
+
+.primaryThemeBtn {
+    background-color: #4E3074;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.primaryThemeBtn:hover {
+    background-color: #3C245C;
+}
+
+.primaryThemeBtn:active {
+    transform: scale(0.98);
+}
+
+.cancelBtn {
+    background-color: #ffffff;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.cancelBtn:hover {
+    background-color: #f9fafb;
+}
+
+.footerActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Custom Modal Overlay styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+}
+
+.modalContent {
+    background-color: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 440px;
+    padding: 28px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+    animation: modalAppear 0.2s ease-out forwards;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modalTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.modalCloseBtn {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.modalCloseBtn:hover {
+    color: #111827;
+}
+
+/* Price Input Prefix Wrapper */
+.priceInputWrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.priceInputWrapper:focus-within {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.currencyPrefix {
+    background-color: transparent;
+    color: #9ca3af;
+    padding: 10px 0 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    user-select: none;
+}
+
+.priceInput {
+    border: none;
+    outline: none;
+    padding: 10px 14px 10px 6px;
+    font-size: 14px;
+    color: #374151;
+    width: 100%;
+}
+
+.modalActions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.modalCancelBtn {
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.modalCancelBtn:hover {
+    background-color: #f9fafb;
+}
+
+.modalSubmitBtn {
+    background-color: #4E3074;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.modalSubmitBtn:hover {
+    background-color: #3C245C;
+}
