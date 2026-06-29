@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import style from "./EditServies.module.css";
+import style from "./EditServices.module.css";
 import api from "../../api";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";

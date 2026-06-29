@@ -455,6 +455,7 @@ export default function Admin({ users = [], roles = [] }) {
                     style={{
                       width: "100%",
                       height: window.innerWidth < 768 ? 400 : 325,
+                      minWidth: 0,
                     }}
                   >
                     {RoleChartData.length === 0 ? (
@@ -471,7 +472,7 @@ export default function Admin({ users = [], roles = [] }) {
                         {/* ممكن تحط رسالة loading هنا */}
                       </div>
                     ) : (
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <Treemap
                           data={RoleChartData}
                           dataKey="size"

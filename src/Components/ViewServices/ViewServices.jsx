@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import style from "./ViewServies.module.css";
+import style from "./ViewServices.module.css";
 import api from "../../api";
 
 export default function ViewServies() {
@@ -10,79 +10,24 @@ export default function ViewServies() {
   const [loading, setLoading] = useState(true);
 
   // Fallback premium mock data matching the screenshot exactly
-  const mockService = {
-    id: id || "1",
-    name: "AI Recommendation",
-    subtitle: "Personalized AI-driven recommendations",
-    description: "Advanced ML models analyze user behavior to deliver highly personalized product and content recommendations at scale.",
-    priority: 1,
-    status: "Active",
-    lastUpdated: "20 Jan 2025",
-    benefits: [
-      "Increase conversion rate by up to 25%",
-      "Real-time personalization engine",
-      "Seamless API integration",
-      "Advanced analytics dashboard",
-      "Multi-language support"
-    ],
-    pricingPlans: [
-      {
-        id: "p1",
-        duration: "30D",
-        name: "30 Days",
-        subtitle: "Monthly",
-        price: "EGP 5,000"
-      },
-      {
-        id: "p2",
-        duration: "90D",
-        name: "90 Days",
-        subtitle: "Quarterly",
-        price: "EGP 12,150",
-        originalPrice: "EGP 13,500",
-        discountTag: "10% off until 31 Mar 2026"
-      },
-      {
-        id: "p3",
-        duration: "365D",
-        name: "365 Days",
-        subtitle: "Annual",
-        price: "EGP 48,000"
-      }
-    ]
-  };
+
 
   useEffect(() => {
     async function fetchService() {
       try {
         setLoading(true);
         const token = localStorage.getItem("token");
-        const response = await api.get(`/Services/${id}`, {
+        const { data } = await api.get(`/admin/services/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        
-        // Map backend response fields to component state
-        if (response.data) {
-          const data = response.data;
-          setService({
-            id: data.id || id,
-            name: data.name || data.serviceName || mockService.name,
-            subtitle: data.subtitle || mockService.subtitle,
-            description: data.description || mockService.description,
-            priority: data.priority !== undefined ? data.priority : mockService.priority,
-            status: data.status || (data.isActive ? "Active" : "Inactive") || mockService.status,
-            lastUpdated: data.lastUpdated || (data.updatedOn ? new Date(data.updatedOn).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : mockService.lastUpdated),
-            benefits: data.benefits || mockService.benefits,
-            pricingPlans: data.pricingPlans || mockService.pricingPlans
-          });
-        } else {
-          setService(mockService);
-        }
+        console.log(data);
+        setService(data);
+
       } catch (error) {
-        console.warn("Backend API not resolved or failed. Using premium mock fallback.", error);
-        setService(mockService);
+        console.log(error);
+
       } finally {
         setLoading(false);
       }
@@ -108,7 +53,7 @@ export default function ViewServies() {
             <i class="fa-solid fa-arrow-left"></i>
           </Link>
           <div className={style.titleMeta}>
-            
+
             <div className={style.titleRow}>
               <h1 className={`${style.mainTitle} `}>{service.name}</h1>
               <span className={`${style.statusBadge} ${service.status === "Active" ? style.activeBadge : style.inactiveBadge}`}>
@@ -130,11 +75,11 @@ export default function ViewServies() {
           <div className={style.infoGrid}>
             <div className={style.gridItemHalf}>
               <label className={style.infoLabel}>Service Name</label>
-              <p className={style.infoValue} style={{"fontWeight":"600"}}>{service.name}</p>
+              <p className={style.infoValue} style={{ "fontWeight": "600" }}>{service.name}</p>
             </div>
             <div className={style.gridItemHalf}>
               <label className={style.infoLabel}>Subtitle</label>
-              <p className={style.infoValueDescription}>{service.subtitle}</p>
+              <p className={style.infoValueDescription}>{service.subTitle}</p>
             </div>
             <div className={style.gridItemFull}>
               <label className={style.infoLabel}>Description</label>
@@ -154,7 +99,13 @@ export default function ViewServies() {
             </div>
             <div className={style.gridItemThird}>
               <label className={style.infoLabel}>Last Updated</label>
-              <p className={style.infoValue}>{service.lastUpdated}</p>
+              <p className={style.infoValue}>
+                {service.lastUpdated ? new Date(service.lastUpdated).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                }) : "N/A"}
+              </p>
             </div>
           </div>
         </section>
@@ -163,13 +114,13 @@ export default function ViewServies() {
         <section className={style.detailsCard}>
           <div className={style.cardHeaderRow}>
             <h2 className={`${style.cardTitle} totalFont`}>Key Benefits</h2>
-            <span className={style.countBadge}>{service.benefits.length} benefits</span>
+            <span className={style.countBadge}>benefits</span>
           </div>
           <div className={style.benefitsList}>
-            {service.benefits.map((benefit, index) => (
+            {service.keyBenefits?.map((benefit, index) => (
               <div key={index} className={style.benefitRow}>
                 <span className={style.checkIcon}>✓</span>
-                <span className={style.benefitText}>#{index + 1} {benefit}</span>
+                <span className={style.benefitText}> {benefit}</span>
               </div>
             ))}
           </div>
@@ -179,27 +130,32 @@ export default function ViewServies() {
         <section className={style.detailsCard}>
           <div className={style.cardHeaderRow}>
             <h2 className={`${style.cardTitle} totalFont`}>Pricing Plans</h2>
-            <span className={style.countBadge}>{service.pricingPlans.length} plans</span>
+            <span className={style.countBadge}> plans</span>
           </div>
           <div className={style.plansList}>
-            {service.pricingPlans.map((plan, index) => (
-              <div key={plan.id || index} className={style.planRow}>
+            {service.pricingPlans?.map((plan) => (
+              <div key={plan.id} className={style.planRow}>
                 <div className={style.planLeft}>
                   <div className={style.planDurationBadge}>
-                    {plan.duration}
+                    {plan.id}
                   </div>
                   <div className={style.planMeta}>
-                    <h4 className={style.planName}>{plan.name}</h4>
-                    <p className={style.planSubtitle}>{plan.subtitle}</p>
+                    <h4 className={style.planName}>{plan.durationInDays} Days</h4>
                   </div>
                 </div>
                 <div className={style.planRight}>
-                  <span className={style.planPrice}>{plan.price}</span>
-                  {plan.originalPrice && (
+                  {plan.isOnSale && (
+                    <span className={style.originalPrice}>EGP {plan.originalPrice}</span>
+                  )}
+                  <span className={style.planPrice}>EGP {plan.currentPrice}</span>
+                  {plan.originalPrice && plan.isOnSale && (
                     <div className={style.discountWrapper}>
-                      <span className={style.originalPrice}>{plan.originalPrice}</span>
                       <span className={style.discountTag}>
-                        → {plan.discountTag}
+                        {plan.discountPercentage}% Off - until {new Date(plan.saleEndDate).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </span>
                     </div>
                   )}

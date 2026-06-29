@@ -150,7 +150,7 @@ export default function Services() {
                                     const firstLetter = service.name ? service.name.charAt(0).toUpperCase() : "";
                                     
                                     return (
-                                        <tr key={service.id} className={styles.row}>
+                                        <tr  onClick={()=>navigate(`/dashboard/services/${service.id}`)} key={service.id} className={styles.row}>
                                             {/* Service details column */}
                                             <td className={styles.td}>
                                                 <div className={styles.serviceCell}>

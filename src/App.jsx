@@ -21,10 +21,11 @@ import ResetPassword from './Components/ResetPassword/ResetPassword'
 import CheckEmail from './Components/CheckEmail/CheckEmail'
 import ActivateAccount from './Components/ActivateAccount/ActivateAccount'
 import Protected from './Components/Protected/Protected'
-import ViewServies from './Components/ViewServies/ViewServies'
-import EditServies from './Components/EditServies/EditServies'
+import ViewServices from './Components/ViewServices/ViewServices'
+import EditServices from './Components/EditServices/EditServices'
 import Services from './Components/Services/Services'
 import AddServices from './Components/AddServices/AddServices'
+import ViewPackeges from './Components/ViewPackeges/ViewPackeges'
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/forget-password",element:<ForgetPassword/>},
@@ -41,8 +42,9 @@ let routers = createBrowserRouter([
     {path:"users/:id",element:<UserDetails/>},
     {path:"services",element:<Protected><Services/></Protected>},
     {path:"services/add",element:<Protected><AddServices/></Protected>},
-    {path:"services/:id",element:<ViewServies/>},
-    {path:"services/:id/edit",element:<EditServies/>}
+    {path:"services/:id",element:<ViewServices/>},
+    {path:"services/:id/edit",element:<EditServices/>},
+    {path:"packages/:id",element:<ViewPackeges/>}
 
   ]},
   {path:"*",element:<NotFound/>}
