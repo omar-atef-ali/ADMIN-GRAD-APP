@@ -25,6 +25,8 @@ import ViewServies from './Components/ViewServies/ViewServies'
 import EditServies from './Components/EditServies/EditServies'
 import Services from './Components/Services/Services'
 import AddServices from './Components/AddServices/AddServices'
+import Packages from './Components/Packages/Packages'
+import AddPackages from './Components/AddPackages/AddPackages'
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/forget-password",element:<ForgetPassword/>},
@@ -42,7 +44,10 @@ let routers = createBrowserRouter([
     {path:"services",element:<Protected><Services/></Protected>},
     {path:"services/add",element:<Protected><AddServices/></Protected>},
     {path:"services/:id",element:<ViewServies/>},
-    {path:"services/:id/edit",element:<EditServies/>}
+    {path:"services/:id/edit",element:<EditServies/>},
+    {path:"packages",element:<Protected><Packages/></Protected>},
+    {path:"packages/add",element:<Protected><AddPackages/></Protected>},
+
 
   ]},
   {path:"*",element:<NotFound/>}

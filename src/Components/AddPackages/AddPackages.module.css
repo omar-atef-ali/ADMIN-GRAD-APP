@@ -1,0 +1,601 @@
+.container {
+    padding-bottom: 32px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 992px) {
+    .container {
+        padding: 80px 16px 24px 16px;
+    }
+}
+
+/* Breadcrumb Header styling */
+.breadcrumbHeader {
+    padding: 18px 35px;
+    background-color: rgba(255, 255, 255, 0.449);
+    margin-bottom: 28px;
+    border-bottom: 1px solid rgba(203, 203, 203, 0.341);
+}
+
+@media (max-width: 768px) {
+    .breadcrumbHeader {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+}
+
+.breadcrumbRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.backBtn {
+    background: none;
+    border: none;
+    color: #4E3074;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    margin-right: 4px;
+}
+
+.backBtn:hover {
+    background-color: #F0E9F6;
+}
+
+.breadcrumbLink {
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+    color: #4E3074;
+}
+
+.breadcrumbSeparator {
+    color: #d1d5db;
+}
+
+.breadcrumbActive {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.pageTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a162e;
+    margin: 0;
+}
+
+/* Form Container */
+.formContainer {
+    max-width: 1150px;
+    width: 100%;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 35px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .formContainer {
+        padding: 0 16px;
+        gap: 16px;
+    }
+}
+
+/* Premium Card Design */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .card {
+        padding: 16px;
+    }
+}
+
+.cardHeaderRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(203, 203, 203, 0.341);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a162e;
+    margin: 0;
+}
+
+.cardSubtitleText {
+    font-size: 13px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Form layouts */
+.row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 0;
+    }
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    margin-bottom: 16px;
+}
+
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.charCount {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.input {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #111827;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.input::placeholder {
+    color: #9ca3af;
+    opacity: 0.8;
+}
+
+.inputError {
+    border-color: #ef4444;
+}
+
+.inputError:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+}
+
+.errorText {
+    font-size: 11px;
+    color: #ef4444;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.textarea {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #111827;
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.textarea:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.textarea::placeholder {
+    color: #9ca3af;
+    opacity: 0.8;
+}
+
+.textareaError {
+    border-color: #ef4444;
+}
+
+/* Custom Toggle Switch */
+.toggleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e5e7eb;
+    transition: 0.3s ease;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: 0.3s ease;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.switch input:checked+.slider {
+    background-color: #4E3074;
+}
+
+.switch input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+.toggleLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4E3074;
+}
+
+.toggleLabelInactive {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* Service Composition Grid */
+.servicesGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .servicesGrid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+/* Service Selection Card */
+.serviceCard {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+    box-sizing: border-box;
+    min-height: 86px;
+}
+
+.serviceCard:hover {
+    border-color: #4E3074;
+    box-shadow: 0 4px 12px rgba(78, 48, 116, 0.05);
+}
+
+.serviceCardSelected {
+    border-color: #4E3074;
+    background-color: #F4EFFF;
+}
+
+.serviceCardIconWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: #F0E9F6;
+    color: #4E3074;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.serviceCardIconWrapperSelected {
+    background-color: #E2D5ED;
+}
+
+.serviceCardIcon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.serviceCardDetails {
+    flex: 1;
+    padding-right: 24px;
+}
+
+.serviceCardName {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a162e;
+    margin: 0 0 4px 0;
+}
+
+.serviceCardDesc {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.serviceCheckmark {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: #4E3074;
+    font-size: 14px;
+}
+
+/* Service Configuration Section */
+.configSectionList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.configCard {
+    border: 1px solid #f1f2f4;
+    border-radius: 12px;
+    background-color: #f9fafb;
+    padding: 16px 20px;
+}
+
+.configCardHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.configCardIcon {
+    font-size: 16px;
+    color: #4E3074;
+    display: flex;
+    align-items: center;
+}
+
+.configCardTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a162e;
+}
+
+.configInputLabel {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.configCardBodyUnlimited {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    margin: 0;
+}
+
+.noConfigText {
+    color: #9ca3af;
+    font-size: 14px;
+    text-align: center;
+    padding: 24px;
+    margin: 0;
+}
+
+/* Sale Configuration Preview */
+.salePricingText {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+/* Date picker wrapper */
+.datepickerWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dateInput {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #111827;
+    outline: none;
+    width: 100%;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    padding-right: 38px;
+    box-sizing: border-box;
+}
+
+/* Webkit calendar triggers overlay */
+.dateInput::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.dateInput:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.dateInputError {
+    border-color: #ef4444;
+}
+
+.dateIcon {
+    position: absolute;
+    right: 14px;
+    color: #9ca3af;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* Footer Actions */
+.footerActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 8px;
+    margin-bottom: 32px;
+    padding: 0 35px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1150px;
+    align-self: center;
+}
+
+@media (max-width: 768px) {
+    .footerActions {
+        padding: 0 16px;
+        flex-direction: column-reverse;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+}
+
+.cancelBtn {
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 24px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.cancelBtn:hover {
+    background-color: #f9fafb;
+    border-color: #c5c7cb;
+}
+
+.createBtn {
+    background-color: #4E3074;
+    color: #ffffff;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(78, 48, 116, 0.15);
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.createBtn:hover {
+    background-color: #3C245C;
+    box-shadow: 0 4px 8px rgba(78, 48, 116, 0.25);
+}
+
+.createBtn:active {
+    transform: scale(0.98);
+}
+
+.createBtn:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+}

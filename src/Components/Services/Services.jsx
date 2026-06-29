@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Services.module.css";
 import { FaPlus, FaSearch, FaChevronDown, FaPencilAlt } from "react-icons/fa";
-import Swal from "sweetalert2";
+
 import api from '../../api'
 import { userContext } from "../../context/userContext";
+import toast from "react-hot-toast";
 export default function Services() {
-    const {userToken}=useContext(userContext)
+    const { userToken } = useContext(userContext)
     const navigate = useNavigate();
-    const [services, setServices]=useState([])
+    const [services, setServices] = useState([])
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("");
@@ -35,7 +36,7 @@ export default function Services() {
             const matchesSearch =
                 service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 service.subTitle.toLowerCase().includes(searchQuery.toLowerCase());
-            
+
             const matchesStatus =
                 statusFilter === "All" ||
                 service.status === statusFilter;
@@ -53,23 +54,47 @@ export default function Services() {
 
     // get All Services
     async function getAllServices() {
-        try{
-            const {data}=await api.get('/admin/services',{
-                headers:{
-                    Authorization:`Bearer ${userToken}`
+        try {
+            const { data } = await api.get('/admin/services', {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
                 }
             })
             console.log(data)
             setServices(data)
 
         }
-        catch(error){
-            console.log(error)
+        catch (error) {
+            console.error("Login Error:", error);
+            toast.error(
+                error.response?.data?.errors[1] ||
+                "Something went wrong while registration.",
+                {
+                    position: "top-center",
+                    duration: 4000,
+                    style: {
+                        background:
+                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        padding: "16px 20px",
+                        color: "#ffffff",
+                        fontSize: "0.95rem",
+                        borderRadius: "5px",
+                        width: "300px",
+                        height: "100%",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                    },
+                    iconTheme: {
+                        primary: "#FF4D4F",
+                        secondary: "#ffffff",
+                    },
+                },
+            );
         }
     }
-    useEffect(()=>{
+    useEffect(() => {
         getAllServices()
-    },[])
+    }, [])
 
     return (
         <div className={styles.container}>
@@ -148,7 +173,7 @@ export default function Services() {
                                 filteredServices.map((service) => {
                                     // Get first letter of service name for Avatar
                                     const firstLetter = service.name ? service.name.charAt(0).toUpperCase() : "";
-                                    
+
                                     return (
                                         <tr key={service.id} className={styles.row}>
                                             {/* Service details column */}
@@ -193,10 +218,10 @@ export default function Services() {
 
                                             {/* Last Updated Column */}
                                             <td className={styles.td}>
-                                                <span className={styles.dateText}>{new Date(service.lastUpdated).toLocaleDateString("en-GB",{
-                                                    day:'2-digit',
-                                                    month:'short',
-                                                    year:"numeric"
+                                                <span className={styles.dateText}>{new Date(service.lastUpdated).toLocaleDateString("en-GB", {
+                                                    day: '2-digit',
+                                                    month: 'short',
+                                                    year: "numeric"
                                                 })}</span>
                                             </td>
 
@@ -204,18 +229,18 @@ export default function Services() {
                                             <td className={styles.td}>
                                                 <div className={styles.actionsWrapper}>
                                                     {/* Edit button */}
-                                                    <button 
-                                                        className={styles.editButton} 
+                                                    <button
+                                                        className={styles.editButton}
                                                         title="Edit Service"
-                                                        
+
                                                     >
                                                         <FaPencilAlt size={13} />
                                                     </button>
 
                                                     {/* Status Toggle Switch */}
                                                     <label className={styles.switch}>
-                                                        <input 
-                                                            type="checkbox" 
+                                                        <input
+                                                            type="checkbox"
                                                             checked={service.status === "Active"}
                                                             onChange={() => handleStatusToggle(service.id)}
                                                         />
