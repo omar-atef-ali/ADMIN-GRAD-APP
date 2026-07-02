@@ -1,155 +1,329 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import style from "./EditServices.module.css";
 import api from "../../api";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import {
+  FaArrowLeft
+} from "react-icons/fa";
+import { userContext } from "../../context/userContext";
 
 export default function EditServies() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [serviceDetails, setServiceDetails] = useState({});
+
+  const { userToken } = useContext(userContext);
 
   // File input refs
   const imageInputRef = useRef(null);
   const iconInputRef = useRef(null);
 
-  // Main page states
-  const [serviceName, setServiceName] = useState("");
-  const [subtitle, setSubtitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState(1);
-  const [status, setStatus] = useState("Active");
-
-  // Media states (can be strings representing URL or File objects)
-  const [serviceImage, setServiceImage] = useState(null);
-  const [serviceIcon, setServiceIcon] = useState(null);
-
-  // Lists state
-  const [benefits, setBenefits] = useState([]);
+  // Accordion UI state
+  const [openDiscountPlanId, setOpenDiscountPlanId] = useState(null);
+  const [openPlanId, setOpenPlanId] = useState(null);
   const [newBenefitText, setNewBenefitText] = useState("");
 
-  // Pricing & sales state
-  const [pricingPlans, setPricingPlans] = useState([]);
-  const [openDiscountPlanId, setOpenDiscountPlanId] = useState(null);
-
-  // Mock service structure for fallback
-  const mockService = {
-    id: id || "1",
-    name: "AI Recommendation",
-    subtitle: "Personalized AI-driven recommendations",
-    description: "Advanced ML models analyze user behavior to deliver highly personalized product and content recommendations at scale.",
-    priority: 1,
-    status: "Active",
-    benefits: [
-      "Increase conversion rate by up to 25%",
-      "Real-time personalization engine",
-      "Seamless API integration",
-      "Advanced analytics dashboard",
-      "Multi-language support"
-    ],
-    pricingPlans: [
-      {
-        id: "p1",
-        duration: "30 Days",
-        price: "5000",
-        isActivePlan: false,
-        hasDiscount: false,
-        discountPct: "",
-        startDate: "",
-        endDate: ""
-      },
-      {
-        id: "p2",
-        duration: "90 Days",
-        price: "12150",
-        isActivePlan: true,
-        hasDiscount: true,
-        discountPct: "10",
-        startDate: "2026-01-01",
-        endDate: "2026-03-31"
-      },
-      {
-        id: "p3",
-        duration: "365 Days",
-        price: "48000",
-        isActivePlan: false,
-        hasDiscount: false,
-        discountPct: "",
-        startDate: "",
-        endDate: ""
-      }
-    ]
+  const formatDateForInput = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "";
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   };
 
-  useEffect(() => {
-    async function fetchService() {
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      subTitle: "",
+      description: "",
+      priority: 1,
+      status: "Active",
+      image: null,
+      icon: null,
+      keyBenefits: [],
+      pricingPlans: []
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .required("Service Name is required")
+        .max(100, "Service Name must be 100 characters or less"),
+      subTitle: Yup.string()
+        .required("Subtitle is required")
+        .max(150, "Subtitle must be 150 characters or less"),
+      description: Yup.string()
+        .max(500, "Description must be 500 characters or less"),
+      priority: Yup.number()
+        .required("Priority is required")
+        .min(1, "Priority must be at least 1"),
+      status: Yup.string().required("Status is required"),
+      pricingPlans: Yup.array().of(
+        Yup.object().shape({
+          durationInDays: Yup.number()
+            .required("Duration is required")
+            .min(1, "Duration must be at least 1 day"),
+          originalPrice: Yup.number()
+            .required("Price is required")
+            .min(0, "Price cannot be negative"),
+          discountPercentage: Yup.number()
+            .nullable()
+            .min(0, "Discount cannot be negative")
+            .max(100, "Discount cannot exceed 100%"),
+          saleStartDate: Yup.string().test("start-date-req", "Sale start date is required", function (val) {
+            return this.parent.isOnSale ? !!val : true;
+          }),
+          saleEndDate: Yup.string()
+            .test("end-date-req", "Sale end date is required", function (val) {
+              return this.parent.isOnSale ? !!val : true;
+            })
+            .test("end-date-after-start", "End Date must be after Start Date", function (val) {
+              const { saleStartDate, isOnSale } = this.parent;
+              if (isOnSale && saleStartDate && val) {
+                return new Date(val) > new Date(saleStartDate);
+              }
+              return true;
+            }),
+          tokens: Yup.array().of(
+            Yup.object().shape({
+              amount: Yup.number()
+                .required("Amount is required")
+                .min(1, "Amount must be at least 1"),
+              price: Yup.number()
+                .required("Price is required")
+                .min(0, "Price cannot be negative")
+            })
+          )
+        })
+      )
+    }),
+    onSubmit: async (values) => {
       try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
-        const response = await api.get(`/Services/${id}`, {
+        setSaving(true);
+        const formData = new FormData();
+        formData.append("Name", values.name);
+        formData.append("SubTitle", values.subTitle);
+        formData.append("Description", values.description);
+        formData.append("Priority", (parseInt(values.priority) || 1).toString());
+        formData.append("IsActive", (values.status === "Active") ? "True" : "False");
+
+        if (values.image instanceof File) {
+          formData.append("Image", values.image);
+        }
+        if (values.icon instanceof File) {
+          formData.append("Icon", values.icon);
+        }
+
+        // KeyBenefits
+        if (values.keyBenefits && values.keyBenefits.length > 0) {
+          values.keyBenefits.forEach((benefit, index) => {
+            if (benefit.id) {
+              formData.append(`KeyBenefits[${index}].Id`, benefit.id.toString());
+            }
+            formData.append(`KeyBenefits[${index}].Text`, benefit.text || "");
+            formData.append(`KeyBenefits[${index}].Priority`, (benefit.priority || (index + 1)).toString());
+          });
+        }
+
+        // Prices
+        if (values.pricingPlans && values.pricingPlans.length > 0) {
+          values.pricingPlans.forEach((plan, planIndex) => {
+            const planId = Number(plan.id);
+            if (plan.id && !isNaN(planId) && planId > 0 && !String(plan.id).includes('.')) {
+              formData.append(`Prices[${planIndex}].Id`, planId.toString());
+            }
+            formData.append(`Prices[${planIndex}].DurationInDays`, (parseInt(plan.durationInDays) || 30).toString());
+
+            const planPrice = parseFloat(plan.originalPrice) || 0;
+            formData.append(`Prices[${planIndex}].Price`, planPrice.toString());
+
+            // Tokens
+            const tokens = plan.tokens || [];
+            if (tokens.length > 0) {
+              tokens.forEach((token, tokenIndex) => {
+                if (token.id) {
+                  formData.append(`Prices[${planIndex}].Tokens[${tokenIndex}].Id`, token.id.toString());
+                }
+                formData.append(`Prices[${planIndex}].Tokens[${tokenIndex}].Amount`, (parseInt(token.amount) || 0).toString());
+                formData.append(`Prices[${planIndex}].Tokens[${tokenIndex}].Price`, (parseFloat(token.price) || 0).toString());
+              });
+            } else {
+              formData.append(`Prices[${planIndex}].Tokens[0].Amount`, "0");
+              formData.append(`Prices[${planIndex}].Tokens[0].Price`, "0");
+            }
+
+            // Sales
+            if (plan.isOnSale) {
+              const discountPercentage = parseFloat(plan.discountPercentage) || 0;
+              const startDate = plan.saleStartDate ? (plan.saleStartDate.includes('T') ? plan.saleStartDate : `${plan.saleStartDate}T00:00:00.000Z`) : new Date().toISOString();
+              const endDate = plan.saleEndDate ? (plan.saleEndDate.includes('T') ? plan.saleEndDate : `${plan.saleEndDate}T23:59:59.000Z`) : new Date().toISOString();
+
+              if (plan.saleId) {
+                formData.append(`Prices[${planIndex}].Sales[0].Id`, plan.saleId.toString());
+              }
+              formData.append(`Prices[${planIndex}].Sales[0].DiscountPercentage`, discountPercentage.toString());
+              formData.append(`Prices[${planIndex}].Sales[0].StartDate`, startDate);
+              formData.append(`Prices[${planIndex}].Sales[0].EndDate`, endDate);
+            }
+          });
+        }
+
+        await api.put(`/admin/services/${id}`, formData, {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${userToken}`,
+            "Content-Type": "multipart/form-data"
           }
         });
 
-        if (response.data) {
-          const data = response.data;
-          setServiceName(data.name || data.serviceName || mockService.name);
-          setSubtitle(data.subtitle || mockService.subtitle);
-          setDescription(data.description || mockService.description);
-          setPriority(data.priority !== undefined ? data.priority : mockService.priority);
-          setStatus(data.status || (data.isActive ? "Active" : "Inactive") || mockService.status);
-          setBenefits(data.benefits || mockService.benefits);
-          
-          // Map backend pricing format to editor states
-          if (data.pricingPlans && data.pricingPlans.length > 0) {
-            setPricingPlans(data.pricingPlans.map(plan => ({
-              id: plan.id || Math.random().toString(36).substr(2, 9),
-              duration: plan.duration || plan.name || "30 Days",
-              price: plan.price ? plan.price.replace(/[^\d]/g, "") : "0",
-              isActivePlan: plan.isActivePlan || plan.discountTag ? true : false,
-              hasDiscount: plan.originalPrice ? true : false,
-              discountPct: plan.discountPct || "10",
-              startDate: plan.startDate || "",
-              endDate: plan.endDate || "2026-03-31"
-            })));
-          } else {
-            setPricingPlans(mockService.pricingPlans);
-          }
-        } else {
-          loadFallbackData();
-        }
+        Swal.fire({
+          title: "Success!",
+          text: "Service updated successfully!",
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        navigate(`/dashboard/services/${id}`);
+
       } catch (error) {
-        console.warn("Backend API endpoint not resolved. Using fallback mock data.", error);
-        loadFallbackData();
+        console.log(error);
+        toast.error(
+          error?.response?.data?.errors?.[1] || "Failed to update service.",
+          {
+            position: "top-center",
+            duration: 4000,
+            style: {
+              background: "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              padding: "16px 20px",
+              color: "#ffffff",
+              fontSize: "0.95rem",
+              borderRadius: "5px",
+              width: "300px",
+              height: "60px",
+              boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+            },
+            iconTheme: {
+              primary: "#FF4D4F",
+              secondary: "#ffffff",
+            },
+          }
+        );
       } finally {
-        setLoading(false);
+        setSaving(false);
       }
     }
+  });
 
-    function loadFallbackData() {
-      setServiceName(mockService.name);
-      setSubtitle(mockService.subtitle);
-      setDescription(mockService.description);
-      setPriority(mockService.priority);
-      setStatus(mockService.status);
-      setBenefits(mockService.benefits);
-      setPricingPlans(mockService.pricingPlans);
+  async function getService() {
+    try {
+      setLoading(true);
+
+      const { data } = await api.get(`/admin/services/${id}`,
+        { headers: { Authorization: `Bearer ${userToken}` } });
+      console.log(data);
+      if (data) {
+        setServiceDetails(data);
+        formik.setValues({
+          name: data.name || "",
+          subTitle: data.subTitle || "",
+          description: data.description || "",
+          priority: data.priority || 1,
+          status: data.status || "Active",
+          image: data.imageURL || null,
+          icon: data.iconURL || null,
+          keyBenefits: data.keyBenefits ? data.keyBenefits.map((ben, idx) => {
+            if (typeof ben === 'object' && ben !== null) {
+              return {
+                id: ben.id || null,
+                text: ben.text || ben.benefit || "",
+                priority: ben.priority || (idx + 1)
+              };
+            }
+            return {
+              id: null,
+              text: ben,
+              priority: idx + 1
+            };
+          }) : [],
+          pricingPlans: data.pricingPlans ? data.pricingPlans.map(plan => {
+            const hasSale = plan.sales && plan.sales.length > 0;
+            const sale = hasSale ? plan.sales[0] : null;
+            const originalPrice = plan.originalPrice || plan.price || 0;
+            const discountPercentage = sale ? (sale.discountPercentage || 0) : (plan.discountPercentage || 0);
+            const currentPrice = (hasSale || plan.isOnSale) ? Math.max(0, originalPrice - (originalPrice * discountPercentage / 100)) : (plan.currentPrice || originalPrice);
+
+            return {
+              id: plan.id || Math.random().toString(36).substr(2, 9),
+              durationInDays: plan.durationInDays || 30,
+              originalPrice: originalPrice,
+              currentPrice: currentPrice,
+              isOnSale: hasSale || plan.isOnSale || false,
+              saleId: sale ? sale.id : (plan.saleId || null),
+              discountPercentage: discountPercentage,
+              saleStartDate: formatDateForInput(sale ? sale.startDate : plan.saleStartDate),
+              saleEndDate: formatDateForInput(sale ? sale.endDate : plan.saleEndDate),
+              tokens: plan.tokens ? plan.tokens.map(tok => ({
+                id: tok.id || null,
+                amount: tok.amount || 0,
+                price: tok.price || 0
+              })) : []
+            };
+          }) : []
+        });
+        if (data.pricingPlans && data.pricingPlans.length > 0) {
+          setOpenPlanId(data.pricingPlans[0].id);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.response?.data?.errors[1] ||
+        "Something went wrong .",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background:
+              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "100%",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        },
+      );
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchService();
-  }, [id]);
+  useEffect(() => {
+    getService();
+  }, []);
 
   // Handle file drops & selections
   const handleFileChange = (e, target) => {
     const file = e.target.files[0];
     if (file) {
       if (target === "image") {
-        setServiceImage(file);
+        formik.setFieldValue("image", file);
       } else {
-        setServiceIcon(file);
+        formik.setFieldValue("icon", file);
       }
     }
   };
@@ -167,29 +341,34 @@ export default function EditServies() {
   const removeFile = (e, target) => {
     e.stopPropagation();
     if (target === "image") {
-      setServiceImage(null);
+      formik.setFieldValue("image", null);
       if (imageInputRef.current) imageInputRef.current.value = "";
     } else {
-      setServiceIcon(null);
+      formik.setFieldValue("icon", null);
       if (iconInputRef.current) iconInputRef.current.value = "";
     }
   };
 
   // Benefits handlers
   const handleBenefitChange = (index, value) => {
-    const updated = [...benefits];
-    updated[index] = value;
-    setBenefits(updated);
+    const updated = [...formik.values.keyBenefits];
+    updated[index] = { ...updated[index], text: value };
+    formik.setFieldValue("keyBenefits", updated);
   };
 
   const deleteBenefit = (index) => {
-    const updated = benefits.filter((_, i) => i !== index);
-    setBenefits(updated);
+    const updated = formik.values.keyBenefits.filter((_, i) => i !== index);
+    formik.setFieldValue("keyBenefits", updated);
   };
 
   const addBenefit = () => {
     if (newBenefitText.trim() === "") return;
-    setBenefits([...benefits, newBenefitText.trim()]);
+    const newBen = {
+      id: null,
+      text: newBenefitText.trim(),
+      priority: formik.values.keyBenefits.length + 1
+    };
+    formik.setFieldValue("keyBenefits", [...formik.values.keyBenefits, newBen]);
     setNewBenefitText("");
   };
 
@@ -202,117 +381,153 @@ export default function EditServies() {
 
   // Pricing Plans handlers
   const handlePlanChange = (id, field, value) => {
-    setPricingPlans(pricingPlans.map(plan => {
+    const updatedPlans = formik.values.pricingPlans?.map(plan => {
       if (plan.id === id) {
-        return { ...plan, [field]: value };
+        const updated = { ...plan, [field]: value };
+        if (field === "originalPrice") {
+          const orig = parseFloat(value) || 0;
+          if (!updated.isOnSale) {
+            updated.currentPrice = orig;
+          } else {
+            const pct = parseFloat(updated.discountPercentage) || 0;
+            updated.currentPrice = Math.max(0, orig - (orig * pct / 100));
+          }
+        } else if (field === "discountPercentage" || field === "isOnSale") {
+          const orig = parseFloat(updated.originalPrice) || 0;
+          const pct = parseFloat(updated.discountPercentage) || 0;
+          if (updated.isOnSale) {
+            updated.currentPrice = Math.max(0, orig - (orig * pct / 100));
+          } else {
+            updated.currentPrice = orig;
+          }
+        }
+        return updated;
       }
       return plan;
-    }));
+    });
+    formik.setFieldValue("pricingPlans", updatedPlans);
+  };
+
+  const handleResetSale = (planId) => {
+    const updatedPlans = formik.values.pricingPlans?.map(plan => {
+      if (plan.id === planId) {
+        return {
+          ...plan,
+          isOnSale: false,
+          discountPercentage: 0,
+          saleStartDate: "",
+          saleEndDate: "",
+          sales: [],
+          currentPrice: plan.originalPrice || 0
+        };
+      }
+      return plan;
+    });
+    formik.setFieldValue("pricingPlans", updatedPlans);
+    setOpenDiscountPlanId(null);
+  };
+
+  const handleAddSaleToggle = (planId) => {
+    const isAlreadyOpen = openDiscountPlanId === planId;
+    if (isAlreadyOpen) {
+      setOpenDiscountPlanId(null);
+    } else {
+      const updatedPlans = formik.values.pricingPlans?.map(plan => {
+        if (plan.id === planId) {
+          return {
+            ...plan,
+            isOnSale: true
+          };
+        }
+        return plan;
+      });
+      formik.setFieldValue("pricingPlans", updatedPlans);
+      setOpenDiscountPlanId(planId);
+    }
   };
 
   const deletePlan = (planId) => {
-    setPricingPlans(pricingPlans.filter(p => p.id !== planId));
+    formik.setFieldValue("pricingPlans", formik.values.pricingPlans.filter(p => p.id !== planId));
+    if (openPlanId === planId) {
+      setOpenPlanId(null);
+    }
+  };
+
+  const handleTokenChange = (planId, tokenIndex, field, value) => {
+    const updatedPlans = formik.values.pricingPlans?.map(plan => {
+      if (plan.id === planId) {
+        const updatedTokens = [...(plan.tokens || [])];
+        updatedTokens[tokenIndex] = {
+          ...updatedTokens[tokenIndex],
+          [field]: value
+        };
+        return { ...plan, tokens: updatedTokens };
+      }
+      return plan;
+    });
+    formik.setFieldValue("pricingPlans", updatedPlans);
+  };
+
+  const addTokenPackage = (planId) => {
+    const updatedPlans = formik.values.pricingPlans?.map(plan => {
+      if (plan.id === planId) {
+        return {
+          ...plan,
+          tokens: [...(plan.tokens || []), { id: null, amount: 0, price: 0 }]
+        };
+      }
+      return plan;
+    });
+    formik.setFieldValue("pricingPlans", updatedPlans);
+  };
+
+  const deleteTokenPackage = (planId, tokenIndex) => {
+    const updatedPlans = formik.values.pricingPlans?.map(plan => {
+      if (plan.id === planId) {
+        return {
+          ...plan,
+          tokens: (plan.tokens || []).filter((_, idx) => idx !== tokenIndex)
+        };
+      }
+      return plan;
+    });
+    formik.setFieldValue("pricingPlans", updatedPlans);
   };
 
   const addPricingPlan = () => {
     const newPlan = {
       id: Math.random().toString(36).substr(2, 9),
-      duration: "30 Days",
-      price: "1000",
-      isActivePlan: false,
-      hasDiscount: false,
-      discountPct: "",
-      startDate: "",
-      endDate: ""
+      durationInDays: 30,
+      originalPrice: 0,
+      currentPrice: 0,
+      isOnSale: false,
+      saleId: null,
+      discountPercentage: 0,
+      saleStartDate: "",
+      saleEndDate: "",
+      tokens: [
+        {
+          amount: 0,
+          price: 0
+        }
+      ]
     };
-    setPricingPlans([...pricingPlans, newPlan]);
+    formik.setFieldValue("pricingPlans", [...formik.values.pricingPlans, newPlan]);
   };
 
   // Calculate discounts preview values
   const calculatePreviewValues = (plan) => {
-    const priceStr = String(plan.price || "").replace(/[^\d]/g, "");
-    const price = parseFloat(priceStr) || 0;
-    const pct = parseFloat(plan.discountPct) || 0;
-    const discountAmount = price * (pct / 100);
-    const finalPrice = Math.max(0, price - discountAmount);
-    
+    const originalPrice = parseFloat(plan.originalPrice) || 0;
+    const discountPct = parseFloat(plan.discountPercentage) || 0;
+    const discountAmount = originalPrice * (discountPct / 100);
+    const finalPrice = Math.max(0, originalPrice - discountAmount);
+
     return {
-      originalPrice: price,
-      discountPct: pct,
+      originalPrice,
+      discountPct,
       finalPrice: finalPrice,
       savings: discountAmount
     };
-  };
-
-  // Form Submit (Save changes)
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!serviceName.trim()) {
-      toast.error("Service Name is required!");
-      return;
-    }
-
-    try {
-      setSaving(true);
-      const token = localStorage.getItem("token");
-
-      // Format payload structure for the backend API
-      const payload = {
-        name: serviceName,
-        subtitle,
-        description,
-        priority: parseInt(priority) || 1,
-        status,
-        benefits,
-        pricingPlans: pricingPlans.map(plan => {
-          const preview = calculatePreviewValues(plan);
-          const priceNum = preview.originalPrice;
-          return {
-            id: plan.id,
-            duration: plan.duration,
-            name: plan.duration,
-            subtitle: plan.duration === "30 Days" ? "Monthly" : plan.duration === "90 Days" ? "Quarterly" : "Annual",
-            price: `EGP ${priceNum.toLocaleString()}`,
-            ...(plan.hasDiscount ? {
-              originalPrice: `EGP ${preview.originalPrice.toLocaleString()}`,
-              price: `EGP ${preview.finalPrice.toLocaleString()}`,
-              discountTag: `${plan.discountPct}% off until ${plan.endDate ? new Date(plan.endDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "31 Mar 2026"}`
-            } : {})
-          };
-        })
-      };
-
-      // Call API
-      await api.put(`/Services/${id}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      toast.success("Service updated successfully!");
-      Swal.fire({
-        icon: "success",
-        title: "Saved!",
-        text: "Service details updated successfully.",
-        confirmButtonColor: "#4E3074"
-      });
-      navigate(`/dashboard/services/${id}`);
-
-    } catch (error) {
-      console.warn("Backend API put error. Simulating success local state.", error);
-      
-      // Simulate success saving state when local environment is missing direct PUT route
-      toast.success("Service changes saved successfully! (Simulation)");
-      Swal.fire({
-        icon: "success",
-        title: "Changes Saved",
-        text: "Service details have been successfully simulated and saved locally.",
-        confirmButtonColor: "#4E3074"
-      });
-      navigate(`/dashboard/services/${id}`);
-    } finally {
-      setSaving(false);
-    }
   };
 
   if (loading) {
@@ -324,17 +539,23 @@ export default function EditServies() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={style.editPage}>
+    <form onSubmit={formik.handleSubmit} className={style.editPage}>
       {/* Top Header & Breadcrumbs */}
-      <div className={style.headerArea}>
-        <div className={style.headerLeft}>
-          <Link to={`/dashboard/services/${id}`} className={style.backBtn}>
-            <i class="fa-solid fa-arrow-left"></i>
-          </Link>
-          <div className={style.titleMeta}>
-            <h1 className={style.mainTitle}>Edit {serviceName}</h1>
-          </div>
+      <div className={style.breadcrumbHeader}>
+        <div className={style.breadcrumbRow}>
+          <button
+            type="button"
+            className={style.backBtn}
+            onClick={() => navigate(-1)}
+            title="Back to Services"
+          >
+            <FaArrowLeft />
+          </button>
+          <span className={style.breadcrumbLink} onClick={() => navigate(-1)}>Services</span>
+          <span className={style.breadcrumbSeparator}>/</span>
+          <span className={style.breadcrumbActive}>Edit Service</span>
         </div>
+        <h1 className={style.pageTitle}>Edit {serviceDetails.name}</h1>
       </div>
 
       <div className={style.cardsContainer}>
@@ -344,39 +565,53 @@ export default function EditServies() {
           <div className={style.infoGrid}>
             <div className={style.gridItemHalf}>
               <div className={style.inputGroup}>
-                <label className={style.infoLabel}>Service Name<span style={{color:"#ED5A6A",marginLeft:"5px"}}>*</span></label>
+                <label className={style.infoLabel}>Service Name<span style={{ color: "#ED5A6A", marginLeft: "5px" }}>*</span></label>
                 <input
                   type="text"
+                  name="name"
                   className={style.inputField}
-                  value={serviceName}
-                  onChange={(e) => setServiceName(e.target.value)}
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   placeholder="e.g. AI Recommendation"
-                  required
                 />
+                {formik.touched.name && formik.errors.name && (
+                  <div className={style.errorMessage}>{formik.errors.name}</div>
+                )}
               </div>
             </div>
             <div className={style.gridItemHalf}>
               <div className={style.inputGroup}>
-                <label className={style.infoLabel}>Subtitle<span style={{color:"#ED5A6A",marginLeft:"5px"}}>*</span></label>
+                <label className={style.infoLabel}>Subtitle<span style={{ color: "#ED5A6A", marginLeft: "5px" }}>*</span></label>
                 <input
                   type="text"
+                  name="subTitle"
                   className={style.inputField}
-                  value={subtitle}
-                  onChange={(e) => setSubtitle(e.target.value)}
+                  value={formik.values.subTitle}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   placeholder="e.g. Personalized AI-driven recommendations"
                 />
+                {formik.touched.subTitle && formik.errors.subTitle && (
+                  <div className={style.errorMessage}>{formik.errors.subTitle}</div>
+                )}
               </div>
             </div>
             <div className={style.gridItemFull}>
               <div className={style.inputGroup}>
                 <label className={style.infoLabel}>Description</label>
                 <textarea
+                  name="description"
                   className={style.inputField}
                   style={{ minHeight: "100px", resize: "vertical" }}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   placeholder="Describe your service in detail..."
                 />
+                {formik.touched.description && formik.errors.description && (
+                  <div className={style.errorMessage}>{formik.errors.description}</div>
+                )}
               </div>
             </div>
             <div className={style.gridItemHalf}>
@@ -384,12 +619,17 @@ export default function EditServies() {
                 <label className={style.infoLabel}>Priority</label>
                 <input
                   type="number"
+                  name="priority"
                   className={style.inputField}
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value)}
+                  value={formik.values.priority}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   min="1"
                   max="100"
                 />
+                {formik.touched.priority && formik.errors.priority && (
+                  <div className={style.errorMessage}>{formik.errors.priority}</div>
+                )}
               </div>
             </div>
             <div className={style.gridItemHalf}>
@@ -399,13 +639,13 @@ export default function EditServies() {
                   <label className={style.switch}>
                     <input
                       type="checkbox"
-                      checked={status === "Active"}
-                      onChange={(e) => setStatus(e.target.checked ? "Active" : "Inactive")}
+                      checked={formik.values.status === "Active"}
+                      onChange={(e) => formik.setFieldValue("status", e.target.checked ? "Active" : "Inactive")}
                     />
                     <span className={style.slider}></span>
                   </label>
-                  <span className={`${style.statusLabel} ${status !== "Active" ? style.inactive : ""}`}>
-                    {status}
+                  <span className={`${style.statusLabel} ${formik.values.status !== "Active" ? style.inactive : ""}`}>
+                    {formik.values.status}
                   </span>
                 </div>
               </div>
@@ -428,14 +668,14 @@ export default function EditServies() {
                   accept="image/*"
                   onChange={(e) => handleFileChange(e, "image")}
                 />
-                {serviceImage ? (
+                {formik.values.image ? (
                   <div className={style.previewContainer}>
-                    <button className={style.removeFileBtn} onClick={(e) => removeFile(e, "image")}>
+                    <button type="button" className={style.removeFileBtn} onClick={(e) => removeFile(e, "image")}>
                       <i className="fa-solid fa-xmark"></i>
                     </button>
                     <img
                       className={style.previewImg}
-                      src={typeof serviceImage === "string" ? serviceImage : URL.createObjectURL(serviceImage)}
+                      src={typeof formik.values.image === "string" ? (formik.values.image.startsWith("http") ? formik.values.image : `https://deebai.runasp.net/${formik.values.image}`) : URL.createObjectURL(formik.values.image)}
                       alt="Service"
                     />
                   </div>
@@ -462,14 +702,14 @@ export default function EditServies() {
                   accept="image/*"
                   onChange={(e) => handleFileChange(e, "icon")}
                 />
-                {serviceIcon ? (
+                {formik.values.icon ? (
                   <div className={style.previewContainer}>
-                    <button className={style.removeFileBtn} onClick={(e) => removeFile(e, "icon")}>
+                    <button type="button" className={style.removeFileBtn} onClick={(e) => removeFile(e, "icon")}>
                       <i className="fa-solid fa-xmark"></i>
                     </button>
                     <img
                       className={style.previewImg}
-                      src={typeof serviceIcon === "string" ? serviceIcon : URL.createObjectURL(serviceIcon)}
+                      src={typeof formik.values.icon === "string" ? (formik.values.icon.startsWith("http") ? formik.values.icon : `https://deebai.runasp.net/${formik.values.icon}`) : URL.createObjectURL(formik.values.icon)}
                       alt="Icon"
                     />
                   </div>
@@ -491,13 +731,13 @@ export default function EditServies() {
         <section className={style.detailsCard}>
           <h2 className={style.cardTitle}>Key Benefits</h2>
           <div className={style.benefitsList}>
-            {benefits.map((benefit, index) => (
+            {formik.values.keyBenefits?.map((benefit, index) => (
               <div key={index} className={style.benefitInputRow}>
                 <span className={style.checkIcon}>✓</span>
                 <input
                   type="text"
                   className={style.benefitInput}
-                  value={benefit}
+                  value={benefit.text}
                   onChange={(e) => handleBenefitChange(index, e.target.value)}
                 />
                 <button
@@ -534,61 +774,140 @@ export default function EditServies() {
 
         {/* Card 4: Pricing Configuration */}
         <section className={style.detailsCard}>
-          <h2 className={style.cardTitle}>Pricing Configuration</h2>
-          <div className={style.pricingTableWrapper}>
-            <table className={style.pricingTable}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: "left" }}>Duration</th>
-                  <th style={{ textAlign: "center" }}>Price</th>
-                  <th style={{ textAlign: "center" }}>Active Sale</th>
-                  <th style={{ textAlign: "right" }}>Remove</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pricingPlans.map((plan) => (
-                  <tr key={plan.id}>
-                    <td style={{ textAlign: "left" }}>
-                      <input
-                        type="text"
-                        className={style.borderlessInput}
-                        value={plan.duration}
-                        onChange={(e) => handlePlanChange(plan.id, "duration", e.target.value)}
-                        placeholder="e.g. 30 Days"
-                      />
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      <input
-                        type="text"
-                        className={style.borderlessPriceInput}
-                        value={plan.price}
-                        onChange={(e) => handlePlanChange(plan.id, "price", e.target.value)}
-                        placeholder="EGP 5,000"
-                      />
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      {plan.hasDiscount && plan.discountPct ? (
-                        <span className={style.saleBadge}>
-                          <i className="fa-solid fa-bolt" style={{ fontSize: "11px" }}></i> {plan.discountPct}% off
+          <div className={style.cardHeaderRow}>
+            <h2 className={style.cardTitle}>Pricing Configuration</h2>
+          </div>
+
+          <div className={style.plansContainer}>
+            {formik.values.pricingPlans?.map((plan, planIndex) => {
+              const isOpen = openPlanId === plan.id;
+              const tokenCount = plan.tokens?.length || 0;
+              const hasSale = plan.isOnSale && plan.discountPercentage;
+              const saleText = hasSale ? `${plan.discountPercentage}% off` : "No sale";
+
+              return (
+                <div key={plan.id} className={style.planAccordionCard}>
+                  {/* Accordion Header */}
+                  <div
+                    className={style.planAccordionHeader}
+                    onClick={() => setOpenPlanId(isOpen ? null : plan.id)}
+                  >
+                    <div className={style.headerLeft}>
+                      <span className={`${style.toggleArrow} ${isOpen ? style.arrowOpen : ""}`}>
+                        <i className="fa-solid fa-chevron-down"></i>
+                      </span>
+                      <div className={style.headerText}>
+                        <h3 className={style.planTitle}>{plan.durationInDays || 0} Days</h3>
+                        <span className={style.planSubtitle}>
+                          {tokenCount} token packages - {saleText}
                         </span>
-                      ) : (
-                        <span className={style.noSale}>—</span>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <button
-                        type="button"
-                        className={style.removeBtn}
-                        onClick={() => deletePlan(plan.id)}
-                        title="Remove Plan"
-                      >
-                        <i className="fa-regular fa-trash-can"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className={style.deletePlanBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deletePlan(plan.id);
+                      }}
+                    >
+                      <i className="fa-regular fa-trash-can"></i> Delete Plan
+                    </button>
+                  </div>
+
+                  {/* Accordion Body */}
+                  {isOpen && (
+                    <div className={style.planAccordionBody}>
+                      <div className={style.planDetailsSection}>
+                        <h4 className={style.sectionSubTitle}>PLAN DETAILS</h4>
+                        <div className={style.detailsGrid}>
+                          <div className={style.inputGroup}>
+                            <label className={style.infoLabel}>Duration</label>
+                            <input
+                              type="number"
+                              className={style.inputField}
+                              value={plan.durationInDays}
+                              onChange={(e) => handlePlanChange(plan.id, "durationInDays", e.target.value)}
+                              placeholder="30"
+                            />
+                            {formik.errors.pricingPlans?.[planIndex]?.durationInDays && (
+                              <div className={style.errorMessage}>{formik.errors.pricingPlans[planIndex].durationInDays}</div>
+                            )}
+                          </div>
+                          <div className={style.inputGroup}>
+                            <label className={style.infoLabel}>Service Price</label>
+                            <input
+                              type="number"
+                              className={style.inputField}
+                              value={plan.originalPrice}
+                              onChange={(e) => handlePlanChange(plan.id, "originalPrice", e.target.value)}
+                              placeholder="0"
+                            />
+                            {formik.errors.pricingPlans?.[planIndex]?.originalPrice && (
+                              <div className={style.errorMessage}>{formik.errors.pricingPlans[planIndex].originalPrice}</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={style.tokenPackagesSection}>
+                        <div className={style.tokenSectionHeader}>
+                          <h4 className={style.sectionSubTitle}>TOKEN PACKAGES</h4>
+                          <span className={style.packageCountLabel}>{tokenCount} packages</span>
+                        </div>
+
+                        <div className={style.tokensList}>
+                          {plan.tokens?.map((token, tokenIndex) => (
+                            <div key={tokenIndex} className={style.tokenPackageRow}>
+                              <div className={style.tokenRowLeft}>
+                                <span className={style.boltIcon}>
+                                  <i className="fa-solid fa-bolt"></i>
+                                </span>
+                                <div className={style.tokenInputsContainer}>
+                                  <input
+                                    type="number"
+                                    className={style.tokenAmountInput}
+                                    value={token.amount || ""}
+                                    onChange={(e) => handleTokenChange(plan.id, tokenIndex, "amount", e.target.value)}
+                                    placeholder="10000"
+                                  />
+                                  <span className={style.tokenText}>tokens</span>
+                                  <span className={style.tokenDivider}>|</span>
+                                  <input
+                                    type="number"
+                                    className={style.tokenPriceInput}
+                                    value={token.price || ""}
+                                    onChange={(e) => handleTokenChange(plan.id, tokenIndex, "price", e.target.value)}
+                                    placeholder="200"
+                                  />
+                                  <span className={style.tokenCurrency}>EGP</span>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                className={style.deleteTokenBtn}
+                                onClick={() => deleteTokenPackage(plan.id, tokenIndex)}
+                                title="Remove package"
+                              >
+                                <i className="fa-solid fa-xmark"></i>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          className={style.addTokenPkgBtn}
+                          onClick={() => addTokenPackage(plan.id)}
+                        >
+                          <i className="fa-solid fa-plus"></i> Add Token Package
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           <button type="button" className={style.addPlanBtn} onClick={addPricingPlan}>
@@ -601,25 +920,24 @@ export default function EditServies() {
           <h2 className={style.cardTitle}>Sales & Discounts</h2>
           <p className={style.cardSubtitle}>Apply specific percentage discounts and start/end dates to existing plans.</p>
           <div className={style.salesGrid}>
-            {pricingPlans.map((plan) => {
+            {formik.values.pricingPlans?.map((plan, planIndex) => {
               const preview = calculatePreviewValues(plan);
               const originalVal = preview.originalPrice;
-              const hasActiveDiscount = plan.hasDiscount && plan.discountPct;
+              const hasActiveDiscount = plan.isOnSale && plan.discountPercentage;
               const isPanelOpen = openDiscountPlanId === plan.id;
 
               return (
                 <div key={plan.id} className={style.salesCard}>
                   <div
                     className={style.salesHeaderRow}
-                    onClick={() => setOpenDiscountPlanId(isPanelOpen ? null : plan.id)}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                       <h3 className={style.salesCardTitle}>
-                        {plan.duration} — EGP {originalVal.toLocaleString()}
+                        {plan.durationInDays} Days — EGP {originalVal.toLocaleString()}
                       </h3>
                       {hasActiveDiscount && (
                         <span className={style.activeSaleBadge}>
-                          {plan.discountPct}% off active
+                          {plan.discountPercentage}% off active
                         </span>
                       )}
                     </div>
@@ -628,7 +946,7 @@ export default function EditServies() {
                       className={style.addSaleBtn}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenDiscountPlanId(isPanelOpen ? null : plan.id);
+                        handleAddSaleToggle(plan.id);
                       }}
                     >
                       <i className="fa-solid fa-bolt" style={{ fontSize: "11px" }}></i>{" "}
@@ -644,30 +962,39 @@ export default function EditServies() {
                           <input
                             type="number"
                             className={style.inputField}
-                            value={plan.discountPct}
-                            onChange={(e) => handlePlanChange(plan.id, "discountPct", e.target.value)}
+                            value={plan.discountPercentage || ""}
+                            onChange={(e) => handlePlanChange(plan.id, "discountPercentage", e.target.value)}
                             placeholder="e.g. 10"
                             min="1"
                             max="100"
                           />
+                          {formik.errors.pricingPlans?.[planIndex]?.discountPercentage && (
+                            <div className={style.errorMessage}>{formik.errors.pricingPlans[planIndex].discountPercentage}</div>
+                          )}
                         </div>
                         <div className={style.inputGroup}>
                           <label className={style.infoLabel}>Start Date</label>
                           <input
                             type="date"
                             className={style.inputField}
-                            value={plan.startDate}
-                            onChange={(e) => handlePlanChange(plan.id, "startDate", e.target.value)}
+                            value={plan.saleStartDate || ""}
+                            onChange={(e) => handlePlanChange(plan.id, "saleStartDate", e.target.value)}
                           />
+                          {formik.errors.pricingPlans?.[planIndex]?.saleStartDate && (
+                            <div className={style.errorMessage}>{formik.errors.pricingPlans[planIndex].saleStartDate}</div>
+                          )}
                         </div>
                         <div className={style.inputGroup}>
                           <label className={style.infoLabel}>End Date</label>
                           <input
                             type="date"
                             className={style.inputField}
-                            value={plan.endDate}
-                            onChange={(e) => handlePlanChange(plan.id, "endDate", e.target.value)}
+                            value={plan.saleEndDate || ""}
+                            onChange={(e) => handlePlanChange(plan.id, "saleEndDate", e.target.value)}
                           />
+                          {formik.errors.pricingPlans?.[planIndex]?.saleEndDate && (
+                            <div className={style.errorMessage}>{formik.errors.pricingPlans[planIndex].saleEndDate}</div>
+                          )}
                         </div>
                       </div>
 
@@ -705,26 +1032,20 @@ export default function EditServies() {
                         <button
                           type="button"
                           className={style.removeSaleLink}
-                          onClick={() => {
-                            handlePlanChange(plan.id, "hasDiscount", false);
-                            handlePlanChange(plan.id, "discountPct", "");
-                            handlePlanChange(plan.id, "startDate", "");
-                            handlePlanChange(plan.id, "endDate", "");
-                            setOpenDiscountPlanId(null);
-                          }}
+                          onClick={() => handleResetSale(plan.id)}
                         >
                           Remove Sale
                         </button>
-                        <button
+                        {/* <button
                           type="button"
                           className={style.updateSaleBtn}
                           onClick={() => {
-                            handlePlanChange(plan.id, "hasDiscount", true);
+                            handlePlanChange(plan.id, "isOnSale", true);
                             setOpenDiscountPlanId(null);
                           }}
                         >
                           Update Sale
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   )}
@@ -744,7 +1065,7 @@ export default function EditServies() {
           >
             Cancel
           </button>
-          <button type="submit" className={style.saveBtn} disabled={saving}>
+          <button type="submit" className={style.saveBtn} disabled={saving || !formik.isValid}>
             {saving ? "Saving..." : "Save changes"}
           </button>
         </div>

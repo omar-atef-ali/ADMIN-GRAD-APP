@@ -17,6 +17,7 @@
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -111,22 +112,22 @@
 }
 
 .activeBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
-    padding: 5px 10px;
-    border: none;
-    border-radius: 999px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 999px;
 
-    background: #E8F8F0;
-    color: #0A8F4D;
+  background: #E8F8F0;
+  color: #0A8F4D;
 
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 
-    transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .inactiveBadge {
@@ -135,10 +136,10 @@
 }
 
 .dot {
-    width: 7px;
-    height: 7px;
-    background: #22C55E;
-    border-radius: 50%;
+  width: 7px;
+  height: 7px;
+  background: #22C55E;
+  border-radius: 50%;
 }
 
 /* Edit Button */
@@ -330,20 +331,31 @@
   gap: 14px;
 }
 
-.planRow {
+/* Pricing Plans Cards Design */
+.planCard {
+  border: 1px solid #F1EDE9;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.planCard:last-child {
+  margin-bottom: 0;
+}
+
+.planHeaderRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 20px 24px;
   background-color: #FFFFFF;
-  border: 1px solid #F1EDE9;
-  border-radius: 12px;
-  transition: all 0.3s ease;
 }
 
-
-
-.planLeft {
+.planHeaderLeft {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -384,41 +396,153 @@
   margin: 0;
 }
 
-.planRight {
+.planStatsRow {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.statCol {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: 4px;
 }
 
-.planPrice {
+.statLabel {
   font-family: 'DM Sans', sans-serif;
-  font-size: 1.15rem;
+  font-size: 0.72rem;
+  color: #9C9A97;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.statValueBold {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1C1814;
+}
+
+.saleLabelBadge {
+  background-color: #FFF2E6;
+  color: #E65C00;
+  border: 1px solid #FFE0C2;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.planTokensList {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #F1EDE9;
+  background-color: #FFFFFF;
+}
+
+.planTokenRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid #FDFCFB;
+  transition: background-color 0.2s ease;
+}
+
+.planTokenRow:last-child {
+  border-bottom: none;
+}
+
+.planTokenRow:hover {
+  background-color: #FAF9F8;
+}
+
+.tokenRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tokenBoltIcon {
+  color: #4E3074;
+  font-size: 0.95rem;
+}
+
+.tokenAmountText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: #4A4745;
+  font-weight: 500;
+}
+
+.tokenPriceText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #4E3074;
 }
 
-.discountWrapper {
+/* Sale Banner Row styling */
+.saleBannerRow {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  padding: 14px 24px;
+  background-color: #FFF9F3;
+  border-top: 1px solid #FFE6CC;
 }
 
-.originalPrice {
+.saleBannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.bannerSaleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #FFE6CC;
+  color: #E65C00;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.saleDatesText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #72706E;
+  font-weight: 500;
+}
+
+.saleBannerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.bannerOriginalPrice {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.8rem;
   color: #9C9A97;
   text-decoration: line-through;
 }
 
-.discountTag {
+.bannerFinalPrice {
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.78rem;
-  color: #D48C27;
-  font-weight: 600;
-  background-color: rgba(212, 140, 39, 0.08);
-  padding: 2px 8px;
-  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1C1814;
+}
+
+.bannerSavingsAmount {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0A8F4D;
 }
 
 /* Spinner loading overlay */
@@ -446,8 +570,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Media Queries */
@@ -457,7 +586,7 @@
     align-items: flex-start;
     gap: 16px;
   }
-  
+
   .editBtn {
     width: 100%;
     justify-content: center;
@@ -468,21 +597,41 @@
     gap: 16px;
   }
 
-  .gridItemHalf, .gridItemThird {
+  .gridItemHalf,
+  .gridItemThird {
     grid-column: span 12;
   }
-  
-  .planRow {
+
+  .planHeaderRow {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
     padding: 16px;
   }
-  
-  .planRight {
-    align-items: flex-start;
+
+  .planStatsRow {
     width: 100%;
+    justify-content: space-between;
+    gap: 12px;
     border-top: 1px solid #F1EDE9;
     padding-top: 12px;
+  }
+
+  .statCol {
+    align-items: flex-start;
+  }
+
+  .saleBannerRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .saleBannerRight {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px dashed #FFE6CC;
+    padding-top: 8px;
   }
 }

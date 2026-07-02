@@ -8,10 +8,22 @@ export default function ViewServies() {
   const navigate = useNavigate();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
+  const formatDateForDisplay = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  };
 
-  // Fallback premium mock data matching the screenshot exactly
-
-
+  const getDurationSubtitle = (days) => {
+    if (days === 30) return "Monthly";
+    if (days === 90) return "Quarterly";
+    if (days === 365) return "Annual";
+    if (days === 7) return "Weekly";
+    return "Custom Duration";
+  };
   useEffect(() => {
     async function fetchService() {
       try {
@@ -27,6 +39,30 @@ export default function ViewServies() {
 
       } catch (error) {
         console.log(error);
+        toast.error(
+          error?.response?.data?.errors[1] ||
+          "Failed to fetch service.",
+          {
+            position: "top-center",
+            duration: 4000,
+            style: {
+              background:
+                "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              padding: "16px 20px",
+              color: "#ffffff",
+              fontSize: "0.95rem",
+              borderRadius: "5px",
+              width: "300px",
+              height: "60px",
+              boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+            },
+            iconTheme: {
+              primary: "#FF4D4F",
+              secondary: "#ffffff",
+            },
+          }
+        );
 
       } finally {
         setLoading(false);
@@ -120,7 +156,11 @@ export default function ViewServies() {
             {service.keyBenefits?.map((benefit, index) => (
               <div key={index} className={style.benefitRow}>
                 <span className={style.checkIcon}>✓</span>
-                <span className={style.benefitText}> {benefit}</span>
+                <span className={style.benefitText}>
+                  {typeof benefit === "object" && benefit !== null
+                    ? (benefit.text || benefit.benefit || "")
+                    : benefit}
+                </span>
               </div>
             ))}
           </div>
@@ -130,38 +170,96 @@ export default function ViewServies() {
         <section className={style.detailsCard}>
           <div className={style.cardHeaderRow}>
             <h2 className={`${style.cardTitle} totalFont`}>Pricing Plans</h2>
-            <span className={style.countBadge}> plans</span>
+            <span className={style.countBadge}>{service.pricingPlans?.length || 0} plans</span>
           </div>
           <div className={style.plansList}>
-            {service.pricingPlans?.map((plan) => (
-              <div key={plan.id} className={style.planRow}>
-                <div className={style.planLeft}>
-                  <div className={style.planDurationBadge}>
-                    {plan.id}
+            {service.pricingPlans?.map((plan) => {
+              const hasSale = (plan.sales && plan.sales.length > 0) || plan.isOnSale;
+              const sale = plan.sales && plan.sales.length > 0 ? plan.sales[0] : null;
+              const discountPercentage = sale ? sale.discountPercentage : (plan.discountPercentage || 0);
+              const startDate = sale ? sale.startDate : plan.saleStartDate;
+              const endDate = sale ? sale.endDate : plan.saleEndDate;
+              const originalPrice = plan.originalPrice || plan.price || 0;
+              const savings = originalPrice * (discountPercentage / 100);
+              const currentPrice = originalPrice - savings;
+              const tokenCount = plan.tokens?.length || 0;
+
+              return (
+                <div key={plan.id} className={style.planCard}>
+                  {/* Plan Main Header */}
+                  <div className={style.planHeaderRow}>
+                    <div className={style.planHeaderLeft}>
+                      <div className={style.planDurationBadge}>
+                        {plan.durationInDays}d
+                      </div>
+                      <div className={style.planMeta}>
+                        <h4 className={style.planName}>{plan.durationInDays} Days</h4>
+                        <span className={style.planSubtitle}>
+                          {getDurationSubtitle(plan.durationInDays)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={style.planStatsRow}>
+                      <div className={style.statCol}>
+                        <span className={style.statLabel}>Service Price</span>
+                        <span className={style.statValueBold}>EGP {originalPrice.toLocaleString()}</span>
+                      </div>
+                      <div className={style.statCol}>
+                        <span className={style.statLabel}>Token Packages</span>
+                        <span className={style.statValueBold}>{tokenCount}</span>
+                      </div>
+                      {hasSale && discountPercentage > 0 && (
+                        <div className={style.statCol}>
+                          <span className={style.statLabel}>Sale</span>
+                          <span className={style.saleLabelBadge}>{discountPercentage}% off</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className={style.planMeta}>
-                    <h4 className={style.planName}>{plan.durationInDays} Days</h4>
-                  </div>
-                </div>
-                <div className={style.planRight}>
-                  {plan.isOnSale && (
-                    <span className={style.originalPrice}>EGP {plan.originalPrice}</span>
+
+                  {/* Token Packages Rows */}
+                  {tokenCount > 0 && (
+                    <div className={style.planTokensList}>
+                      {plan.tokens.map((tok, tIdx) => (
+                        <div key={tok.id || tIdx} className={style.planTokenRow}>
+                          <div className={style.tokenRowLeft}>
+                            <span className={style.tokenBoltIcon}>
+                              <i className="fa-solid fa-bolt"></i>
+                            </span>
+                            <span className={style.tokenAmountText}>
+                              {(tok.amount || 0).toLocaleString()} tokens
+                            </span>
+                          </div>
+                          <span className={style.tokenPriceText}>
+                            EGP {(tok.price || 0).toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   )}
-                  <span className={style.planPrice}>EGP {plan.currentPrice}</span>
-                  {plan.originalPrice && plan.isOnSale && (
-                    <div className={style.discountWrapper}>
-                      <span className={style.discountTag}>
-                        {plan.discountPercentage}% Off - until {new Date(plan.saleEndDate).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </span>
+
+                  {/* Active Sale Banner Row */}
+                  {hasSale && discountPercentage > 0 && (
+                    <div className={style.saleBannerRow}>
+                      <div className={style.saleBannerLeft}>
+                        <span className={style.bannerSaleBadge}>
+                          <i className="fa-solid fa-bolt" style={{ fontSize: "10px" }}></i> {discountPercentage}% off
+                        </span>
+                        <span className={style.saleDatesText}>
+                          {formatDateForDisplay(startDate)} → {formatDateForDisplay(endDate)}
+                        </span>
+                      </div>
+                      <div className={style.saleBannerRight}>
+                        <span className={style.bannerOriginalPrice}>EGP {originalPrice.toLocaleString()}</span>
+                        <span className={style.bannerFinalPrice}>EGP {currentPrice.toLocaleString()}</span>
+                        <span className={style.bannerSavingsAmount}>-EGP {savings.toLocaleString()}</span>
+                      </div>
                     </div>
                   )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </div>
