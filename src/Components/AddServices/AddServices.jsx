@@ -1,77 +1,201 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AddServices.module.css";
+import * as yup from "yup";
 import {
     FaArrowLeft,
     FaPlus,
     FaTrashAlt,
     FaTimes,
-    FaBolt,
-    FaCalendarAlt,
     FaCloudUploadAlt
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
+import api from "../../api";
+import { userContext } from "../../context/userContext";
+import toast from "react-hot-toast";
 
 export default function AddServices() {
     const navigate = useNavigate();
+    const { userToken } = useContext(userContext);
 
-    // let formik = useFormik({
-    //     initialValues: {
-    //         ServiceName: "",
-    //         Subtitle: "",
-    //         Description: "",
-    //         Priority: 1,
-    //         Status: true,
-    //     },
-    //     onSubmit:s
-
-    // })
-
-    // Basic Information states
-    const [name, setName] = useState("");
-    const [subtitle, setSubtitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [priority, setPriority] = useState(1);
-    const [status, setStatus] = useState(true); // true = Active, false = Inactive
-
-    // Media Assets states
-    const [bannerImage, setBannerImage] = useState(null);
+    // Media previews
     const [bannerPreview, setBannerPreview] = useState(null);
-    const [serviceIcon, setServiceIcon] = useState(null);
     const [iconPreview, setIconPreview] = useState(null);
 
     // Refs for file inputs
     const bannerInputRef = useRef(null);
     const iconInputRef = useRef(null);
 
-    // Key Benefits states
+    // Key Benefits input temp state
     const [benefitInput, setBenefitInput] = useState("");
-    const [benefits, setBenefits] = useState([]);
 
-    // Pricing Plans states
-    const [pricingPlans, setPricingPlans] = useState([]);
+    // Pricing Plans modal states
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newPlanDuration, setNewPlanDuration] = useState("");
     const [newPlanPrice, setNewPlanPrice] = useState("");
 
-    // Accordion State for Sales section
-    // Stores the plan ID of the open sale dropdown
-    const [openSaleId, setOpenSaleId] = useState(null);
+    // Token list inside the modal
+    const [tokensList, setTokensList] = useState([]); // [{ amount: "", price: "" }]
 
-    // Temp inputs for Sales (tracked per plan to allow editing before applying)
-    const [salesData, setSalesData] = useState({}); // format: { [planId]: { discountPercent: '', startDate: '', endDate: '' } }
+    // Sale inside the modal
+    const [hasSale, setHasSale] = useState(false);
+    const [newPlanDiscount, setNewPlanDiscount] = useState("");
+    const [newPlanStartDate, setNewPlanStartDate] = useState("");
+    const [newPlanEndDate, setNewPlanEndDate] = useState("");
 
-    // Handle character limit count helpers
     const nameLimit = 80;
     const subtitleLimit = 120;
     const descriptionLimit = 500;
+
+    // Formik & Yup configuration
+    const formik = useFormik({
+        initialValues: {
+            Name: "",
+            SubTitle: "",
+            Description: "",
+            Priority: "",
+            IsActive: true,
+            Image: null,
+            Icon: null,
+            KeyBenefits: [],
+            Prices: []
+        },
+        validationSchema: yup.object({
+            Name: yup
+                .string("Service name must be a string")
+                .required("Service name is required")
+                .max(80, "Service name must be 80 characters or less"),
+            SubTitle: yup
+                .string("Subtitle must be a string")
+                .required("Subtitle is required")
+                .max(120, "Subtitle must be 120 characters or less"),
+            Description: yup
+                .string("Description must be a string")
+                .required("Description is required")
+                .max(500, "Description must be 500 characters or less"),
+            Priority: yup
+                .number("Priority must be a number")
+                .typeError("Priority must be a number")
+                .required("Priority is required")
+                .min(1, "Priority must be at least 1"),
+            IsActive: yup.boolean(),
+            Prices: yup
+                .array()
+                .min(1, "Please add at least one pricing plan")
+                .required("Pricing plans are required")
+        }),
+        onSubmit: async (values) => {
+            // const loadingAlert = Swal.fire({
+            //     title: "Creating Service...",
+            //     text: "Please wait while we set up the new service.",
+            //     allowOutsideClick: false,
+            //     didOpen: () => {
+            //         Swal.showLoading();
+            //     }
+            // });
+
+            try {
+                const formData = new FormData();
+                formData.append("Name", values.Name.trim());
+                formData.append("SubTitle", values.SubTitle.trim());
+                formData.append("Description", values.Description.trim());
+                // formData.append("Priority", parseInt(values.Priority) || 1);
+                formData.append("Priority", parseInt(values.Priority));
+                formData.append("IsActive", values.IsActive);
+
+                if (values.Image) {
+                    formData.append("Image", values.Image);
+                }
+                if (values.Icon) {
+                    formData.append("Icon", values.Icon);
+                }
+
+                // KeyBenefits
+                values.KeyBenefits.forEach((benefit, index) => {
+                    formData.append(`KeyBenefits[${index}].text`, benefit);
+                    formData.append(`KeyBenefits[${index}].priority`, index + 1);
+                });
+
+                // Prices
+                values.Prices.forEach((plan, index) => {
+                    formData.append(`Prices[${index}].durationInDays`, parseInt(plan.duration) || 0);
+                    formData.append(`Prices[${index}].price`, parseFloat(plan.price) || 0);
+
+                    // tokens inside price plan
+                    if (plan.tokens && plan.tokens.length > 0) {
+                        plan.tokens.forEach((tok, tokIdx) => {
+                            formData.append(`Prices[${index}].tokens[${tokIdx}].amount`, parseInt(tok.amount) || 0);
+                            formData.append(`Prices[${index}].tokens[${tokIdx}].price`, parseFloat(tok.price) || 0);
+                        });
+                    }
+
+                    // sales inside price plan
+                    if (plan.saleApplied && plan.saleData) {
+                        formData.append(`Prices[${index}].sales[0].discountPercentage`, parseFloat(plan.saleData.discountPercent) || 0);
+                        formData.append(`Prices[${index}].sales[0].startDate`, new Date(plan.saleData.startDate).toISOString());
+                        formData.append(`Prices[${index}].sales[0].endDate`, new Date(plan.saleData.endDate).toISOString());
+                    }
+                });
+
+                await api.post("/admin/services", formData, {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                        "Content-Type": "multipart/form-data"
+                    }
+                });
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Service Created!",
+                    text: "Your new service was successfully created.",
+                    confirmButtonColor: "#4E3074"
+                }).then(() => {
+                    navigate("/dashboard/services");
+                });
+
+            } catch (error) {
+                console.error("API error creating service", error);
+                // const apiErrorMsg = error.response?.data?.message || error.response?.data?.errors?.[0] || "Failed to create service.";
+                // Swal.fire({
+                //     icon: "error",
+                //     title: "Creation Failed",
+                //     text: apiErrorMsg,
+                //     confirmButtonColor: "#4E3074"
+                // });
+                toast.error(
+                    error.response?.data?.errors[1] ||
+                    "Something went wrong while registration.",
+                    {
+                        position: "top-center",
+                        duration: 4000,
+                        style: {
+                            background:
+                                "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                            padding: "16px 20px",
+                            color: "#ffffff",
+                            fontSize: "0.95rem",
+                            borderRadius: "5px",
+                            width: "300px",
+                            height: "100%",
+                            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                        },
+                        iconTheme: {
+                            primary: "#FF4D4F",
+                            secondary: "#ffffff",
+                        },
+                    },
+                );
+            }
+        }
+    });
 
     // Handle File uploads
     const handleBannerChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setBannerImage(file);
+            formik.setFieldValue("Image", file);
             setBannerPreview(URL.createObjectURL(file));
         }
     };
@@ -79,7 +203,7 @@ export default function AddServices() {
     const handleIconChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setServiceIcon(file);
+            formik.setFieldValue("Icon", file);
             setIconPreview(URL.createObjectURL(file));
         }
     };
@@ -87,8 +211,8 @@ export default function AddServices() {
     // Key Benefits handlers
     const handleAddBenefit = () => {
         const trimmed = benefitInput.trim();
-        if (trimmed && !benefits.includes(trimmed)) {
-            setBenefits([...benefits, trimmed]);
+        if (trimmed && !formik.values.KeyBenefits.includes(trimmed)) {
+            formik.setFieldValue("KeyBenefits", [...formik.values.KeyBenefits, trimmed]);
             setBenefitInput("");
         }
     };
@@ -101,18 +225,37 @@ export default function AddServices() {
     };
 
     const handleRemoveBenefit = (indexToRemove) => {
-        setBenefits(benefits.filter((_, index) => index !== indexToRemove));
+        formik.setFieldValue("KeyBenefits", formik.values.KeyBenefits.filter((_, index) => index !== indexToRemove));
     };
 
     // Pricing Plans handlers
     const openAddPlanModal = () => {
         setNewPlanDuration("");
         setNewPlanPrice("");
+        setTokensList([]);
+        setHasSale(false);
+        setNewPlanDiscount("");
+        setNewPlanStartDate("");
+        setNewPlanEndDate("");
         setIsModalOpen(true);
     };
 
     const closeAddPlanModal = () => {
         setIsModalOpen(false);
+    };
+
+    const handleAddTokenRow = () => {
+        setTokensList([...tokensList, { amount: "", price: "" }]);
+    };
+
+    const handleTokenRowChange = (index, field, value) => {
+        const updated = [...tokensList];
+        updated[index][field] = value;
+        setTokensList(updated);
+    };
+
+    const handleRemoveTokenRow = (index) => {
+        setTokensList(tokensList.filter((_, idx) => idx !== index));
     };
 
     const handleAddPricingPlan = (e) => {
@@ -128,154 +271,93 @@ export default function AddServices() {
             return;
         }
 
+        // Validate token rows
+        for (let i = 0; i < tokensList.length; i++) {
+            const tok = tokensList[i];
+            const tAmount = parseInt(tok.amount);
+            const tPrice = parseFloat(tok.price);
+            if (!tok.amount || isNaN(tAmount) || tAmount <= 0 || !tok.price || isNaN(tPrice) || tPrice <= 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid Token Row",
+                    text: `Please enter a valid amount and price for token row ${i + 1}.`,
+                    confirmButtonColor: "#4E3074"
+                });
+                return;
+            }
+        }
+
+        // Validate sale if checked
+        if (hasSale) {
+            const discountNum = parseFloat(newPlanDiscount);
+            if (isNaN(discountNum) || discountNum < 0 || discountNum > 100) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid Discount",
+                    text: "Discount percentage must be between 0 and 100.",
+                    confirmButtonColor: "#4E3074"
+                });
+                return;
+            }
+            if (!newPlanStartDate || !newPlanEndDate) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Missing Sale Dates",
+                    text: "Please select both start and end dates for the sale.",
+                    confirmButtonColor: "#4E3074"
+                });
+                return;
+            }
+            if (new Date(newPlanStartDate) > new Date(newPlanEndDate)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid Date Range",
+                    text: "Start Date cannot be after End Date.",
+                    confirmButtonColor: "#4E3074"
+                });
+                return;
+            }
+        }
+
         const newPlan = {
             id: Date.now(),
             duration: newPlanDuration.trim(),
             price: priceNum,
-            discountPercent: null,
-            startDate: null,
-            endDate: null,
-            saleApplied: false
+            tokens: tokensList.map(t => ({
+                amount: parseInt(t.amount),
+                price: parseFloat(t.price)
+            })),
+            saleApplied: hasSale,
+            saleData: hasSale ? {
+                discountPercent: parseFloat(newPlanDiscount),
+                startDate: newPlanStartDate,
+                endDate: newPlanEndDate
+            } : null
         };
 
-        setPricingPlans([...pricingPlans, newPlan]);
-
-        // Initialize sales data helper for this plan
-        setSalesData(prev => ({
-            ...prev,
-            [newPlan.id]: {
-                discountPercent: "",
-                startDate: "",
-                endDate: ""
-            }
-        }));
-
+        formik.setFieldValue("Prices", [...formik.values.Prices, newPlan]);
         closeAddPlanModal();
     };
 
     const handleRemovePricingPlan = (id) => {
-        setPricingPlans(pricingPlans.filter(plan => plan.id !== id));
-        // Remove from sales inputs and close dropdown if it was open
-        const updatedSales = { ...salesData };
-        delete updatedSales[id];
-        setSalesData(updatedSales);
-        if (openSaleId === id) {
-            setOpenSaleId(null);
-        }
+        formik.setFieldValue("Prices", formik.values.Prices.filter(plan => plan.id !== id));
     };
 
-    // Sales Accordion handlers
-    const toggleSaleDropdown = (planId) => {
-        if (openSaleId === planId) {
-            setOpenSaleId(null);
-        } else {
-            setOpenSaleId(planId);
+    const handleRemoveIcon = () => {
+        formik.setFieldValue("Icon", null);
+        setIconPreview(null);
+
+        if (iconInputRef.current) {
+            iconInputRef.current.value = "";
         }
     };
+    const handleRemoveBanner = () => {
+        formik.setFieldValue("Image", null);
+        setBannerPreview(null);
 
-    const handleSalesInputChange = (planId, field, value) => {
-        setSalesData(prev => ({
-            ...prev,
-            [planId]: {
-                ...prev[planId],
-                [field]: value
-            }
-        }));
-    };
-
-    const handleApplySale = (planId) => {
-        const planSalesInput = salesData[planId];
-        const discount = parseFloat(planSalesInput?.discountPercent);
-        const start = planSalesInput?.startDate;
-        const end = planSalesInput?.endDate;
-
-        if (isNaN(discount) || discount < 0 || discount > 100) {
-            Swal.fire({
-                icon: "error",
-                title: "Invalid Discount",
-                text: "Please provide a discount between 0 and 100%.",
-                confirmButtonColor: "#4E3074"
-            });
-            return;
+        if (bannerInputRef.current) {
+            bannerInputRef.current.value = "";
         }
-
-        if (!start || !end) {
-            Swal.fire({
-                icon: "error",
-                title: "Dates Required",
-                text: "Please choose both start and end dates.",
-                confirmButtonColor: "#4E3074"
-            });
-            return;
-        }
-
-        if (new Date(start) > new Date(end)) {
-            Swal.fire({
-                icon: "error",
-                title: "Invalid Date Range",
-                text: "Start Date cannot be after End Date.",
-                confirmButtonColor: "#4E3074"
-            });
-            return;
-        }
-
-        // Update pricing plan with sale details
-        setPricingPlans(prevPlans => prevPlans.map(plan => {
-            if (plan.id === planId) {
-                return {
-                    ...plan,
-                    discountPercent: discount,
-                    startDate: start,
-                    endDate: end,
-                    saleApplied: true
-                };
-            }
-            return plan;
-        }));
-
-        Swal.fire({
-            icon: "success",
-            title: "Sale Applied",
-            text: "Discount successfully configured for this pricing plan.",
-            confirmButtonColor: "#4E3074",
-            timer: 1500,
-            showConfirmButton: false
-        });
-
-        // Close dropdown
-        setOpenSaleId(null);
-    };
-
-    // Form Submission
-    const handleCreateService = () => {
-        if (!name.trim()) {
-            Swal.fire({
-                icon: "error",
-                title: "Required Field",
-                text: "Service Name is required.",
-                confirmButtonColor: "#4E3074"
-            });
-            return;
-        }
-        if (!subtitle.trim()) {
-            Swal.fire({
-                icon: "error",
-                title: "Required Field",
-                text: "Subtitle is required.",
-                confirmButtonColor: "#4E3074"
-            });
-            return;
-        }
-
-        // Mock saving service
-        Swal.fire({
-            icon: "success",
-            title: "Service Created!",
-            text: "Your new service was successfully created.",
-            confirmButtonColor: "#4E3074"
-        }).then(() => {
-            navigate("/dashboard/services");
-        });
     };
 
     return (
@@ -287,6 +369,7 @@ export default function AddServices() {
                         className={styles.backBtn}
                         onClick={() => navigate("/dashboard/services")}
                         title="Back to Services"
+                        type="button"
                     >
                         <FaArrowLeft />
                     </button>
@@ -298,7 +381,7 @@ export default function AddServices() {
             </div>
 
             {/* Form Content Cards */}
-            <form className={styles.formContainer}>
+            <form className={styles.formContainer} onSubmit={formik.handleSubmit}>
 
                 {/* 1. Basic Information Card */}
                 <div className={styles.card}>
@@ -311,7 +394,7 @@ export default function AddServices() {
                                     Service Name <span className={styles.required}>*</span>
                                 </label>
                                 <span className={styles.charCount}>
-                                    {name.length}/{nameLimit}
+                                    {formik.values.Name.length}/{nameLimit}
                                 </span>
                             </div>
                             <input
@@ -319,9 +402,14 @@ export default function AddServices() {
                                 className={styles.input}
                                 placeholder="e.g., AI Recommendation"
                                 maxLength={nameLimit}
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                name="Name"
+                                value={formik.values.Name}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
                             />
+                            {formik.touched.Name && formik.errors.Name && (
+                                <span className={styles.errorMessage}>{formik.errors.Name}</span>
+                            )}
                         </div>
 
                         <div className={styles.formGroup}>
@@ -330,7 +418,7 @@ export default function AddServices() {
                                     Subtitle <span className={styles.required}>*</span>
                                 </label>
                                 <span className={styles.charCount}>
-                                    {subtitle.length}/{subtitleLimit}
+                                    {formik.values.SubTitle.length}/{subtitleLimit}
                                 </span>
                             </div>
                             <input
@@ -338,17 +426,22 @@ export default function AddServices() {
                                 className={styles.input}
                                 placeholder="e.g., Personalized AI-driven recommendations"
                                 maxLength={subtitleLimit}
-                                value={subtitle}
-                                onChange={(e) => setSubtitle(e.target.value)}
+                                name="SubTitle"
+                                value={formik.values.SubTitle}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
                             />
+                            {formik.touched.SubTitle && formik.errors.SubTitle && (
+                                <span className={styles.errorMessage}>{formik.errors.SubTitle}</span>
+                            )}
                         </div>
                     </div>
 
                     <div className={styles.formGroup}>
                         <div className={styles.labelRow}>
-                            <label className={styles.label}>Description</label>
+                            <label className={styles.label}>Description <span className={styles.required}>*</span></label>
                             <span className={styles.charCount}>
-                                {description.length}/{descriptionLimit}
+                                {formik.values.Description.length}/{descriptionLimit}
                             </span>
                         </div>
                         <textarea
@@ -356,22 +449,31 @@ export default function AddServices() {
                             placeholder="Describe what this service offers to your customers..."
                             maxLength={descriptionLimit}
                             rows={4}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
+                            name="Description"
+                            value={formik.values.Description}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                         />
+                        {formik.touched.Description && formik.errors.Description && (
+                            <span className={styles.errorMessage}>{formik.errors.Description}</span>
+                        )}
                     </div>
 
                     <div className={styles.row} style={{ marginTop: "8px" }}>
                         <div className={styles.formGroup} style={{ flex: 1 }}>
-                            <label className={styles.label}>Priority</label>
+                            <label className={styles.label}>Priority <span className={styles.required}>*</span></label>
                             <input
                                 type="text"
                                 className={styles.input}
-                                value={priority}
-                                min={1}
-                                onChange={(e) => setPriority(parseInt(e.target.value) || 1)}
+                                name="Priority"
+                                value={formik.values.Priority}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
                             />
                             <span className={styles.helperText}>Lower number = higher display priority</span>
+                            {formik.touched.Priority && formik.errors.Priority && (
+                                <span className={styles.errorMessage}>{formik.errors.Priority}</span>
+                            )}
                         </div>
 
                         <div className={styles.formGroup} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -380,8 +482,9 @@ export default function AddServices() {
                                 <label className={styles.switch}>
                                     <input
                                         type="checkbox"
-                                        checked={status}
-                                        onChange={() => setStatus(!status)}
+                                        name="IsActive"
+                                        checked={formik.values.IsActive}
+                                        onChange={formik.handleChange}
                                     />
                                     <span className={styles.slider}></span>
                                 </label>
@@ -416,8 +519,26 @@ export default function AddServices() {
                                 />
                                 {bannerPreview ? (
                                     <div className={styles.previewWrapper}>
-                                        <img src={bannerPreview} alt="Banner Preview" className={styles.bannerPreviewImg} />
-                                        <div className={styles.previewOverlay}>Click to replace image</div>
+                                        <button
+                                            type="button"
+                                            className={styles.removeBannerBtn}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // يمنع فتح اختيار الملفات
+                                                handleRemoveBanner();
+                                            }}
+                                        >
+                                            <FaTimes />
+                                        </button>
+
+                                        <img
+                                            src={bannerPreview}
+                                            alt="Banner Preview"
+                                            className={styles.bannerPreviewImg}
+                                        />
+
+                                        <div className={styles.previewOverlay}>
+                                            Click to replace image
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className={styles.dropzoneContent}>
@@ -450,11 +571,29 @@ export default function AddServices() {
                                         accept="image/*"
                                         onChange={handleIconChange}
                                     />
+
                                     {iconPreview ? (
-                                        <img src={iconPreview} alt="Icon Preview" className={styles.iconPreviewImg} />
+                                        <>
+                                            <img
+                                                src={iconPreview}
+                                                alt="Icon Preview"
+                                                className={styles.iconPreviewImg}
+                                            />
+
+                                            <button
+                                                type="button"
+                                                className={styles.removeImageBtn}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // يمنع فتح file picker
+                                                    handleRemoveIcon();
+                                                }}
+                                            >
+                                                <FaTimes />
+                                            </button>
+                                        </>
                                     ) : (
                                         <div className={styles.iconUploadPrompt}>
-                                            <FaCloudUploadAlt className={styles.miniUploadIcon} />
+                                            <FaCloudUploadAlt />
                                             <span>Upload</span>
                                         </div>
                                     )}
@@ -492,9 +631,9 @@ export default function AddServices() {
                         />
                     </div>
 
-                    {benefits.length > 0 && (
+                    {formik.values.KeyBenefits.length > 0 && (
                         <div className={styles.tagsContainer}>
-                            {benefits.map((benefit, index) => (
+                            {formik.values.KeyBenefits.map((benefit, index) => (
                                 <div key={index} className={styles.benefitTag}>
                                     <span className={styles.tagText}>{benefit}</span>
                                     <button
@@ -514,7 +653,7 @@ export default function AddServices() {
                 <div className={styles.card}>
                     <h3 className={styles.cardTitle}>Pricing Configuration</h3>
 
-                    {pricingPlans.length === 0 ? (
+                    {formik.values.Prices.length === 0 ? (
                         <div className={styles.emptyStateContainer}>
                             <p className={styles.emptyStateText}>No pricing plans configured yet.</p>
                         </div>
@@ -523,22 +662,51 @@ export default function AddServices() {
                             <table className={styles.plansTable}>
                                 <thead>
                                     <tr>
-                                        <th style={{ width: "30%" }}>Duration</th>
-                                        <th style={{ width: "30%" }}>Price</th>
-                                        <th style={{ width: "25%" }}>Active Sale</th>
-                                        <th style={{ width: "15%", textAlign: "center" }}>Remove</th>
+                                        <th style={{ width: "15%" }}>Duration</th>
+                                        <th style={{ width: "15%" }}>Price</th>
+                                        <th style={{ width: "20%" }}>Tokens</th>
+                                        <th style={{ width: "20%" }}>Tokens Price</th>
+                                        <th style={{ width: "20%" }}>Active Sale</th>
+                                        <th style={{ width: "10%", textAlign: "center" }}>Remove</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {pricingPlans.map((plan) => (
+                                    {formik.values.Prices.map((plan) => (
                                         <tr key={plan.id}>
                                             <td className={styles.tableDuration}>{plan.duration}</td>
                                             <td className={styles.tablePrice}>EGP {plan.price.toLocaleString()}</td>
                                             <td>
-                                                {plan.saleApplied ? (
-                                                    <span className={styles.activeSaleBadge}>
-                                                        -{plan.discountPercent}%
-                                                    </span>
+                                                {plan.tokens && plan.tokens.length > 0 ? (
+                                                    <div className={styles.tokensCellList}>
+                                                        {plan.tokens.map((t, i) => (
+                                                            <div key={i} className={styles.tokenItemText}>{t.amount.toLocaleString()} Tokens</div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className={styles.noSaleText}>—</span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                {plan.tokens && plan.tokens.length > 0 ? (
+                                                    <div className={styles.tokensCellList}>
+                                                        {plan.tokens.map((t, i) => (
+                                                            <div key={i} className={styles.tokenItemText}>EGP {t.price.toLocaleString()}</div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className={styles.noSaleText}>—</span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                {plan.saleApplied && plan.saleData ? (
+                                                    <div className={styles.activeSaleBadgeWrapper}>
+                                                        <span className={styles.activeSaleBadge}>
+                                                            -{plan.saleData.discountPercent}%
+                                                        </span>
+                                                        <span className={styles.saleDatesText}>
+                                                            ({new Date(plan.saleData.startDate).toLocaleDateString("en-GB", { day: 'numeric', month: 'short' })} - {new Date(plan.saleData.endDate).toLocaleDateString("en-GB", { day: 'numeric', month: 'short' })})
+                                                        </span>
+                                                    </div>
                                                 ) : (
                                                     <span className={styles.noSaleText}>—</span>
                                                 )}
@@ -559,6 +727,9 @@ export default function AddServices() {
                             </table>
                         </div>
                     )}
+                    {formik.touched.Prices && formik.errors.Prices && (
+                        <div className={styles.errorMessage} style={{ marginBottom: "12px" }}>{formik.errors.Prices}</div>
+                    )}
 
                     <button
                         type="button"
@@ -567,149 +738,6 @@ export default function AddServices() {
                     >
                         <FaPlus size={10} /> Add Pricing Plan
                     </button>
-                </div>
-
-                {/* 5. Sales & Discounts Card */}
-                <div className={styles.card}>
-                    <h3 className={styles.cardTitle}>Sales & Discounts</h3>
-
-                    {pricingPlans.length === 0 ? (
-                        <div className={styles.disabledSalesContainer}>
-                            <p className={styles.disabledSalesText}>
-                                Add pricing plans first to configure discounts.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className={styles.salesAccordionList}>
-                            {pricingPlans.map((plan) => {
-                                const currentInput = salesData[plan.id] || { discountPercent: "", startDate: "", endDate: "" };
-                                const isExpanded = openSaleId === plan.id;
-
-                                // Live calculations
-                                const originalPrice = plan.price;
-                                const discountPct = parseFloat(currentInput.discountPercent) || 0;
-                                // const finalPrice = Math.max(0, originalPrice - (originalPrice * discountPct / 100));
-                                // const savings = originalPrice - finalPrice;
-                                const finalPrice = Math.round(
-                                    Math.max(0, originalPrice - (originalPrice * discountPct / 100))
-                                );
-
-                                const savings = originalPrice - finalPrice;
-
-                                return (
-                                    <div key={plan.id} className={styles.accordionItem}>
-                                        {/* Header */}
-                                        <div className={styles.accordionHeader}>
-                                            <span className={styles.accordionHeaderText}>
-                                                {plan.duration} — E£{plan.price.toLocaleString()}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                className={styles.addSaleToggleBtn}
-                                                onClick={() => toggleSaleDropdown(plan.id)}
-                                            >
-                                                <FaBolt className={styles.boltIcon} /> Add Sale
-                                            </button>
-                                        </div>
-
-                                        {/* Dropdown Panel */}
-                                        <div className={`${styles.accordionPanel} ${isExpanded ? styles.expanded : ""}`}>
-                                            <div className={styles.accordionPanelContent}>
-
-                                                <div className={styles.salesFieldsRow}>
-                                                    <div className={styles.formGroup} style={{ flex: 1 }}>
-                                                        <label className={styles.label}>Discount %</label>
-                                                        <input
-                                                            type="text"
-                                                            className={styles.input}
-                                                            placeholder="10"
-                                                            min={0}
-                                                            max={100}
-                                                            value={currentInput.discountPercent}
-                                                            onChange={(e) => handleSalesInputChange(plan.id, "discountPercent", e.target.value)}
-                                                        />
-                                                    </div>
-
-                                                    <div className={styles.formGroup} style={{ flex: 1 }}>
-                                                        <label className={styles.label}>Start Date</label>
-                                                        <div className={styles.datepickerWrapper}>
-                                                            <input
-                                                                type="date"
-                                                                className={styles.dateInput}
-                                                                value={currentInput.startDate}
-                                                                onClick={(e) => {
-                                                                    try { e.target.showPicker(); } catch (err) { }
-                                                                }}
-                                                                onChange={(e) => handleSalesInputChange(plan.id, "startDate", e.target.value)}
-                                                            />
-                                                            <FaCalendarAlt className={styles.dateIcon} />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className={styles.formGroup} style={{ flex: 1 }}>
-                                                        <label className={styles.label}>End Date</label>
-                                                        <div className={styles.datepickerWrapper}>
-                                                            <input
-                                                                type="date"
-                                                                className={styles.dateInput}
-                                                                value={currentInput.endDate}
-                                                                onClick={(e) => {
-                                                                    try { e.target.showPicker(); } catch (err) { }
-                                                                }}
-                                                                onChange={(e) => handleSalesInputChange(plan.id, "endDate", e.target.value)}
-                                                            />
-                                                            <FaCalendarAlt className={styles.dateIcon} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Calculation Summary Row */}
-                                                <div className={styles.calcSummaryBox}>
-                                                    <div className={styles.calcItem}>
-                                                        <span className={styles.calcLabel}>Original</span>
-                                                        <span className={styles.calcValueOriginal}>
-                                                            EGP {originalPrice.toLocaleString()}
-                                                        </span>
-                                                    </div>
-                                                    <div className={styles.calcItem}>
-                                                        <span className={styles.calcLabel}>Discount</span>
-                                                        <span className={styles.calcValueDiscount}>
-                                                            -{discountPct}%
-                                                        </span>
-                                                    </div>
-                                                    <div className={styles.calcItem}>
-                                                        <span className={styles.calcLabel}>Final</span>
-                                                        <span className={styles.calcValueFinal}>
-                                                            {/* EGP {Math.round(finalPrice).toLocaleString()} */}
-                                                            EGP {finalPrice.toLocaleString()}
-                                                        </span>
-                                                    </div>
-                                                    <div className={styles.calcItem}>
-                                                        <span className={styles.calcLabel}>Savings</span>
-                                                        <span className={styles.calcValueSavings}>
-                                                            {/* EGP {Math.round(savings).toLocaleString()} */}
-                                                            EGP {savings.toLocaleString()}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <div className={styles.applySaleActionRow}>
-                                                    <button
-                                                        type="button"
-                                                        className={styles.applySaleBtn}
-                                                        onClick={() => handleApplySale(plan.id)}
-                                                    >
-                                                        Apply Sale
-                                                    </button>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
                 </div>
 
                 {/* Footer Buttons */}
@@ -722,9 +750,9 @@ export default function AddServices() {
                         Cancel
                     </button>
                     <button
-                        type="button"
+                        type="submit"
                         className={styles.primaryThemeBtn}
-                        onClick={handleCreateService}
+                        disabled={formik.isSubmitting}
                     >
                         Create Service
                     </button>
@@ -742,6 +770,7 @@ export default function AddServices() {
                                 className={styles.modalCloseBtn}
                                 onClick={closeAddPlanModal}
                                 title="Close"
+                                type="button"
                             >
                                 <FaTimes />
                             </button>
@@ -749,11 +778,11 @@ export default function AddServices() {
 
                         {/* Modal Form */}
                         <form onSubmit={handleAddPricingPlan}>
-                            <div className={styles.formGroup} style={{ marginBottom: "20px" }}>
-                                <label className={styles.label}>Duration</label>
+                            <div className={styles.modalFormGroup}>
+                                <label className={styles.modalLabel}>Duration</label>
                                 <input
                                     type="text"
-                                    className={styles.input}
+                                    className={styles.modalInput}
                                     placeholder="e.g. 30 Days"
                                     required
                                     value={newPlanDuration}
@@ -761,14 +790,14 @@ export default function AddServices() {
                                 />
                             </div>
 
-                            <div className={styles.formGroup} style={{ marginBottom: "24px" }}>
-                                <label className={styles.label}>
+                            <div className={styles.modalFormGroup}>
+                                <label className={styles.modalLabel}>
                                     Price <span className={styles.required}>*</span>
                                 </label>
                                 <div className={styles.priceInputWrapper}>
                                     <span className={styles.currencyPrefix}>E£</span>
                                     <input
-                                        type="text"
+                                        type="number"
                                         className={styles.priceInput}
                                         placeholder="5000"
                                         required
@@ -778,6 +807,144 @@ export default function AddServices() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Add Tokens Button */}
+                            <div className={styles.modalActionHeader}>
+                                <button
+                                    type="button"
+                                    className={styles.modalAddBtn}
+                                    onClick={handleAddTokenRow}
+                                >
+                                    <FaPlus size={10} /> Add Tokens
+                                </button>
+                            </div>
+
+                            {/* Tokens List */}
+                            {tokensList.map((token, index) => (
+                                <div key={index} className={styles.modalRow}>
+                                    <div className={styles.modalFormGroup} style={{ flex: 1, marginBottom: 0 }}>
+                                        <label className={styles.modalLabel}>Tokens Amount</label>
+                                        <input
+                                            type="number"
+                                            className={styles.modalInput}
+                                            value={token.amount}
+                                            onChange={(e) => handleTokenRowChange(index, "amount", e.target.value)}
+                                            placeholder="e.g. 1000"
+                                            required
+                                        />
+                                    </div>
+                                    <div className={styles.modalFormGroup} style={{ flex: 1, marginBottom: 0 }}>
+                                        <label className={styles.modalLabel}>Price <span className={styles.required}>*</span></label>
+                                        <div className={styles.priceInputWrapper}>
+                                            <span className={styles.currencyPrefix}>E£</span>
+                                            <input
+                                                type="number"
+                                                className={styles.priceInput}
+                                                value={token.price}
+                                                onChange={(e) => handleTokenRowChange(index, "price", e.target.value)}
+                                                placeholder="5000"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className={styles.modalRemoveRowBtn}
+                                        onClick={() => handleRemoveTokenRow(index)}
+                                    >
+                                        <FaTrashAlt />
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* Add Sale Button */}
+                            {!hasSale && (
+                                <div className={styles.modalActionHeader}>
+                                    <button
+                                        type="button"
+                                        className={styles.modalAddBtn}
+                                        onClick={() => setHasSale(true)}
+                                    >
+                                        <FaPlus size={10} /> Add Sale
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Sale configuration fields */}
+                            {hasSale && (
+                                <div className={styles.saleSectionContainer}>
+                                    <div className={styles.modalRow} style={{ justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                                        <span className={styles.saleSectionTitle}>Sale Configuration</span>
+                                        <button
+                                            type="button"
+                                            className={styles.modalRemoveSaleBtn}
+                                            onClick={() => {
+                                                setHasSale(false);
+                                                setNewPlanDiscount("");
+                                                setNewPlanStartDate("");
+                                                setNewPlanEndDate("");
+                                            }}
+                                        >
+                                            Remove Sale
+                                        </button>
+                                    </div>
+
+                                    <div className={styles.modalFormGroup}>
+                                        <label className={styles.modalLabel}>Discount %</label>
+                                        <input
+                                            type="number"
+                                            className={styles.modalInput}
+                                            placeholder="10"
+                                            value={newPlanDiscount}
+                                            onChange={(e) => setNewPlanDiscount(e.target.value)}
+                                            min={0}
+                                            max={100}
+                                            required={hasSale}
+                                        />
+                                    </div>
+
+                                    <div className={styles.modalRow} style={{ marginBottom: 0 }}>
+                                        <div className={styles.modalFormGroup} style={{ flex: 1, marginBottom: 0 }}>
+                                            <label className={styles.modalLabel}>Start Date</label>
+                                            <input
+                                                type="date"
+                                                className={styles.modalInput}
+                                                value={newPlanStartDate}
+                                                onChange={(e) => setNewPlanStartDate(e.target.value)}
+                                                required={hasSale}
+                                            />
+                                        </div>
+                                        <div className={styles.modalFormGroup} style={{ flex: 1, marginBottom: 0 }}>
+                                            <label className={styles.modalLabel}>End Date</label>
+                                            <input
+                                                type="date"
+                                                className={styles.modalInput}
+                                                value={newPlanEndDate}
+                                                onChange={(e) => setNewPlanEndDate(e.target.value)}
+                                                required={hasSale}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Calculation Box */}
+                            {hasSale && (
+                                <div className={styles.modalSummaryBox}>
+                                    <div className={styles.modalSummaryItem}>
+                                        <span className={styles.modalSummaryLabel}>Original</span>
+                                        <span className={styles.modalSummaryValueOriginal}>
+                                            EGP {(parseFloat(newPlanPrice) || 0).toLocaleString()}
+                                        </span>
+                                    </div>
+                                    <div className={styles.modalSummaryItem}>
+                                        <span className={styles.modalSummaryLabel}>Final</span>
+                                        <span className={styles.modalSummaryValueFinal}>
+                                            EGP {Math.round((parseFloat(newPlanPrice) || 0) - ((parseFloat(newPlanPrice) || 0) * (parseFloat(newPlanDiscount) || 0) / 100)).toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Modal Actions */}
                             <div className={styles.modalActions}>

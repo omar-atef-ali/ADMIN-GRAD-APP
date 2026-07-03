@@ -83,7 +83,7 @@ export default function AddPackages() {
             price: 0,
             priority: 1,
             isActive: true,
-            services: [], // Array of { serviceId, tokenAmount }
+            services: [], 
             discountPercentage: 0,
             startDate: "",
             endDate: ""
@@ -148,23 +148,26 @@ export default function AddPackages() {
                     price: Number(values.price),
                     priority: Number(values.priority),
                     isActive: values.isActive,
+                    
                     services: values.services.map(s => ({
                         serviceId: Number(s.serviceId),
-                        tokenAmount: Number(s.tokenAmount)
+                        ...(Number(s.tokenAmount) > 0 && {
+                            tokenAmount: Number(s.tokenAmount)
+                        })
                     }))
                 };
 
-                // 2. Submit Package Creation API
+                
                 const packageResponse = await api.post('/admin/packages', packagePayload, {
                     headers: {
                         Authorization: `Bearer ${userToken}`
                     }
                 });
 
-                // 3. Extract created Package ID (adapt depending on backend payload structure)
+              
                 const packageId = packageResponse.data?.id || packageResponse.data?.packageId || packageResponse.data;
 
-                // 4. Sequential Sale API call if discount is configured
+                
                 if (values.discountPercentage > 0 && packageId) {
                     const salePayload = {
                         discountPercentage: Number(values.discountPercentage),
@@ -172,7 +175,7 @@ export default function AddPackages() {
                         endDate: new Date(values.endDate).toISOString()
                     };
 
-                    // Send to sale configuration API
+                   
                     await api.post(`/admin/packages/${packageId}/sales`, salePayload, {
                         headers: {
                             Authorization: `Bearer ${userToken}`
@@ -186,6 +189,32 @@ export default function AddPackages() {
                 console.error("API error", error);
                 const apiErrorMsg = error.response?.data?.message || "Failed to create package";
                 toast.error(apiErrorMsg, { id: toastId });
+
+                console.error("Login Error:", error);
+                toast.error(
+                    error.response?.data?.errors[1] ||
+                    "Something went wrong while registration.",
+                    {
+                        position: "top-center",
+                        duration: 4000,
+                        style: {
+                            background:
+                                "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                            padding: "16px 20px",
+                            color: "#ffffff",
+                            fontSize: "0.95rem",
+                            borderRadius: "5px",
+                            width: "300px",
+                            height: "100%",
+                            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                        },
+                        iconTheme: {
+                            primary: "#FF4D4F",
+                            secondary: "#ffffff",
+                        },
+                    },
+                );
             } finally {
                 setSubmitting(false);
             }
@@ -200,7 +229,7 @@ export default function AddPackages() {
         if (index > -1) {
             currentServices.splice(index, 1);
         } else {
-            currentServices.push({ serviceId: serviceId, tokenAmount: 0 });
+            currentServices.push({ serviceId: serviceId, tokenAmount: "" });
         }
 
         formik.setFieldValue("services", currentServices);
@@ -432,8 +461,9 @@ export default function AddPackages() {
                         <div className={styles.configSectionList}>
                             {servicesList.filter(s => selectedServiceIds.includes(s.id)).map((service) => {
                                 const serviceIndex = formik.values.services.findIndex(item => item.serviceId === service.id);
-                                const tokenAmount = serviceIndex > -1 ? formik.values.services[serviceIndex].tokenAmount : 0;
-                                const isDashboard = service.name.toLowerCase() === "dashboard";
+                                // const tokenAmount = serviceIndex > -1 ? formik.values.services[serviceIndex].tokenAmount : 0;
+                                const tokenAmount = serviceIndex > -1 ? formik.values.services[serviceIndex].tokenAmount: "";
+                                // const isDashboard = service.name.toLowerCase() === "dashboard";
 
                                 return (
                                     <div key={service.id} className={styles.configCard}>
@@ -445,11 +475,11 @@ export default function AddPackages() {
                                             <span className={styles.configCardTitle}>{service.name}</span>
                                         </div>
 
-                                        {isDashboard ? (
+                                        {/* {isDashboard ? (
                                             <div className={styles.configCardBodyUnlimited}>
                                                 Unlimited Tokens
                                             </div>
-                                        ) : (
+                                        ) : ( */}
                                             <div className={styles.formGroup} style={{ marginBottom: 0 }}>
                                                 <label className={styles.configInputLabel}>
                                                     Token Allocation
@@ -468,19 +498,30 @@ export default function AddPackages() {
                                                     type="number"
                                                     className={styles.input}
                                                     placeholder="Enter tokens allocation"
-                                                    value={tokenAmount || ""}
+                                                    // value={tokenAmount || ""}
+                                                    value={tokenAmount}
                                                     min={0}
+                                                    // onChange={(e) => {
+                                                    //     const val = parseInt(e.target.value) || 0;
+                                                    //     const updatedServices = [...formik.values.services];
+                                                    //     if (serviceIndex > -1) {
+                                                    //         updatedServices[serviceIndex].tokenAmount = val;
+                                                    //         formik.setFieldValue("services", updatedServices);
+                                                    //     }
+                                                    // }}
                                                     onChange={(e) => {
-                                                        const val = parseInt(e.target.value) || 0;
+                                                        const value = e.target.value;
                                                         const updatedServices = [...formik.values.services];
+
                                                         if (serviceIndex > -1) {
-                                                            updatedServices[serviceIndex].tokenAmount = val;
+                                                            updatedServices[serviceIndex].tokenAmount =value === "" ? "" : parseInt(value, 10);
+
                                                             formik.setFieldValue("services", updatedServices);
                                                         }
                                                     }}
                                                 />
                                             </div>
-                                        )}
+                                        {/* )} */}
                                     </div>
                                 );
                             })}

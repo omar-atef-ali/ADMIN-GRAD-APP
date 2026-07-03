@@ -16,17 +16,17 @@ export default function Packages() {
     const [sortBy, setSortBy] = useState("");
 
     // Toggle status (Active / Inactive)
-    const handleStatusToggle = (id) => {
-        setPackages(prev =>
-            prev.map(pkg => {
-                if (pkg.id === id) {
-                    const newStatus = pkg.status === "Active" ? "Inactive" : "Active";
-                    return { ...pkg, status: newStatus };
-                }
-                return pkg;
-            })
-        );
-    };
+    // const handleStatusToggle = (id) => {
+    //     setPackages(prev =>
+    //         prev.map(pkg => {
+    //             if (pkg.id === id) {
+    //                 const newStatus = pkg.status === "Active" ? "Inactive" : "Active";
+    //                 return { ...pkg, status: newStatus };
+    //             }
+    //             return pkg;
+    //         })
+    //     );
+    // };
 
     
 
@@ -238,14 +238,14 @@ export default function Packages() {
                                                     <FaPencilAlt size={13} />
                                                 </button>
 
-                                                <label className={styles.switch}>
+                                                {/* <label className={styles.switch}>
                                                     <input
                                                         type="checkbox"
                                                         checked={pkg.status === "Active"}
                                                         onChange={() => handleStatusToggle(pkg.id)}
                                                     />
                                                     <span className={styles.slider}></span>
-                                                </label>
+                                                </label> */}
                                             </div>
                                         </td>
                                     </tr>
