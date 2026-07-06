@@ -34,10 +34,12 @@
 }
 
 .title {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1a162e;
-    margin: 0 0 6px 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: #4E3074;
+  margin: 0;
+  line-height: 1.1;
 }
 
 .subtitle {
@@ -242,7 +244,8 @@
 }
 
 .row:hover {
-    background-color: #fcfcfd;
+    background-color: #f1f1f3;
+    cursor: pointer;
 }
 
 .td {
@@ -501,4 +504,38 @@
 
 .switch input:checked + .slider:before {
     transform: translateX(16px);
+}
+
+/* Spinner & Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  border: 4px solid rgba(78, 48, 116, 0.08);
+  border-top: 4px solid #4E3074;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }

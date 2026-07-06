@@ -170,10 +170,10 @@ export default function Layout() {
 
           {/* Right Header Actions */}
           <div className={styles.headerActions}>
-            <div className={styles.notificationWrapper}>
+            {/* <div className={styles.notificationWrapper}>
               <i className={`fa-regular fa-bell ${styles.bellIcon}`}></i>
               <span className={styles.bellBadge}>3</span>
-            </div>
+            </div> */}
 
             <div className={styles.profileWrapper}>
               <div className={styles.avatar}>{adminInfo?.firstName?.charAt(0)}{adminInfo?.lastName?.charAt(0)}</div>

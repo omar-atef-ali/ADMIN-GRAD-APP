@@ -43,7 +43,7 @@ export default function AddPackages() {
             console.error("Login Error:", error);
             toast.error(
                 error.response?.data?.errors[1] ||
-                "Something went wrong while registration.",
+                "Something went wrong.",
                 {
                     position: "top-center",
                     duration: 4000,
@@ -148,6 +148,7 @@ export default function AddPackages() {
                     price: Number(values.price),
                     priority: Number(values.priority),
                     isActive: values.isActive,
+
                     
                     services: values.services.map(s => ({
                         serviceId: Number(s.serviceId),
@@ -155,6 +156,9 @@ export default function AddPackages() {
                             tokenAmount: Number(s.tokenAmount)
                         })
                     }))
+
+                    
+
                 };
 
                 
@@ -229,7 +233,11 @@ export default function AddPackages() {
         if (index > -1) {
             currentServices.splice(index, 1);
         } else {
+
             currentServices.push({ serviceId: serviceId, tokenAmount: "" });
+
+            
+
         }
 
         formik.setFieldValue("services", currentServices);
@@ -461,9 +469,12 @@ export default function AddPackages() {
                         <div className={styles.configSectionList}>
                             {servicesList.filter(s => selectedServiceIds.includes(s.id)).map((service) => {
                                 const serviceIndex = formik.values.services.findIndex(item => item.serviceId === service.id);
+
                                 // const tokenAmount = serviceIndex > -1 ? formik.values.services[serviceIndex].tokenAmount : 0;
                                 const tokenAmount = serviceIndex > -1 ? formik.values.services[serviceIndex].tokenAmount: "";
-                                // const isDashboard = service.name.toLowerCase() === "dashboard";
+                                
+
+                                
 
                                 return (
                                     <div key={service.id} className={styles.configCard}>

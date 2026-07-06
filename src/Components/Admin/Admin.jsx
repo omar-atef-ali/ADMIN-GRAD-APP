@@ -18,6 +18,7 @@ import {
 export default function Admin({ users = [], roles = [] }) {
   const userId = localStorage.getItem("id");
   const { userToken } = useContext(userContext);
+  const [loading, setLoading] = useState(false);
   const [analytics, setAnalytics] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -48,9 +49,7 @@ export default function Admin({ users = [], roles = [] }) {
       console.log(error.response?.status, error.response?.data);
     }
   }
-  useEffect(() => {
-    getAnalytics();
-  }, [userToken]);
+
 
   /////////////////////////////////////////////////////////////////////
 
@@ -148,10 +147,7 @@ export default function Admin({ users = [], roles = [] }) {
     fill: COLORS2[r.isDisabled],
   }));
 
-  useEffect(() => {
-    getAllUsers();
-    getAllRoles();
-  }, [userToken]);
+
 
   ////////////////////////////////////////////////////////////////////////////
 
@@ -276,16 +272,35 @@ export default function Admin({ users = [], roles = [] }) {
   //   }
   // }
 
-  useEffect(() => {
-    if (userId && userToken) {
-      getAnalytics();
-      getRecentUsers();
-      getRecentRoles();
+  async function loadData() {
+    if (!userToken) return;
+    try {
+      setLoading(true);
+      await Promise.all([
+        getAnalytics(),
+        getRecentUsers(),
+        getRecentRoles(),
+        getAllUsers(),
+        getAllRoles(),
+      ]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
-  }, [userId, userToken]);
+  }
+
+  useEffect(() => {
+    loadData();
+  }, [userToken, userId]);
 
   return (
     <>
+      {loading && (
+        <div className={style.overlay}>
+          <div className={style.spinner}></div>
+        </div>
+      )}
       <div className={`container-fluid ${style.AdminBody}`}>
         <div className={`${style.parent_Admin}`}>
           <h1
@@ -455,6 +470,7 @@ export default function Admin({ users = [], roles = [] }) {
                     style={{
                       width: "100%",
                       height: window.innerWidth < 768 ? 400 : 325,
+                      minWidth: 0,
                     }}
                   >
                     {RoleChartData.length === 0 ? (
@@ -471,7 +487,7 @@ export default function Admin({ users = [], roles = [] }) {
                         {/* ممكن تحط رسالة loading هنا */}
                       </div>
                     ) : (
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <Treemap
                           data={RoleChartData}
                           dataKey="size"

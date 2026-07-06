@@ -10,6 +10,7 @@ export default function Services() {
     const { userToken } = useContext(userContext)
     const navigate = useNavigate();
     const [services, setServices] = useState([])
+    const [loading, setLoading] = useState(false);
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("");
@@ -17,44 +18,39 @@ export default function Services() {
     const [sortBy, setSortBy] = useState("");
 
     // Toggle service status (Active / Inactive)
-    // const handleStatusToggle = (id) => {
-    //     setServices(prev =>
-    //         prev.map(service => {
-    //             if (service.id === id) {
-    //                 const newStatus = service.status === "Active" ? "Inactive" : "Active";
-    //                 return { ...service, status: newStatus };
-    //             }
-    //             return service;
-    //         })
-    //     );
-    // };
-
-
-    // Filter and sort the services list
-    // const filteredServices = services
-    //     .filter(service => {
-    //         const matchesSearch =
-    //             service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //             service.subTitle.toLowerCase().includes(searchQuery.toLowerCase());
-
-    //         const matchesStatus =
-    //             statusFilter === "All" ||
-    //             service.status === statusFilter;
-
-    //         return matchesSearch && matchesStatus;
-    //     })
-    //     .sort((a, b) => {
-    //         if (sortBy === "Priority") {
-    //             return a.priority - b.priority;
-    //         } else if (sortBy === "Alphabetical") {
-    //             return a.name.localeCompare(b.name);
-    //         }
-    //         return 0;
-    //     });
+    async function handleStatusToggle(id) {
+        // Optimistic update
+        setServices(prev =>
+            prev.map(service => {
+                if (service.id === id) {
+                    const newStatus = service.status === "Active" ? "Inactive" : "Active";
+                    return { ...service, status: newStatus };
+                }
+                return service;
+            })
+        );
+        try {
+            await api.put(`/admin/services/${id}/toggle-status`);
+            toast.success("Service status updated successfully", {
+                position: "top-center",
+                duration: 2000,
+            });
+        } catch (error) {
+            console.error("Toggle Error:", error);
+            toast.error(
+                error.response?.data?.message || "Failed to toggle service status.",
+                { position: "top-center", duration: 3000 }
+            );
+            // Revert on failure
+            getAllServices();
+        }
+    }
+    
 
     // get All Services
     async function getAllServices() {
         try {
+            setLoading(true);
             const { data } = await api.get('/admin/services', {
                 headers: {
                     Authorization: `Bearer ${userToken}`
@@ -95,13 +91,22 @@ export default function Services() {
                 },
             );
         }
+        finally {
+            setLoading(false);
+        }
     }
     useEffect(() => {
         getAllServices()
     }, [searchQuery, statusFilter, sortBy])
 
     return (
-        <div className={styles.container}>
+        <>
+            {loading && (
+                <div className={styles.overlay}>
+                    <div className={styles.spinner}></div>
+                </div>
+            )}
+            <div className={styles.container}>
             {/* Header Section */}
             <div className={styles.header}>
                 <div className={styles.headerText}>
@@ -180,7 +185,7 @@ export default function Services() {
                                     const firstLetter = service.name ? service.name.charAt(0).toUpperCase() : "";
 
                                     return (
-                                        <tr key={service.id} className={styles.row}>
+                                        <tr  onClick={()=>navigate(`/dashboard/services/${service.id}`)} key={service.id} className={styles.row}>
                                             {/* Service details column */}
                                             <td className={styles.td}>
                                                 <div className={styles.serviceCell}>
@@ -243,14 +248,14 @@ export default function Services() {
                                                     </button>
 
                                                     {/* Status Toggle Switch */}
-                                                    {/* <label className={styles.switch}>
+                                                    <label className={styles.switch} onClick={(e) => e.stopPropagation()}>
                                                         <input
                                                             type="checkbox"
                                                             checked={service.status === "Active"}
                                                             onChange={() => handleStatusToggle(service.id)}
                                                         />
                                                         <span className={styles.slider}></span>
-                                                    </label> */}
+                                                    </label>
                                                 </div>
                                             </td>
                                         </tr>
@@ -268,5 +273,6 @@ export default function Services() {
                 </div>
             </div>
         </div>
+        </>
     );
 }

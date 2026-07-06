@@ -4,11 +4,13 @@ import { FaPlus, FaSearch, FaChevronDown, FaPencilAlt } from "react-icons/fa";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 export default function Packages() {
     const { userToken } = useContext(userContext)
     const navigate=useNavigate()
 
     const [packages, setPackages] = useState([])
+    const [loading, setLoading] = useState(false);
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("");
@@ -16,23 +18,40 @@ export default function Packages() {
     const [sortBy, setSortBy] = useState("");
 
     // Toggle status (Active / Inactive)
-    // const handleStatusToggle = (id) => {
-    //     setPackages(prev =>
-    //         prev.map(pkg => {
-    //             if (pkg.id === id) {
-    //                 const newStatus = pkg.status === "Active" ? "Inactive" : "Active";
-    //                 return { ...pkg, status: newStatus };
-    //             }
-    //             return pkg;
-    //         })
-    //     );
-    // };
+    async function handleStatusToggle(id) {
+        // Optimistic update
+        setPackages(prev =>
+            prev.map(pkg => {
+                if (pkg.id === id) {
+                    const newStatus = pkg.status === "Active" ? "Inactive" : "Active";
+                    return { ...pkg, status: newStatus };
+                }
+                return pkg;
+            })
+        );
+        try {
+            await api.put(`/admin/packages/${id}/toggle-status`);
+            toast.success("Package status updated successfully", {
+                position: "top-center",
+                duration: 2000,
+            });
+        } catch (error) {
+            console.error("Toggle Error:", error);
+            toast.error(
+                error.response?.data?.message || "Failed to toggle package status.",
+                { position: "top-center", duration: 3000 }
+            );
+            // Revert on failure
+            getAllPackages();
+        }
+    }
 
     
 
     // get All packages
     async function getAllPackages() {
         try {
+            setLoading(true);
             const { data } = await api.get('admin/packages', {
                 headers: {
                     Authorization: `Bearer ${userToken}`
@@ -42,17 +61,15 @@ export default function Packages() {
                     status:statusFilter,
                     prioritySort:sortBy
                 }
-
-
-
             });
             console.log(data)
             setPackages(data)
-
-
         }
         catch (error) {
             console.log(error)
+        }
+        finally {
+            setLoading(false);
         }
     }
     useEffect(() => {
@@ -60,7 +77,13 @@ export default function Packages() {
     }, [searchQuery,statusFilter,sortBy])
 
     return (
-        <div className={styles.container}>
+        <>
+            {loading && (
+                <div className={styles.overlay}>
+                    <div className={styles.spinner}></div>
+                </div>
+            )}
+            <div className={styles.container}>
             {/* Header Section */}
             <div className={styles.header}>
                 <div className={styles.headerText}>
@@ -143,7 +166,7 @@ export default function Packages() {
                         <tbody>
                             {packages.length > 0 ? (
                                 packages.map((pkg) => (
-                                    <tr key={pkg.id} className={styles.row}>
+                                    <tr onClick={() => navigate(`/dashboard/packages/${pkg.id}`)} key={pkg.id} className={styles.row}>
                                         {/* Package cell with avatar and description */}
                                         <td className={styles.td}>
                                             <div className={styles.packageCell}>
@@ -238,14 +261,14 @@ export default function Packages() {
                                                     <FaPencilAlt size={13} />
                                                 </button>
 
-                                                {/* <label className={styles.switch}>
+                                                <label className={styles.switch} onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="checkbox"
                                                         checked={pkg.status === "Active"}
                                                         onChange={() => handleStatusToggle(pkg.id)}
                                                     />
                                                     <span className={styles.slider}></span>
-                                                </label> */}
+                                                </label>
                                             </div>
                                         </td>
                                     </tr>
@@ -262,5 +285,6 @@ export default function Packages() {
                 </div>
             </div>
         </div>
+        </>
     );
 }

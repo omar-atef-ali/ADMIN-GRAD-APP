@@ -3,34 +3,24 @@ import style from "./MyPermissions.module.css";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function MyPermissions() {
-  const userId = localStorage.getItem("id");
   const { userToken } = useContext(userContext);
-  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [permissions, setPermissions] = useState([]);
-  const [selected, setSelected] = useState({});
-  const [data, setData] = useState({});
 
-  async function Permissions() {
+  async function fetchPermissions() {
     try {
-      const { data } = await api.get(
-        `/Roles/Permissions`,
-        {
-          headers: { Authorization: `Bearer ${userToken}` },
-        }
-      );
-      setShowModal(true);
-      setData(data);
-
-      // console.log(data.permissions);
+      setLoading(true);
+      const { data } = await api.get(`/Roles/Permissions`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      });
       setPermissions(data);
-      // console.log(permissions);
     } catch (error) {
-      console.log(error?.response?.data?.errors[1]);
+      console.log(error);
       toast.error(
-        error?.response?.data?.errors[1] ||
-          "Failed to fetch role details.",
+        error?.response?.data?.errors[1] || "Failed to fetch role details.",
         {
           position: "top-center",
           duration: 4000,
@@ -52,109 +42,85 @@ export default function MyPermissions() {
           },
         }
       );
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    if (Array.isArray(permissions)) {
-      const init = {};
-
-      permissions.forEach((perm) => {
-        init[perm.name] = {
-          add: true,
-          inheritable: perm.isInheritable,
-        };
-      });
-
-      setSelected(init);
+    if (userToken) {
+      fetchPermissions();
     }
-  }, [permissions]);
-
-  useEffect(() => {
-    if (userId && userToken) {
-      Permissions();
-    }
-  }, [userId, userToken]);
+  }, [userToken]);
 
   return (
     <>
-      <div className={` container-fluid ${style.MyPermissionsPage}`}>
-        <h2 className={`${style.permissionsH} totalFont`}>My Permissions</h2>
+      {loading && (
+        <div className={style.overlay}>
+          <div className={style.spinner}></div>
+        </div>
+      )}
+      <div className={style.pageContainer}>
+        {/* Breadcrumb Header */}
+        <div className={style.headerArea}>
+          <div className={style.titleMeta}>
+            <h1 className={style.mainTitle}>My Permissions</h1>
+          </div>
+        </div>
 
-        {showModal && (
-          <>
-            {/* صندوق الـ Modal */}
-            <div
-              style={{
-                position: "fixed",
-                top: "60%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                background: "#0f0f0f",
-                padding: "25px",
-                borderRadius: "15px",
-                width: "450px",
-                maxWidth: "90%",
-                color: "white",
-                boxShadow: "0 0 7px #000",
-              }}
-            >
-              <h3 className="totalFont" style={{ marginBottom: "20px" }}>
-                Permissions
-              </h3>
-
-              {/* <label className="totalFont fs-4 mb-2" htmlFor="name">
-                {data.name}
-              </label> */}
-              <div className={`${style.allDiv}`}>
-                <div className={`${style.PermissionsDiv}`}>
-                  <h5 className="totalFont">Permissions</h5>
-                  {permissions.map((perm, index) => (
-                    <p key={index} className="totalFont">
-                      {perm.name}
-                    </p>
-                  ))}
-                </div>
-
-                {/* ----------------- ADD COLUMN ------------------- */}
-                <div className={style.addDiv}>
-                  <h5 className="totalFont">Add</h5>
-
-                  {permissions.map((perm, index) => (
-                    <div key={index} className="mb-3">
-                      <div className="form-check form-switch">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={true} // Add
-                          disabled
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* ----------------- INHERITABLE COLUMN ------------------- */}
-                <div className={style.inheritableDiv}>
-                  <h5 className="totalFont">Inheritable</h5>
-
-                  {permissions.map((perm, index) => (
-                    <div key={index} className="mb-3 mx-4">
-                      <div className="form-check form-switch">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={perm.isInheritable}
-                          disabled
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+        <div className={style.cardsContainer}>
+          <section className={style.detailsCard}>
+            <div className={style.cardHeaderRow}>
+              <div>
+                <h2 className={`${style.cardTitle} totalFont`}>Granted Permissions</h2>
+                <p className={style.cardSubtitle}>
+                  A list of administrative privileges currently assigned to your account.
+                </p>
               </div>
+              <span className={style.countBadge}>{permissions.length} Permissions</span>
             </div>
-          </>
-        )}
+
+            {permissions.length === 0 && !loading ? (
+              <p className={style.noPermissionsText}>No permissions assigned to your user account.</p>
+            ) : (
+              <div className={style.permissionsTableWrapper}>
+                <table className={style.permissionsTable}>
+                  <thead>
+                    <tr>
+                      <th>Permission Name</th>
+                      <th>Status</th>
+                      <th>Inheritable</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {permissions.map((perm, index) => (
+                      <tr key={index}>
+                        <td className={style.permNameCell}>
+                          <div className={style.iconBadge}>
+                            <i className="fa-solid fa-shield-halved"></i>
+                          </div>
+                          <span className="totalFont" style={{ fontWeight: "500", color: "#1C1814" }}>
+                            {perm.name}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`${style.statusBadge} ${style.activeBadge}`}>
+                            <span className={style.dot}></span> Enabled
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`${style.statusBadge} ${perm.isInheritable ? style.activeBadge : style.inactiveBadge}`}>
+                            <span className={style.dot}></span> {perm.isInheritable ? "Yes" : "No"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </>
   );

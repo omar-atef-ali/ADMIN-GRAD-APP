@@ -20,6 +20,7 @@ export default function Users() {
   const [isOpenEditRole, setIsOpenEditRole] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [pageLoading, setPageLoading] = useState(false);
 
   const [searchtext, setsearchtext] = useState("");
 
@@ -73,6 +74,7 @@ export default function Users() {
     activeProps = Propertiesvalue
   ) {
     try {
+      setPageLoading(true);
       const trimmedSearch = searchValue.trim();
       let activeProperties =
         activeProps.length === 0
@@ -188,6 +190,8 @@ export default function Users() {
 
     } catch (error) {
       console.log("ERROR:", error.response?.data || error.message);
+    } finally {
+      setPageLoading(false);
     }
   }
 
@@ -423,6 +427,11 @@ export default function Users() {
 
   return (
     <>
+      {pageLoading && (
+        <div className={style.overlay}>
+          <div className={style.spinner}></div>
+        </div>
+      )}
       <div className={style.rolesPage}>
         <div className="d-flex justify-content-between align-items-center mb-2">
           <h2 className={`${style.rolesH} totalFont`}>Users</h2>
