@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import style from "./Clients.module.css";
 import {
   FaUsers,
@@ -19,6 +19,7 @@ import {
 import toast from "react-hot-toast";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
+import Swal from "sweetalert2";
 
 export default function Clients() {
 
@@ -30,6 +31,166 @@ export default function Clients() {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
   const { userToken } = useContext(userContext);
+
+  const [searchText, setSearchText] = useState("");
+  const [accountStatus, setAccountStatus] = useState("all");
+  const [searchProperties, setSearchProperties] = useState(["Email", "BusinessName", "Position", "UserName"]);
+  const [showSearchProps, setShowSearchProps] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const [sortColumn, setSortColumn] = useState("");
+  const [sortDirection, setSortDirection] = useState("");
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowSearchProps(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handlePropertyToggle = (propsToToggle) => {
+    setSearchProperties(prev => {
+      const hasAll = propsToToggle.every(p => prev.includes(p));
+      if (hasAll) {
+        return prev.filter(p => !propsToToggle.includes(p));
+      } else {
+        return [...new Set([...prev, ...propsToToggle])];
+      }
+    });
+  };
+
+  const handleSort = (column, direction) => {
+    setSortColumn(column);
+    setSortDirection(direction);
+  };
+
+  async function handleToggleStatus(cust) {
+    const actionText = cust.isDisabled ? "Enable" : "Disable";
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `Do you want to ${actionText} this customer: ${cust.firstName} ${cust.lastName}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, confirm",
+      cancelButtonText: "Cancel",
+      background: "#FAF8F6",
+      color: "#1C1814",
+      confirmButtonColor: "#4E3074",
+      cancelButtonColor: "#8C8581",
+      customClass: {
+        popup: "custom-popup",
+      },
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await api.put(`/Clients/${cust.id}/toggle-status`, {}, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        }
+      });
+
+      toast.success(`${cust.firstName} ${cust.lastName} has been ${cust.isDisabled ? "Enabled" : "Disabled"}.`);
+      getStats();
+      getCustomers(1);
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.errors?.[1] || "Failed to update status.",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background: "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleUnlock(cust) {
+    const result = await Swal.fire({
+      title: "Unlock Account?",
+      text: `Do you want to unlock this customer's account: ${cust.firstName} ${cust.lastName}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, unlock",
+      cancelButtonText: "Cancel",
+      background: "#FAF8F6",
+      color: "#1C1814",
+      confirmButtonColor: "#4E3074",
+      cancelButtonColor: "#8C8581",
+      customClass: {
+        popup: "custom-popup",
+      },
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await api.put(`/Clients/${cust.id}/unlock`, {}, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        }
+      });
+
+      toast.success(`${cust.firstName} ${cust.lastName}'s account has been unlocked successfully.`);
+      getStats();
+      getCustomers(pageNumber);
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.errors?.[1] || "Failed to unlock account.",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background: "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
 
 
@@ -76,10 +237,35 @@ export default function Clients() {
   async function getCustomers(page = 1) {
     try {
       setLoading(true);
-      const { data } = await api.post("/Clients/search", {
+      const boolProperties = {};
+      if (accountStatus !== "all") {
+        boolProperties["IsDisabled"] = accountStatus === "disabled";
+      }
+
+      // If only searching in name/username/email, remove spaces. Otherwise keep spaces.
+      const onlyNoSpaceFields = searchProperties.length > 0 && searchProperties.every(prop =>
+        ["FirstName", "LastName", "UserName", "Email"].includes(prop)
+      );
+      const searchValue = onlyNoSpaceFields
+        ? searchText.replace(/\s+/g, "")
+        : searchText.trim();
+
+      const payload = {
         "pageNumber": page,
-        "pageSize": 10
-      }, {
+        "pageSize": 10,
+        "searchValue": searchValue,
+        "searchProperties": searchProperties.length > 0 ? searchProperties : ["FirstName", "LastName", "Email", "UserName", "BusinessName", "Position"],
+        "boolProperties": boolProperties
+      };
+
+      if (sortColumn) {
+        payload["SortColumn"] = sortColumn;
+      }
+      if (sortDirection) {
+        payload["SortDirection"] = sortDirection;
+      }
+
+      const { data } = await api.post("/Clients/search", payload, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         }
@@ -124,9 +310,29 @@ export default function Clients() {
   useEffect(() => {
     if (userToken) {
       getStats();
-      getCustomers(1);
     }
   }, [userToken]);
+
+  useEffect(() => {
+    if (userToken) {
+      getCustomers(1);
+    }
+  }, [userToken, accountStatus, searchText, sortColumn, sortDirection]);
+
+  useEffect(() => {
+    if (searchText === "" && userToken) {
+      getCustomers(1);
+    }
+  }, [searchText]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    getCustomers(1);
+  };
+
+
+
+
 
 
 
@@ -141,7 +347,7 @@ export default function Clients() {
       )}
       {/* Header */}
       <header className={style.pageHeader}>
-        <h1 className={style.pageTitle}>Customers</h1>
+        <h1 className={style.pageTitle}>Clients</h1>
         <p className={style.pageSubtitle}>
           Manage all customer accounts, subscriptions, and database credentials
         </p>
@@ -210,18 +416,85 @@ export default function Clients() {
       {/* Search & Filters */}
       <section className={style.filterBar}>
         <div className={style.searchContainer}>
-          <FaSearch className={style.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search customers..."
-            className={style.searchInput}
-            disabled
-          />
+          <div className="d-flex flex-wrap gap-3 align-items-center w-100">
+            <form className={`${style.formm} d-flex flex-grow-1`} style={{ minWidth: "280px" }} onSubmit={handleSearch}>
+              <div className={style.inputWrapper}>
+                <input
+                  className={style.searchInput}
+                  type="search"
+                  placeholder="Search Customers..."
+                  aria-label="Search"
+                  onChange={(e) => setSearchText(e.target.value)}
+                  value={searchText}
+                />
+                <FaSearch className={style.inputSearchIcon} onClick={() => getCustomers(1)} />
+              </div>
+
+              <div className={style.dropdownContainer} ref={dropdownRef}>
+                <button
+                  type="button"
+                  className={`${style.UserButton} ${style.searchFieldsBtn} totalFont`}
+                  onClick={() => setShowSearchProps(!showSearchProps)}
+                >
+                  Search In <FaChevronDown size={10} style={{ marginLeft: "6px" }} />
+                </button>
+
+                {showSearchProps && (
+                  <div className={style.searchPropsDropdown}>
+                    <label className={style.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={searchProperties.includes("UserName")}
+                        onChange={() => handlePropertyToggle(["UserName"])}
+                        className={style.checkboxInput}
+                      />
+                      <span>Customer Name</span>
+                    </label>
+                    <label className={style.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={searchProperties.includes("Email")}
+                        onChange={() => handlePropertyToggle(["Email"])}
+                        className={style.checkboxInput}
+                      />
+                      <span>Email Address</span>
+                    </label>
+                    <label className={style.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={searchProperties.includes("BusinessName")}
+                        onChange={() => handlePropertyToggle(["BusinessName"])}
+                        className={style.checkboxInput}
+                      />
+                      <span>Business Name</span>
+                    </label>
+                    <label className={style.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={searchProperties.includes("Position")}
+                        onChange={() => handlePropertyToggle(["Position"])}
+                        className={style.checkboxInput}
+                      />
+                      <span>Position</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+            </form>
+
+            <div className={style.selection}>
+              <select
+                value={accountStatus}
+                onChange={(e) => setAccountStatus(e.target.value)}
+                className={style.filterSelect}
+              >
+                <option value="all">All Statuses</option>
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <button className={style.filterButton} disabled>
-          <FaSlidersH className={style.filterIcon} />
-          <span>Filters</span>
-        </button>
       </section>
 
       {/* Customers Table Section */}
@@ -231,38 +504,96 @@ export default function Clients() {
             <thead>
               <tr>
                 <th className={style.th}>
-                  <div className={style.thContent}>
-                    CUSTOMER <FaChevronUp className={style.sortIcon} />
+                  <div className={style.sortingContainer}>
+                    CUSTOMER
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "UserName" && sortDirection === "ASC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("UserName", "ASC")}
+                      data-tooltip="Sort ascending"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "UserName" && sortDirection === "DESC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("UserName", "DESC")}
+                      data-tooltip="Sort descending"
+                    >
+                      ▼
+                    </button>
                   </div>
                 </th>
                 <th className={style.th}>
-                  <div className={style.thContent}>
-                    BUSINESS NAME <FaChevronDown className={style.sortIcon} />
+                  <div className={style.sortingContainer}>
+                    BUSINESS NAME
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "BusinessName" && sortDirection === "ASC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("BusinessName", "ASC")}
+                      data-tooltip="Sort ascending"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "BusinessName" && sortDirection === "DESC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("BusinessName", "DESC")}
+                      data-tooltip="Sort descending"
+                    >
+                      ▼
+                    </button>
                   </div>
                 </th>
                 <th className={style.th}>
-                  <div className={style.thContent}>
-                    POSITION <FaChevronDown className={style.sortIcon} />
+                  <div className={style.sortingContainer}>
+                    POSITION
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "Position" && sortDirection === "ASC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("Position", "ASC")}
+                      data-tooltip="Sort ascending"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "Position" && sortDirection === "DESC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("Position", "DESC")}
+                      data-tooltip="Sort descending"
+                    >
+                      ▼
+                    </button>
                   </div>
                 </th>
                 <th className={style.th}>
-                  <div className={style.thContent}>
-                    SUBSCRIPTION <FaChevronDown className={style.sortIcon} />
-                  </div>
+                  SUBSCRIPTION
                 </th>
                 <th className={style.th}>
-                  <div className={style.thContent}>
-                    ACCOUNT <FaChevronDown className={style.sortIcon} />
-                  </div>
+                  ACCOUNT
                 </th>
                 <th className={style.th}>
-                  <div className={style.thContent}>
-                    STATUS <FaChevronDown className={style.sortIcon} />
-                  </div>
+                  STATUS
                 </th>
                 <th className={style.th}>
-                  <div className={style.thContent}>
-                    JOIN DATE <FaChevronDown className={style.sortIcon} />
+                  <div className={style.sortingContainer}>
+                    JOIN DATE
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "JoinedDate" && sortDirection === "ASC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("JoinedDate", "ASC")}
+                      data-tooltip="Sort ascending"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "JoinedDate" && sortDirection === "DESC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("JoinedDate", "DESC")}
+                      data-tooltip="Sort descending"
+                    >
+                      ▼
+                    </button>
                   </div>
                 </th>
 
@@ -311,16 +642,20 @@ export default function Clients() {
 
                   {/* Account Badge */}
                   <td className={style.td}>
-                    <span
-                      className={`${style.badge} ${cust.isLocked ? style.badgeLocked
-                        : style.badgeActive
-                        }`}
-                    >
-                      {cust.isLocked && (
-                        <FaLock className={style.badgeIcon} />
-                      )}
-                      {cust.isLocked ? "Locked" : "Active"}
-                    </span>
+                    {cust.isLocked ? (
+                      <button
+                        type="button"
+                        className={`${style.badge} ${style.badgeLocked} ${style.clickableBadge}`}
+                        onClick={() => handleUnlock(cust)}
+                        title="Click to unlock account"
+                      >
+                        <FaLock className={style.badgeIcon} /> Locked
+                      </button>
+                    ) : (
+                      <span className={`${style.badge} ${style.badgeActive}`}>
+                        Active
+                      </span>
+                    )}
                   </td>
 
                   {/* Status Badge */}
@@ -350,7 +685,7 @@ export default function Clients() {
                         <input
                           type="checkbox"
                           checked={!cust.isDisabled}
-
+                          onChange={() => handleToggleStatus(cust)}
                         />
                         <span className={style.slider}></span>
                       </label>

@@ -816,6 +816,12 @@
   flex: 1;
 }
 
+.tokenInputSubGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .tokenAmountInput,
 .tokenPriceInput {
   border: 1px solid #E8E2DE;
@@ -1187,6 +1193,60 @@
   .saveBtn {
     width: 100%;
     text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .detailsCard {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+  
+  .tokenPackageRow {
+    padding: 12px;
+  }
+  
+  .tokenRowLeft {
+    gap: 10px;
+  }
+
+  .tokenInputsContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .tokenDivider {
+    display: none;
+  }
+  
+  .summaryGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .planAccordionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .deletePlanBtn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .planAccordionBody {
+    padding: 16px 12px;
+  }
+
+  .detailsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
