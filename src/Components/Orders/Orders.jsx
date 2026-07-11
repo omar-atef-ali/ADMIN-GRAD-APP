@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import style from './Orders.module.css';
 import { FaChevronDown, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { userContext } from '../../Context/userContext';
+import { userContext } from '../../context/userContext';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
