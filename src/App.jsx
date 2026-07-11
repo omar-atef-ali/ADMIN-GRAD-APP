@@ -34,6 +34,7 @@ import CustomersView from './Components/CustomersView/CustomersView'
 import EditPackages from './Components/EditPackages/EditPackages'
 import Clients from './Components/Clients/Clients'
 import SubscriptionView from './Components/SubscriptionView/SubscriptionView'
+import OrdersDetails from './Components/OrdersDetails/OrdersDetails'
 
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
@@ -60,7 +61,8 @@ let routers = createBrowserRouter([
     {path:"packages",element:<Protected><Packages/></Protected>},
     {path:"packages/add",element:<Protected><AddPackages/></Protected>},
     {path:'customersview/:id',element:<CustomersView/>},
-    {path:'subscriptionview',element:<SubscriptionView/>}
+    {path:'subscriptionview',element:<SubscriptionView/>},
+    {path:'orders-details',element:<OrdersDetails/>}
 
 
   ]},

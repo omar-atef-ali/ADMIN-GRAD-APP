@@ -195,7 +195,7 @@ export default function RolesDetails() {
                             icon: "info",
                             title: "Noticeeee",
                             text: "You are the one who updated this role!",
-                            confirmButtonColor: "#2D0B14",
+                    
                             background: "#FAF8F6",
                             color: "#1C1814",
                             confirmButtonColor: "#2D0B14",
