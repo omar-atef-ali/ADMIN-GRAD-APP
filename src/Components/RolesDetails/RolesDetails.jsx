@@ -198,7 +198,6 @@ export default function RolesDetails() {
                             confirmButtonColor: "#2D0B14",
                             background: "#FAF8F6",
                             color: "#1C1814",
-                            confirmButtonColor: "#2D0B14",
                             cancelButtonColor: "#8C8581",
                             customClass: {
                               popup: "custom-popup",
