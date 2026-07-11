@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 24px;
+  padding: 15px;
   height: 70px;
   box-sizing: border-box;
   border-bottom: 1px solid #F1EDE9;
@@ -61,12 +61,11 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background-color: #7a3e28;
+    background-color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    box-shadow: 0 6px 16px rgba(122, 62, 40, 0.15);
 }
 .logoImage {
     width: 100%;

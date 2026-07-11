@@ -864,23 +864,27 @@ export default function EditServies() {
                                   <i className="fa-solid fa-bolt"></i>
                                 </span>
                                 <div className={style.tokenInputsContainer}>
-                                  <input
-                                    type="number"
-                                    className={style.tokenAmountInput}
-                                    value={token.amount || ""}
-                                    onChange={(e) => handleTokenChange(plan.id, tokenIndex, "amount", e.target.value)}
-                                    placeholder="10000"
-                                  />
-                                  <span className={style.tokenText}>tokens</span>
+                                  <div className={style.tokenInputSubGroup}>
+                                    <input
+                                      type="number"
+                                      className={style.tokenAmountInput}
+                                      value={token.amount || ""}
+                                      onChange={(e) => handleTokenChange(plan.id, tokenIndex, "amount", e.target.value)}
+                                      placeholder="10000"
+                                    />
+                                    <span className={style.tokenText}>tokens</span>
+                                  </div>
                                   <span className={style.tokenDivider}>|</span>
-                                  <input
-                                    type="number"
-                                    className={style.tokenPriceInput}
-                                    value={token.price || ""}
-                                    onChange={(e) => handleTokenChange(plan.id, tokenIndex, "price", e.target.value)}
-                                    placeholder="200"
-                                  />
-                                  <span className={style.tokenCurrency}>EGP</span>
+                                  <div className={style.tokenInputSubGroup}>
+                                    <input
+                                      type="number"
+                                      className={style.tokenPriceInput}
+                                      value={token.price || ""}
+                                      onChange={(e) => handleTokenChange(plan.id, tokenIndex, "price", e.target.value)}
+                                      placeholder="200"
+                                    />
+                                    <span className={style.tokenCurrency}>EGP</span>
+                                  </div>
                                 </div>
                               </div>
                               <button

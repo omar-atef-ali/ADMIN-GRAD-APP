@@ -35,12 +35,11 @@ export default function OrdersDetails() {
   const handleCancelOrder = async () => {
     const status = order?.status;
 
-    if (!["pending", "AwaitingPayment"].includes(status)) {
+    if (!["Pending", "AwaitingPayment"].includes(status)) {
       return;
     }
 
-    const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
-    if (!confirmCancel) return;
+   
 
     try {
       setLoading(true);
@@ -136,7 +135,7 @@ export default function OrdersDetails() {
         <div className={styles.headerContainer}>
           <div className={styles.headerLeft}>
             <div className={styles.breadcrumb}>
-              <Link to="/orders" className={styles.backLink}>
+              <Link to="/dashboard/orders" className={styles.backLink}>
                 <FiArrowLeft /> Orders
               </Link>
               <span className={styles.separator}>/</span>
@@ -150,7 +149,7 @@ export default function OrdersDetails() {
             className={styles.cancelBtn}
             onClick={handleCancelOrder}
             disabled={
-              !["pending", "AwaitingPayment"].includes(order?.status)
+              !["Pending", "AwaitingPayment"].includes(order?.status)
             }
           >
             Cancel order
@@ -649,7 +648,7 @@ export default function OrdersDetails() {
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Payment</span>
-                  <span className={getStatusBadge(order.payments?.[0]?.status )}>{order.payments?.[0].status}</span>
+                  <span className={getStatusBadge(order.payments?.[0]?.status )}>{order.payments?.[0]?.status}</span>
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Currency</span>

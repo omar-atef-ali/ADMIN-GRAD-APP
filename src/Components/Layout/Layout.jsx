@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styles from "./Layout.module.css";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
+import logo from "../../assets/logo.png";
 
 export default function Layout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -53,6 +54,7 @@ export default function Layout() {
     { path: "packages", label: "Packages", icon: "fa-solid fa-cubes" },
     { path: "services", label: "Services", icon: "fa-solid fa-box" },
     { path: "orders", label: "Orders", icon: "fa-solid fa-bag-shopping" },
+    { path: "subscriptions", label: "Subscriptions", icon: "fa-solid fa-repeat" },
     { path: "my-permissions", label: "My Permissions", icon: "fa-solid fa-lock" },
     { path: "settings", label: "Settings", icon: "fa-solid fa-sliders" },
 
@@ -89,7 +91,9 @@ export default function Layout() {
       >
         {/* Brand Header */}
         <div onClick={() => navigate("/dashboard")} className={styles.brand}>
-
+          <div className={styles.logoImageContainer}>
+            <img src={logo} alt="Namaa Logo" className={styles.logoImage} />
+          </div>
           <span className={styles.brandName}>Namaa</span>
 
           {/* Close button for Mobile */}

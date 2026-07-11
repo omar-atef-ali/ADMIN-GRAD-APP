@@ -38,7 +38,7 @@ export default function Login() {
       console.error("Login Error:", error);
       toast.error(
         error.response?.data?.errors[1] ||
-        "Something went wrong while registration.",
+        "Something went wrong logging in.",
         {
           position: "top-center",
           duration: 4000,

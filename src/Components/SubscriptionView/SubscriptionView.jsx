@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
     FaArrowLeft,
     FaExclamationTriangle,
@@ -15,23 +15,28 @@ import {
     FaBan,
     FaRegCheckCircle,
     FaRegClock,
-    FaRegTimesCircle
+    FaRegTimesCircle,
+    FaChartLine
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import api from '../../api';
 import styles from './SubscriptionView.module.css';
+import { userContext } from '../../context/userContext';
 
 export default function SubscriptionView() {
     const navigate = useNavigate();
-
-    const subscriptionId = 14
+    const {id}=useParams()
+    const subscriptionId = id
     const [subscription, setSubscription] = useState(null);
     const [dataState, setDataState] = useState('populated'); // 'populated' or 'empty' for testing/empty views
     const [loading, setLoading] = useState(false);
-
+    const { userToken } = useContext(userContext);
     // Modal state for schedule change
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedPackage, setSelectedPackage] = useState('');
+    const [selectedPackageId, setSelectedPackageId] = useState('');
+    const [events, setEvents] = useState([]);
+    const [packages, setPackages] = useState([]);
+    const [addOns, setAddOns] = useState([]);
 
 
     const fetchSubscriptionDetails = async () => {
@@ -374,52 +379,54 @@ export default function SubscriptionView() {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        setSelectedPackage('');
+        setSelectedPackageId('');
     };
 
-    const handleScheduleChangeSubmit = (e) => {
-        e.preventDefault();
-        if (selectedPackage && subscription) {
-            setSubscription({
-                ...subscription,
-                scheduledNewPackageId: 2, // arbitrary scheduled id
-                scheduledNewPackageName: selectedPackage + " Pack"
+    
+
+    const handleCancelSchedule = async () => {
+        try {
+            setLoading(true);
+            await api.put(`/admin/client-subscriptions/package/${subscriptionId}/cancel-scheduled-change`, {}, {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
             });
-            toast.success(`Package change scheduled to: ${selectedPackage} Pack`);
-            handleCloseModal();
+            toast.success("Scheduled change cancelled successfully");
+            fetchSubscriptionDetails();
+            getEvents();
+        } catch (error) {
+            console.log(error);
+            toast.error(
+                error?.response?.data?.errors[1] ||
+                "Failed to cancel scheduled change.",
+                {
+                    position: "top-center",
+                    duration: 4000,
+                    style: {
+                        background:
+                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        padding: "16px 20px",
+                        color: "#ffffff",
+                        fontSize: "0.95rem",
+                        borderRadius: "5px",
+                        width: "300px",
+                        height: "60px",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                    },
+                    iconTheme: {
+                        primary: "#FF4D4F",
+                        secondary: "#ffffff",
+                    },
+                }
+            );
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleCancelSchedule = () => {
-        if (subscription) {
-            setSubscription({
-                ...subscription,
-                scheduledNewPackageId: 0,
-                scheduledNewPackageName: ""
-            });
-            toast.success("Scheduled change cancelled");
-        }
-    };
 
-    // Mock constants for tables & timeline logs
-    const mockAddons = [
-        {
-            id: 1,
-            relatedService: "AI Recommendation",
-            value: "+5,000 tokens",
-            type: "tokens",
-            purchasedOn: "28 May 2026",
-            price: "EGP 2,500"
-        },
-        {
-            id: 2,
-            relatedService: "Dashboard",
-            value: "+30 Days",
-            type: "days",
-            purchasedOn: "30 Jun 2026",
-            price: "EGP 2,000"
-        }
-    ];
 
     const mockRenewals = [
         {
@@ -431,52 +438,252 @@ export default function SubscriptionView() {
         }
     ];
 
-    const mockEventsCustomized = [
-        {
-            id: 1,
-            title: "Subscription Created",
-            user: "By System",
-            date: "01 Mar 2025",
-            desc: "Customized plan with AI Chatbot and Dashboard services",
-            type: "create"
-        },
-        {
-            id: 2,
-            title: "Renewal Cancelled",
-            user: "By Customer",
-            date: "20 Mar 2025",
-            desc: "Dashboard service auto-renewal was cancelled",
-            type: "cancel",
-            descFirst: true
-        },
-        {
-            id: 3,
-            title: "Service Expired",
-            user: "By System",
-            date: "01 Apr 2025",
-            desc: "Dashboard 30-day plan reached its end date",
-            type: "expire"
-        }
-    ];
 
-    const mockEventsStandard = [
-        {
-            id: 1,
-            title: "Subscription Created",
-            user: "By System",
-            date: "15 Jul 2024",
-            desc: "Enterprise plan activated",
-            type: "create"
-        },
-        {
-            id: 2,
-            title: "Add-on Added",
-            user: "By Admin",
-            date: "01 Oct 2024",
-            desc: "Dedicated Support add-on added",
-            type: "addon"
+
+    async function getEvents() {
+        try {
+            const { data } = await api.get(`/admin/client-subscriptions/events/${subscriptionId}`, {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log(data);
+            setEvents(data);
+        } catch (error) {
+            console.log(error)
+            toast.error(
+                error?.response?.data?.errors[1] ||
+                "Failed to fetch event logs.",
+                {
+                    position: "top-center",
+                    duration: 4000,
+                    style: {
+                        background:
+                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        padding: "16px 20px",
+                        color: "#ffffff",
+                        fontSize: "0.95rem",
+                        borderRadius: "5px",
+                        width: "300px",
+                        height: "60px",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                    },
+                    iconTheme: {
+                        primary: "#FF4D4F",
+                        secondary: "#ffffff",
+                    },
+                }
+            );
         }
-    ];
+    }
+
+    const getEventConfig = (eventType) => {
+        switch (eventType) {
+            case 'UpgradeImmediate':
+                return {
+                    icon: <FaBolt />,
+                    iconClass: styles.purpleBg,
+                    label: 'Immediate Upgrade'
+                };
+            case 'Terminated':
+                return {
+                    icon: <FaBan />,
+                    iconClass: styles.redBg,
+                    label: 'Forced Termination'
+                };
+            case 'Cancel':
+            case 'Canceled':
+                return {
+                    icon: <FaExclamationTriangle />,
+                    iconClass: styles.yellowBg,
+                    label: 'Cancellation Scheduled'
+                };
+            case 'Reactivate':
+            case 'Resume':
+                return {
+                    icon: <FaSync className={styles.syncIcon} />,
+                    iconClass: styles.greenBg,
+                    label: 'Subscription Reactivated'
+                };
+            case 'AutoRenewToggle':
+                return {
+                    icon: <FaSync />,
+                    iconClass: styles.blueBg,
+                    label: 'Auto-Renewal Toggled'
+                };
+            default:
+                const formattedLabel = eventType ? eventType.replace(/([A-Z])/g, ' $1').trim() : 'Subscription Event';
+                return {
+                    icon: <FaInfoCircle />,
+                    iconClass: styles.grayBg,
+                    label: formattedLabel
+                };
+        }
+    };
+
+    const formatDateTime = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    };
+
+    const formatDateOnly = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    };
+
+
+    async function getPackages() {
+        try{
+            const {data} = await api.get(`/admin/packages`,{
+                headers:{
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log(data);
+            setPackages(data);
+        }catch(error){
+            console.log(error)
+            toast.error(
+                error?.response?.data?.errors[1] ||
+                "Failed to fetch Packages.",
+                {
+                    position: "top-center",
+                    duration: 4000,
+                    style: {
+                        background:
+                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        padding: "16px 20px",
+                        color: "#ffffff",
+                        fontSize: "0.95rem",
+                        borderRadius: "5px",
+                        width: "300px",
+                        height: "60px",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                    },
+                    iconTheme: {
+                        primary: "#FF4D4F",
+                        secondary: "#ffffff",
+                    },
+                }
+            );
+        }
+    }
+
+    async function changeSchedule(packageId) {
+        try {
+            setLoading(true);
+            const { data } = await api.put(
+                `/admin/client-subscriptions/package/${subscriptionId}/schedule-change/${packageId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`
+                    }
+                }
+            );
+            console.log(data);
+            toast.success("Schedule changed successfully.");
+            fetchSubscriptionDetails();
+            getEvents();
+        } catch (error) {
+            console.log(error);
+            toast.error(
+                error?.response?.data?.errors[1] ||
+                "Failed to change schedule.",
+                {
+                    position: "top-center",
+                    duration: 4000,
+                    style: {
+                        background:
+                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        padding: "16px 20px",
+                        color: "#ffffff",
+                        fontSize: "0.95rem",
+                        borderRadius: "5px",
+                        width: "300px",
+                        height: "60px",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                    },
+                    iconTheme: {
+                        primary: "#FF4D4F",
+                        secondary: "#ffffff",
+                    },
+                }
+            );
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleScheduleChangeSubmit = (e) => {
+        e.preventDefault();
+        if (selectedPackageId) {
+            changeSchedule(selectedPackageId);
+            handleCloseModal();
+        }
+
+    };
+
+    async function getAddOns() {
+        try {
+            const {data} = await api.get(`/admin/client-subscriptions/add-ons/${subscriptionId}`,{
+                headers:{
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log(data);
+            setAddOns(data);
+        } catch (error) {
+            console.log(error);
+            toast.error(
+                error?.response?.data?.errors[1] ||
+                "Failed to fetch Add-Ons.",
+                {
+                    position: "top-center",
+                    duration: 4000,
+                    style: {
+                        background:
+                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        padding: "16px 20px",
+                        color: "#ffffff",
+                        fontSize: "0.95rem",
+                        borderRadius: "5px",
+                        width: "300px",
+                        height: "60px",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                    },
+                    iconTheme: {
+                        primary: "#FF4D4F",
+                        secondary: "#ffffff",
+                    },
+                }
+            );
+        }
+    }
+
+
+    useEffect(() => {
+        getEvents();
+        getPackages();
+        getAddOns();
+    }, [userToken, subscriptionId]);
 
     return (
         <div className={styles.wrapper}>
@@ -502,11 +709,12 @@ export default function SubscriptionView() {
             </header>
 
             {/* Scheduled Change Banner (Standard Package only) */}
-            {subscription?.planType === 'StandardPackage' && subscription?.scheduledNewPackageId > 0 && (
+
+            {subscription?.planType === 'StandardPackage' && subscription?.scheduledNewPackageId > 0 && subscription?.packageName !== subscription?.scheduledNewPackageName && (
                 <div className={styles.scheduledBanner}>
                     <div className={styles.bannerLeft}>
                         <div className={styles.bannerIconCircle}>
-                            <FaSync className={styles.bannerIcon} />
+                            <FaChartLine className={styles.bannerIcon} />
                         </div>
                         <div>
                             <h4 className={styles.bannerTitle}>Scheduled Package Change</h4>
@@ -531,8 +739,9 @@ export default function SubscriptionView() {
                     </div>
                     <div className={styles.bannerRight}>
                         <span className={styles.badgeScheduled}>Scheduled</span>
-                        <button className={styles.clearScheduleBtn} onClick={handleCancelSchedule} title="Cancel scheduled change">
-                            <FaTimes />
+                        <button className={styles.cancelScheduleBtn} onClick={handleCancelSchedule} title="Cancel scheduled change">
+                            <FaRegTimesCircle className={styles.cancelScheduleIcon} />
+                            <span>Cancel Scheduled Change</span>
                         </button>
                     </div>
                 </div>
@@ -704,7 +913,7 @@ export default function SubscriptionView() {
                                     </div>
                                     <div className={styles.featuresRow}>
                                         {subscription?.services?.map((srv) => (
-                                            <span className={styles.featureBadge} key={srv.subscriptionItemId}>
+                                            <span key={srv.serviceId} className={styles.featureBadge}>
                                                 <FaCheckCircle className={styles.checkIcon} /> {srv.name}
                                             </span>
                                         ))}
@@ -870,7 +1079,7 @@ export default function SubscriptionView() {
                 <div className={styles.splitCard}>
                     <h3 className={styles.splitCardTitle}>Add-ons</h3>
 
-                    {dataState === 'empty' ? (
+                    {!addOns || addOns.length === 0 ? (
                         <div className={styles.emptyState}>
                             <div className={styles.emptyIconCircleDashed}>
                                 <FaBolt className={styles.emptyIcon} />
@@ -882,32 +1091,36 @@ export default function SubscriptionView() {
                             <table className={styles.splitTable}>
                                 <thead>
                                     <tr>
-                                        <th>RELATED SERVICE</th>
+                                        <th>ADD-ON NAME</th>
                                         <th>VALUE</th>
                                         <th>PURCHASED ON</th>
                                         <th>PRICE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {mockAddons.map((addon) => (
-                                        <tr key={addon.id}>
-                                            <td>
-                                                <span className={styles.tableBadgeGray}>{addon.relatedService}</span>
-                                            </td>
-                                            <td>
-                                                <span className={styles.tableBadgePurple}>
-                                                    {addon.type === 'tokens' ? (
-                                                        <FaBolt className={styles.badgeBoltIcon} />
-                                                    ) : (
-                                                        <FaClock className={styles.badgeClockIcon} />
-                                                    )}
-                                                    {addon.value}
-                                                </span>
-                                            </td>
-                                            <td>{addon.purchasedOn}</td>
-                                            <td className={styles.boldText}>{addon.price}</td>
-                                        </tr>
-                                    ))}
+                                    {addOns.map((addon) => {
+                                        const isToken = addon.tokenAmount !== null && addon.tokenAmount !== undefined;
+                                        const displayValue = isToken ? `+${addon.tokenAmount?.toLocaleString()} tokens` : `+${addon.durationDays} Days`;
+                                        return (
+                                            <tr key={addon.id}>
+                                                <td>
+                                                    <span className={styles.tableBadgeGray}>{addon.name}</span>
+                                                </td>
+                                                <td>
+                                                    <span className={styles.tableBadgePurple}>
+                                                        {isToken ? (
+                                                            <FaBolt className={styles.badgeBoltIcon} />
+                                                        ) : (
+                                                            <FaClock className={styles.badgeClockIcon} />
+                                                        )}
+                                                        {displayValue}
+                                                    </span>
+                                                </td>
+                                                <td>{formatDateOnly(addon.purchasedOn)}</td>
+                                                <td className={styles.boldText}>EGP {addon.price?.toLocaleString()}</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -960,56 +1173,60 @@ export default function SubscriptionView() {
                     <h3 className={styles.eventLogTitle}>Event Log</h3>
 
                     <div className={styles.timeline}>
-                        {subscription?.planType === 'CustomizedPlan' ? (
-                            /* Customized Event Log Items */
-                            mockEventsCustomized.map((ev) => (
-                                <div className={styles.timelineItem} key={ev.id}>
-                                    <div className={`${styles.timelineIcon} ${ev.type === 'create' ? styles.greenBg :
-                                        ev.type === 'cancel' ? styles.yellowBg : styles.grayBg
-                                        }`}>
-                                        {ev.type === 'create' && <FaRegCheckCircle />}
-                                        {ev.type === 'cancel' && <FaRegTimesCircle />}
-                                        {ev.type === 'expire' && <FaRegClock />}
-                                    </div>
-                                    <div className={styles.timelineContent}>
-                                        {ev.descFirst && (
-                                            <div className={styles.timelineDescBox} style={{ marginBottom: '8px', marginTop: '0' }}>
-                                                {ev.desc}
-                                            </div>
-                                        )}
-                                        <div className={styles.timelineHeader}>
-                                            <h4 className={styles.timelineTitle}>{ev.title}</h4>
-                                            <span className={styles.timelineDate}>{ev.date}</span>
-                                        </div>
-                                        <p className={styles.timelineUser}>{ev.user}</p>
-                                        {!ev.descFirst && (
-                                            <div className={styles.timelineDescBox}>
-                                                {ev.desc}
-                                            </div>
-                                        )}
-                                    </div>
+                        {events.length === 0 ? (
+                            <div className={styles.emptyState}>
+                                <div className={styles.emptyIconCircleDashed}>
+                                    <FaRegClock className={styles.emptyIcon} />
                                 </div>
-                            ))
+                                <p className={styles.emptyText}>No events logged for this subscription</p>
+                            </div>
                         ) : (
-                            /* Standard Event Log Items */
-                            mockEventsStandard.map((ev) => (
-                                <div className={styles.timelineItem} key={ev.id}>
-                                    <div className={`${styles.timelineIcon} ${ev.type === 'create' ? styles.greenBg : styles.purpleBg
-                                        }`}>
-                                        {ev.type === 'create' ? <FaRegCheckCircle /> : <FaBolt />}
-                                    </div>
-                                    <div className={styles.timelineContent}>
-                                        <div className={styles.timelineHeader}>
-                                            <h4 className={styles.timelineTitle}>{ev.title}</h4>
-                                            <span className={styles.timelineDate}>{ev.date}</span>
+                            events.map((ev) => {
+                                const config = getEventConfig(ev.eventType);
+                                const hasDateChange = ev.oldEndDate && ev.newEndDate && ev.oldEndDate !== ev.newEndDate;
+                                return (
+                                    <div className={styles.timelineItem} key={ev.id}>
+                                        <div className={`${styles.timelineIcon} ${config.iconClass}`}>
+                                            {config.icon}
                                         </div>
-                                        <p className={styles.timelineUser}>{ev.user}</p>
-                                        <div className={styles.timelineDescBox}>
-                                            {ev.desc}
+                                        <div className={styles.timelineContent}>
+                                            <div className={styles.timelineHeader}>
+                                                <h4 className={styles.timelineTitle}>{config.label}</h4>
+                                                <span className={styles.timelineDate}>{formatDateTime(ev.createdOn)}</span>
+                                            </div>
+
+                                            {ev.remarks && (
+                                                <div className={styles.timelineDescBox}>
+                                                    {ev.remarks}
+                                                </div>
+                                            )}
+
+                                            {/* Date changes visual representation */}
+                                            {hasDateChange && (
+                                                <div className={styles.dateChangeContainer}>
+                                                    <div className={styles.dateChangeCard}>
+                                                        <span className={styles.dateChangeLabel}>Previous End Date</span>
+                                                        <span className={styles.dateChangeVal}>{formatDateOnly(ev.oldEndDate)}</span>
+                                                    </div>
+                                                    <div className={styles.dateChangeArrow}>
+                                                        ➔
+                                                    </div>
+                                                    <div className={styles.dateChangeCard}>
+                                                        <span className={styles.dateChangeLabel}>New End Date</span>
+                                                        <span className={styles.dateChangeVal}>{formatDateOnly(ev.newEndDate)}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {ev.triggeredBy && (
+                                                <div className={styles.triggeredBadge} title={`Triggered by ID: ${ev.triggeredBy}`}>
+                                                    <span>By: {ev.triggeredBy.substring(0, 20)}...</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 </div>
@@ -1045,15 +1262,25 @@ export default function SubscriptionView() {
                                 <select
                                     id="targetPackage"
                                     className={styles.selectInput}
-                                    value={selectedPackage}
-                                    onChange={(e) => setSelectedPackage(e.target.value)}
+                                    value={selectedPackageId}
+                                    onChange={(e) => {
+                                        console.log("Selected Package ID:", e.target.value);
+                                        setSelectedPackageId(e.target.value);
+                                    }}
                                     required
                                 >
                                     <option value="">Select Package</option>
-                                    <option value="Starter">Starter</option>
-                                    <option value="Professional">Professional</option>
-                                    <option value="Enterprise">Enterprise</option>
-                                    <option value="Premium">Premium</option>
+                                    {packages.length > 0 ? (
+                                        packages
+                                            .filter((pkg) => pkg.name !== subscription?.packageName)
+                                            .map((pkg) => (
+                                                <option key={pkg.id} value={pkg.id}>
+                                                    {pkg.name}
+                                                </option>
+                                            ))
+                                    ) : (
+                                       <option value="">No packages available</option>
+                                    )}
                                 </select>
                             </div>
 
@@ -1074,7 +1301,7 @@ export default function SubscriptionView() {
                                 <button
                                     type="submit"
                                     className={styles.modalSubmitBtn}
-                                    disabled={!selectedPackage}
+                                    disabled={!selectedPackageId}
                                 >
                                     Schedule Change
                                 </button>
