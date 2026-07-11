@@ -15,10 +15,11 @@ export default function Services() {
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
-    const [sortBy, setSortBy] = useState("Priority");
+    const [sortBy, setSortBy] = useState("");
 
     // Toggle service status (Active / Inactive)
-    const handleStatusToggle = (id) => {
+    async function handleStatusToggle(id) {
+        // Optimistic update
         setServices(prev =>
             prev.map(service => {
                 if (service.id === id) {
@@ -28,30 +29,23 @@ export default function Services() {
                 return service;
             })
         );
-    };
-
-
-    // Filter and sort the services list
-    const filteredServices = services
-        .filter(service => {
-            const matchesSearch =
-                service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                service.subTitle.toLowerCase().includes(searchQuery.toLowerCase());
-
-            const matchesStatus =
-                statusFilter === "All" ||
-                service.status === statusFilter;
-
-            return matchesSearch && matchesStatus;
-        })
-        .sort((a, b) => {
-            if (sortBy === "Priority") {
-                return a.priority - b.priority;
-            } else if (sortBy === "Alphabetical") {
-                return a.name.localeCompare(b.name);
-            }
-            return 0;
-        });
+        try {
+            await api.put(`/admin/services/${id}/toggle-status`);
+            toast.success("Service status updated successfully", {
+                position: "top-center",
+                duration: 2000,
+            });
+        } catch (error) {
+            console.error("Toggle Error:", error);
+            toast.error(
+                error.response?.data?.message || "Failed to toggle service status.",
+                { position: "top-center", duration: 3000 }
+            );
+            // Revert on failure
+            getAllServices();
+        }
+    }
+    
 
     // get All Services
     async function getAllServices() {
@@ -60,6 +54,10 @@ export default function Services() {
             const { data } = await api.get('/admin/services', {
                 headers: {
                     Authorization: `Bearer ${userToken}`
+                }, params: {
+                    search: searchQuery,
+                    status: statusFilter,
+                    prioritySort: sortBy
                 }
             })
             console.log(data)
@@ -99,7 +97,7 @@ export default function Services() {
     }
     useEffect(() => {
         getAllServices()
-    }, [])
+    }, [searchQuery, statusFilter, sortBy])
 
     return (
         <>
@@ -157,8 +155,9 @@ export default function Services() {
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
                     >
-                        <option value="Priority">Sort: Priority</option>
-                        <option value="Alphabetical">Sort: Alphabetical</option>
+                        <option value="" >Sort: Priority</option>
+                        <option value="Ascending">Ascending</option>
+                        <option value="Descending">Descending</option>
                     </select>
                     <FaChevronDown className={styles.selectChevron} />
                 </div>
@@ -180,8 +179,8 @@ export default function Services() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredServices.length > 0 ? (
-                                filteredServices.map((service) => {
+                            {services.length > 0 ? (
+                                services.map((service) => {
                                     // Get first letter of service name for Avatar
                                     const firstLetter = service.name ? service.name.charAt(0).toUpperCase() : "";
 
@@ -249,7 +248,7 @@ export default function Services() {
                                                     </button>
 
                                                     {/* Status Toggle Switch */}
-                                                    <label className={styles.switch}>
+                                                    <label className={styles.switch} onClick={(e) => e.stopPropagation()}>
                                                         <input
                                                             type="checkbox"
                                                             checked={service.status === "Active"}

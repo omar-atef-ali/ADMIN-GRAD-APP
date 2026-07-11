@@ -4,6 +4,7 @@ import { FaPlus, FaSearch, FaChevronDown, FaPencilAlt } from "react-icons/fa";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 export default function Packages() {
     const { userToken } = useContext(userContext)
     const navigate=useNavigate()
@@ -17,7 +18,8 @@ export default function Packages() {
     const [sortBy, setSortBy] = useState("");
 
     // Toggle status (Active / Inactive)
-    const handleStatusToggle = (id) => {
+    async function handleStatusToggle(id) {
+        // Optimistic update
         setPackages(prev =>
             prev.map(pkg => {
                 if (pkg.id === id) {
@@ -27,7 +29,22 @@ export default function Packages() {
                 return pkg;
             })
         );
-    };
+        try {
+            await api.put(`/admin/packages/${id}/toggle-status`);
+            toast.success("Package status updated successfully", {
+                position: "top-center",
+                duration: 2000,
+            });
+        } catch (error) {
+            console.error("Toggle Error:", error);
+            toast.error(
+                error.response?.data?.message || "Failed to toggle package status.",
+                { position: "top-center", duration: 3000 }
+            );
+            // Revert on failure
+            getAllPackages();
+        }
+    }
 
     
 
@@ -244,7 +261,7 @@ export default function Packages() {
                                                     <FaPencilAlt size={13} />
                                                 </button>
 
-                                                <label className={styles.switch}>
+                                                <label className={styles.switch} onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="checkbox"
                                                         checked={pkg.status === "Active"}

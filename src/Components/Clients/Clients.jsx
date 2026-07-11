@@ -20,9 +20,10 @@ import toast from "react-hot-toast";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function Clients() {
-
+  const navigate = useNavigate()
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState([]);
@@ -339,6 +340,7 @@ export default function Clients() {
 
 
   return (
+
     <div className={style.pageContainer}>
       {loading && (
         <div className={style.overlay}>
@@ -603,8 +605,9 @@ export default function Clients() {
               </tr>
             </thead>
             <tbody>
+             
               {customers?.map((cust) => (
-                <tr key={cust.id} className={style.tableRow}>
+                <tr onClick={() => navigate(`/dashboard/customersview/${cust.id}`)} key={cust.id} className={style.tableRow}>
                   {/* Customer Column */}
                   <td className={style.td}>
                     <div className={style.customerCell}>

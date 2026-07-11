@@ -28,9 +28,15 @@ import AddServices from './Components/AddServices/AddServices'
 import ViewPackeges from './Components/ViewPackeges/ViewPackeges'
 import Packages from './Components/Packages/Packages'
 import AddPackages from './Components/AddPackages/AddPackages'
+
+import CustomersView from './Components/CustomersView/CustomersView'
+
 import EditPackages from './Components/EditPackages/EditPackages'
 import Clients from './Components/Clients/Clients'
 import Subscriptions from './Components/Subscriptions/Subscriptions'
+import SubscriptionView from './Components/SubscriptionView/SubscriptionView'
+import Orders from './Components/Orders/Orders'
+
 let routers = createBrowserRouter([
   {path : "/" , element : <Login /> },
   {path:"/forget-password",element:<ForgetPassword/>},
@@ -55,7 +61,10 @@ let routers = createBrowserRouter([
     {path:"packages/:id/edit",element:<Protected><EditPackages/></Protected>},
     {path:"packages",element:<Protected><Packages/></Protected>},
     {path:"packages/add",element:<Protected><AddPackages/></Protected>},
+    {path:"orders",element:<Protected><Orders/></Protected>},
     {path:"subscriptions",element:<Protected><Subscriptions/></Protected>},
+    {path:'customersview/:id',element:<CustomersView/>},
+    {path:'subscriptions/:id',element:<SubscriptionView/>}
 
 
   ]},

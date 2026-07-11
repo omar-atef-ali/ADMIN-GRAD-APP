@@ -206,7 +206,12 @@
     color: #9ca3af;
     margin-top: 4px;
 }
+.errorMessage{
+    color: #ef4444;
+    margin-top: 2px;
+    font-size: 12px;
 
+}
 /* Custom Toggle Switch */
 .toggleWrapper {
     display: flex;
@@ -380,6 +385,32 @@
     opacity: 1;
 }
 
+
+.previewWrapper {
+    position: relative;
+}
+
+.removeBannerBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: 0.2s;
+}
+
+.removeBannerBtn:hover {
+    background: #e53935;
+}
 /* Service Icon Upload Group */
 .iconUploadRow {
     display: flex;
@@ -407,6 +438,31 @@
 .iconSquare:hover {
     border-color: #4E3074;
     background-color: #F4EFFF;
+}
+
+.iconSquare {
+    position: relative;
+}
+
+.removeImageBtn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0,0,0,.7);
+    color: white;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.removeImageBtn:hover {
+    background: #dc2626;
 }
 
 .miniUploadIcon {
@@ -930,12 +986,14 @@
 
 .modalContent {
     background-color: #ffffff;
-    border-radius: 20px;
+    border-radius: 10px;
     width: 100%;
     max-width: 440px;
     padding: 28px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
     animation: modalAppear 0.2s ease-out forwards;
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 @keyframes modalAppear {
@@ -1052,4 +1110,172 @@
 
 .modalSubmitBtn:hover {
     background-color: #3C245C;
+}
+
+/* New Table and Modal custom styling */
+.tokensCellList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tokenItemText {
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.activeSaleBadgeWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.saleDatesText {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.modalFormGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+    
+}
+
+.modalLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-align: left;
+}
+
+.modalInput {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #374151;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modalInput:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.08);
+}
+
+.modalActionHeader {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+    margin-top: 12px;
+}
+
+.modalAddBtn {
+    background-color: #FAF5FF;
+    color: #4E3074;
+    border: 1px solid #E2D5ED;
+    border-radius: 16px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.modalAddBtn:hover {
+    background-color: #F3E8FF;
+    border-color: #D8B4FE;
+}
+
+.modalRow {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.modalRemoveRowBtn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    margin-bottom: 4px;
+}
+
+.modalRemoveRowBtn:hover {
+    background-color: #FEE2E2;
+}
+
+.saleSectionContainer {
+    border: 1px dashed #E2D5ED;
+    border-radius: 12px;
+    padding: 16px;
+    background-color: #FAF9FC;
+    margin-bottom: 16px;
+}
+
+.saleSectionTitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: #4E3074;
+}
+
+.modalRemoveSaleBtn {
+    background: none;
+    border: none;
+    color: #EF4444;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.modalSummaryBox {
+    background-color: #F8F9FA;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border: 1px solid #f1f2f4;
+}
+
+.modalSummaryItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.modalSummaryLabel {
+    font-size: 11px;
+    color: #9CA3AF;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.modalSummaryValueOriginal {
+    font-size: 14px;
+    color: #9CA3AF;
+    text-decoration: line-through;
+}
+
+.modalSummaryValueFinal {
+    font-size: 16px;
+    color: #4E3074;
+    font-weight: 700;
 }

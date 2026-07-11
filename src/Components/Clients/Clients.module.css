@@ -387,6 +387,7 @@
 
 .tableRow:hover {
   background-color: #fafafa;
+  cursor: pointer;
 }
 
 .td {

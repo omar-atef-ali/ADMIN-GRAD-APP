@@ -55,27 +55,51 @@ export default function Subscriptions() {
   const [totalPages, setTotalPages] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
+  const [sortColumn, setSortColumn] = useState('')
+  const [sortDirection, setSortDirection] = useState('')
+  const [search, setSearch] = useState('')
+  const [filterPlanType, setFilterPlanType] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [autoRenew, setAutoRenew] = useState('')
+  const [EndDate, setEndDate] = useState('')
+
+  
+  
 
   async function getSubscriptions(page = 1) {
     try {
-      const payload = {
-        "pageNumber": page,
-        "pageSize": 10,
-        // "sortColumn": "string",
-        // "sortDirection": "string",
-        "searchValue": "CustomerName",
-        "searchProperties": [
-          "Sara"
-        ],
-        // "planType": "StandardPackage",
-        // "status": "Active",
-        // "autoRenew": true,
-        // "endDate": "2026-07-05T14:04:20.515Z"
-      };
-      const { data } = await api.post('/ClientSubscriptions/search', payload, {
+      const params = new URLSearchParams();
+      params.append("PageNumber", page);
+      params.append("PageSize", 10);
+      params.append("SearchProperties", "customerName");
+      params.append("SearchProperties", "customerEmail");
+
+      if (sortColumn) {
+        params.append("SortColumn", sortColumn);
+      }
+      if (sortDirection) {
+        params.append("SortDirection", sortDirection);
+      }
+      if (search) {
+        params.append("SearchValue", search.replace(/\s+/g, ''));
+      }
+      if (filterPlanType) {
+        params.append("PlanType", filterPlanType);
+      }
+      if (filterStatus) {
+        params.append("Status", filterStatus);
+      }
+      if (autoRenew) {
+        params.append("AutoRenew", autoRenew);
+      }
+      if (EndDate) {
+        params.append("EndDate", EndDate);
+      }
+      const { data } = await api.get('/admin/client-subscriptions', {
         headers: {
           Authorization: `Bearer ${userToken}`
-        }
+        },
+        params: params
       });
       console.log(data);
       setSubscription(data.items || []);
@@ -112,14 +136,17 @@ export default function Subscriptions() {
     }
   }
 
+  const handleSort = (column, direction) => {
+    setSortColumn(column);
+    setSortDirection(direction);
+  };
+
   useEffect(() => {
     if (userToken) {
       getSubscriptions(1);
     }
-  }, [userToken]);
-  // Static state variables for input controls (no handlers/functions as requested)
-  const [searchValue, setSearchValue] = useState("");
-
+  }, [userToken, sortColumn, sortDirection, search, filterPlanType, filterStatus, autoRenew, EndDate]);
+  
   return (
     <div className={style.pageContainer}>
       {/* Header Section */}
@@ -138,29 +165,73 @@ export default function Subscriptions() {
             <FaSearch className={style.searchIcon} />
             <input
               type="text"
-              placeholder="Search by ID, name or email..."
+              placeholder="Search by name or email..."
               className={style.searchInput}
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          {/* Filter Pills */}
-          <button type="button" className={style.filterPill}>
-            All Types <FaChevronDown className={style.arrowIcon} />
-          </button>
+          {/* Filter Dropdowns */}
+          <select
+            className={style.filterSelect}
+            value={filterPlanType}
+            onChange={(e) => setFilterPlanType(e.target.value)}
+          >
+            <option value="">All Types</option>
+            <option value="StandardPackage">Standard</option>
+            <option value="CustomizedPlan">Customized</option>
+          </select>
 
-          <button type="button" className={style.filterPill}>
-            All Status <FaChevronDown className={style.arrowIcon} />
-          </button>
+          <select
+            className={style.filterSelect}
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Expired">Expired</option>
+            <option value="Terminated">Terminated</option>
+            <option value="Canceled">Canceled</option>
+            <option value="Suspended">Suspended</option>
+            <option value="PastDue">Past Due</option>
+          </select>
 
-          <button type="button" className={style.filterPill}>
-            Auto Renew <FaChevronDown className={style.arrowIcon} />
-          </button>
+          <select
+            className={style.filterSelect}
+            value={autoRenew}
+            onChange={(e) => setAutoRenew(e.target.value)}
+          >
+            <option value="">Auto Renew</option>
+            <option value="true">Enabled</option>
+            <option value="false">Disabled</option>
+          </select>
 
-          <button type="button" className={style.filterPill}>
-            <FaSlidersH className={style.sliderIcon} /> End Date
-          </button>
+          <div className={style.dateInputWrapper}>
+            <FaSlidersH className={style.sliderIcon} />
+            <span className={style.dateLabel}>End Date:</span>
+            <input
+              type="date"
+              className={style.dateInput}
+              value={EndDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+
+          {(filterPlanType || filterStatus || autoRenew || EndDate) && (
+            <button
+              type="button"
+              className={style.resetBtn}
+              onClick={() => {
+                setFilterPlanType('');
+                setFilterStatus('');
+                setAutoRenew('');
+                setEndDate('');
+              }}
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
 
         {/* Counter */}
@@ -175,13 +246,73 @@ export default function Subscriptions() {
           <table className={style.table}>
             <thead>
               <tr>
-                <th className={style.th}>Subscription ID</th>
-                <th className={style.th}>Customer</th>
+                <th className={style.th}>
+                  <div className={style.sortingContainer}>
+                    Subscription ID
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "SubscriptionId" && sortDirection === "ASC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("SubscriptionId", "ASC")}
+                      data-tooltip="Sort ascending"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "SubscriptionId" && sortDirection === "DESC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("SubscriptionId", "DESC")}
+                      data-tooltip="Sort descending"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </th>
+                <th className={style.th}>
+                  <div className={style.sortingContainer}>
+                    Customer
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "CustomerName" && sortDirection === "ASC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("CustomerName", "ASC")}
+                      data-tooltip="Sort ascending"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "CustomerName" && sortDirection === "DESC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("CustomerName", "DESC")}
+                      data-tooltip="Sort descending"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </th>
                 <th className={style.th}>Plan Type</th>
                 <th className={style.th}>Current Plan</th>
                 <th className={style.th}>Status</th>
                 <th className={style.th}>Auto Renew</th>
-                <th className={style.th}>End Date</th>
+                <th className={style.th}>
+                  <div className={style.sortingContainer}>
+                    End Date
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "EndDate" && sortDirection === "ASC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("EndDate", "ASC")}
+                      data-tooltip="Sort ascending"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      className={`${style.sortBtn} ${sortColumn === "EndDate" && sortDirection === "DESC" ? style.activeSort : ""} btn p-0 m-0 border-0`}
+                      onClick={() => handleSort("EndDate", "DESC")}
+                      data-tooltip="Sort descending"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                </th>
                 <th className={style.th}>Created</th>
                 {/* <th className={style.th} style={{ textAlign: 'right' }}>Actions</th> */}
               </tr>
