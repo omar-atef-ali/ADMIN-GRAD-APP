@@ -1,452 +1,247 @@
-# Deeb AI (Namaa) — Frontend Documentation
+# Admin Dashboard — Technical Architecture & Reference Manual
 
-Welcome to the frontend documentation for the **Deeb AI (Namaa)** graduation project. This repository contains the complete admin dashboard and client-side applications built using React and modern frontend tools.
+Welcome to the professional technical documentation for the **Namaa (Deeb AI) Admin Dashboard**. This reference manual is designed for Platform Administrators, Superusers, and Support Agents to understand, maintain, and develop the administrative control plane of the Namaa platform. 
 
----
+This repository houses the React 19 application that governs system-wide configurations, handles role-based access control, tracks client subscriptions, verifies database connection health, inspects financial transactions, and facilitates service and pricing package management.
 
-## 1. Project Overview
-
-**Deeb AI (Namaa)** is an AI-powered business analytics and insights platform designed specifically for Small and Medium Businesses (SMBs). The system helps business owners turn operational and transactional data into actionable insights, enabling them to make smarter data-driven decisions.
-
-### Target Users
-1. **Client-Side (User-Facing) Application**:
-   - **Target Audience**: SMB Owners, Managers, and Business Operators.
-   - **Core Use Cases**: Browse platform features, view pricing packages, set up configurations, manage active subscriptions, configure payment methods, sync data sources, and monitor custom analytics dashboards.
-2. **Admin Dashboard**:
-   - **Target Audience**: Platform Administrators, Superusers, and Support Agents.
-   - **Core Use Cases**: Manage clients and administrative users, configure fine-grained role permissions, track platform packages/services (CRUD operations), monitor client orders, track overall subscriptions, view analytical charts, and execute user status toggles.
-
-### Tech Stack
-The frontend is built on **React** as a component-based, highly scalable architecture utilizing **Vite** for optimized building, fast hot-reloading (HMR), and efficient bundle sizes.
+> [!NOTE]
+> *For shared fundamentals such as Vite build configuration, Axios silent refresh interceptors, global authentication context, and core OKLCH design variables, please refer to the **Client-Side Application Documentation**. This manual focuses strictly on admin-specific components, layouts, RBAC systems, page workflows, and admin-only backend API endpoints.*
 
 ---
 
-## 2. Tech Stack & Dependencies
+## 1. System Users & Access Control Levels
 
-The project leverages a robust stack of modern npm packages to ensure stability, responsiveness, and clean interactive features:
+The Admin Dashboard provides access to three distinct user archetypes, each mapped to specific permissions and functional boundaries:
 
-| Package / Library | Version | Purpose |
-| :--- | :--- | :--- |
-| **React** | `^19.1.1` | Core UI library for component-based rendering |
-| **React DOM** | `^19.1.1` | DOM rendering and layout updates |
-| **React Router DOM** | `^7.9.3` | Client-side routing, navigation, and protected routes |
-| **Axios** | `^1.12.2` | HTTP client for backend API communication and interceptor handling |
-| **Formik** | `^2.4.6` | Form state management and submission control |
-| **Yup** | `^1.7.1` | Schema-based form validation |
-| **Bootstrap** | `^5.3.8` | Responsive design grid framework and utility classes |
-| **React Bootstrap** | `^2.10.10` | Bootstrap components built natively for React layouts |
-| **SweetAlert2** | `^11.26.x` | Interactive, stylized confirmation alerts and dialog modals |
-| **React Hot Toast** | `^2.6.0` | Non-blocking, light toast alerts |
-| **ECharts** & **ECharts for React** | `^5.6.0` / `^3.0.2` | High-performance interactive analytical widgets and charts |
-| **Recharts** | `^3.5.1` | Declarative responsive chart components (Admin dashboard) |
-| **PapaParse** | `^5.5.3` | CSV parser for data integrations and exports |
-| **React Spinners** | `^0.17.0` | Stylized loading spinners for async actions |
-| **Lucide React** | `^0.563.0` | Modern, clean svg iconography |
-| **FontAwesome Free** | `^7.1.0` | System icon set |
+1. **Platform Administrators**: Superusers with unrestricted access to the dashboard. They can create/modify administrative user accounts, configure custom security roles, assign global permissions, update system packages, manage client databases, and oversee all platform parameters.
+2. **Superusers**: Experienced administrators who focus on business-level updates. They manage active subscriptions, configure pricing and discount periods, approve package changes, and inspect platform analytics, while lacking permissions to modify roles or delete core configurations.
+3. **Support Agents**: Customer service operators who utilize the dashboard to inspect client profiles, view invoice histories, search transactional logs, audit system events, and assist clients in troubleshooting their synced database connections.
 
 ---
 
-## 3. Project Structure (Folder Structure)
+## 2. Layout, Routing, & Security Architecture
 
-Both the **Client-Side** and **Admin Dashboard** applications share an aligned directory architecture, allowing developers to context-switch between projects easily.
+### App Layout Scaffolding (`Layout.jsx`)
+The main interface shell is managed by the unified [Layout](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Layout/Layout.jsx) component. It organizes the screen into a responsive, two-column layout:
+- **Left Navigation Sidebar**: Contains collapsible navigation items for all system modules (Dashboard, Clients, Users, Roles, Packages, Services, Orders, Subscriptions, Invoices, My Permissions, and Settings). It is optimized with mobile-friendly overlay controls and remembers collapse states via local state.
+- **Top Header Bar**: Houses search functions, the administrator info indicator (fetched dynamically via `GET /Accounts` on mount), logout utility triggers, and a dynamic Breadcrumbs generator. 
+- **Breadcrumbs Generator**: Automatically splits the current window path location, capitalizes the URL path segments, maps technical database IDs to the label "Details" using regular expressions, and prints a hierarchical path for easy navigation.
+- **Main Nested Outlet**: Renders sub-routed child views using React Router DOM's `<Outlet />`.
 
-### The `src/` Directory Organization
-```text
-src/
-├── assets/                  # Static assets: images, local fonts, branding logos
-│   ├── fonts/               # Inter typography font files
-│   └── images/              # Layout placeholders and background graphics
-├── Components/              # Modular UI components grouped by feature
-│   ├── Subscriptions/       # Component folder containing logic and styles
-│   │   ├── Subscriptions.jsx
-│   │   └── Subscriptions.module.css
-│   ├── Protected/           # Route guards implementation
-│   │   ├── Protected.jsx
-│   │   └── Protected.module.css
-│   └── Layout/              # Structure containers (NavBar, Footer, Sidebar layouts)
-├── context/                 # Global React Context providers
-│   ├── userContext.jsx      # Authentication and profile state
-│   └── CartContext.jsx      # Cart items sync and persistence
-├── utils/                   # Helper functions and global utilities
-│   └── imageUrl.js          # Backend URL assets resolver
-├── api.js                   # Axios base client, interceptors, and token refresh logic
-├── App.jsx                  # Main routing declarations (createBrowserRouter)
-├── App.css                  # Global overrides and helper style overrides
-├── index.css                # Base stylesheet, design system tokens, typography
-└── main.jsx                 # React root entry, mounts Context Providers and Router
+```
++-------------------------------------------------------------+
+| Namaa  [Collapse]      Search...          [Profile] Logout  |
+| Breadcrumb: Dashboard / Clients / Details                   |
++------------------------------------+------------------------+
+|                                    |                        |
+|  * Dashboard                       |  [Main Outlet Content] |
+|  * Clients                         |                        |
+|  * Users                           |                        |
+|  * Roles                           |                        |
+|  * Packages                        |                        |
+|  * Services                        |                        |
+|  * Orders                          |                        |
+|  * Subscriptions                   |                        |
+|  * Invoices                        |                        |
+|  * My Permissions                  |                        |
+|                                    |                        |
++------------------------------------+------------------------+
 ```
 
-### Naming Conventions
-- **PascalCase**: Used for all component directories and file names (e.g., `Subscriptions/Subscriptions.jsx`).
-- **PascalCase.module.css**: Used for component-isolated stylesheet modules (e.g., `Subscriptions.module.css`).
-- **camelCase**: Used for JavaScript helper files, contexts, parameters, and functions (e.g., `imageUrl.js`, `api.js`, `userContext.jsx`).
+### Route Protection & Guards (`Protected.jsx`)
+Protected paths within the routing tree are wrapped inside the [Protected](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Protected/Protected.jsx) component. 
+- **Token Validation**: On route transitions, the guard reads `userToken` and `loading` states from the React `userContext`.
+- **Automatic Redirects**: If `userToken` is null, the guard terminates the transition and redirects the browser to the login screen (`/`). If a token is detected, it proceeds with rendering the children.
 
 ---
 
-## 4. Installation & Setup
+## 3. Role-Based Access Control (RBAC) & System Users
 
-### Prerequisites
-- **Node.js**: Version `18.x` or `20.x` (LTS versions recommended).
-- **Package Manager**: `npm` (v9+) or `yarn` (v1.x+).
-
-### Step-by-Step Local Deployment
-1. **Clone the repository** and navigate to your target frontend application directory:
-   ```bash
-   cd final-grad-app   # For Client-Side Application
-   # OR
-   cd Admin-grad-app   # For Admin Dashboard Application
-   ```
-2. **Install project dependencies**:
-   ```bash
-   npm install
-   ```
-3. **Set up Environment Variables**:
-   Create a `.env` file in the root of the project (see [Environment Variables](#5-environment-variables) below).
-4. **Launch the local development server**:
-   ```bash
-   npm run dev
-   ```
-   *The application will launch on your local host (usually `http://localhost:5173`).*
-
-### Available Scripts
-- `npm run dev`: Boots up Vite's local dev server with HMR.
-- `npm run build`: Generates compressed, optimized build files inside the `/dist` output directory.
-- `npm run lint`: Scans code files using ESLint for style validation and potential bugs.
-- `npm run preview`: Launches a local server previewing the generated production files in `/dist`.
-
----
-
-## 5. Environment Variables
-
-Define a `.env` file in the root directory of your app with the following configuration:
-
-```env
-VITE_API_BASE_URL=/api
-```
-
-- **`VITE_API_BASE_URL`**: Instructs the HTTP client where to send network requests. Setting this to `/api` allows the local Vite proxy or cloud host (like Vercel or Netlify) to rewrite requests dynamically to the target backend service, avoiding Cross-Origin Resource Sharing (CORS) complications during development and production.
-
----
-
-## 6. Routing (React Router)
-
-Routing is powered by **React Router DOM v7** utilizing the modern data-driven router patterns (`createBrowserRouter` and `<RouterProvider>`).
-
-### Client-Side Routes List
-- **Public Routes**:
-  - `/login`: User login gateway.
-  - `/register`: User registration form.
-  - `/check-email`: Email verification landing instructions.
-  - `/confirm-email`: Verification confirmation page.
-  - `/reset-password` / `/change-password`: Security password restoration paths.
-  - `/google/callback`: Catch-all redirection logic for Google OAuth logins.
-  - `/home`: Homepage landing, highlighting Deeb AI's value proposition.
-  - `/demo`: Form allowing companies to request custom demos.
-  - `/pricing`: Details about standard pricing plans and customization sliders.
-  - `/features` / `/feature-details/:id`: Overview of platform capabilities.
-  - `/privacy`: Platform privacy policies.
-- **Protected Routes**:
-  - `/profile`: Base layout for personal configuration.
-    - `/profile/info`: Modify display profile credentials.
-  - `/dashboard`: Core dashboard view.
-    - `/dashboard/home`: Personalized client overview page.
-    - `/dashboard/subscription`: View active packages, dates, and renewals.
-    - `/dashboard/billing`: Download invoices and transaction statements.
-    - `/dashboard/security`: Update profile passwords.
-    - `/dashboard/data-sources`: Register/sync company data sources.
-
-### Admin Dashboard Routes List
-- **Public Routes**:
-  - `/`: Admin login page.
-  - `/forget-password`: Password reset initiation.
-  - `/check-email` / `/reset-password` / `/activate-account`: Support security pipelines.
-- **Protected Routes (`/dashboard/*` nested routes)**:
-  - `/dashboard`: Home metrics, platform overview, active counters.
-  - `/dashboard/clients`: Searchable lists of registered businesses with status toggles.
-  - `/dashboard/customersview/:id`: Complete client business profile.
-  - `/dashboard/roles` / `/dashboard/roles/:id`: Role assignments and edit permission mappings.
-  - `/dashboard/my-permissions`: List currently logged-in administrator permissions.
-  - `/dashboard/users` / `/dashboard/users/:id`: Internal system users CRUD.
-  - `/dashboard/services` (with `/add`, `/:id`, `/:id/edit`): CRUD operations for services.
-  - `/dashboard/packages` (with `/add`, `/:id`, `/:id/edit`): CRUD operations for packages.
-  - `/dashboard/orders`: Grid of client platform invoices.
-  - `/dashboard/subscriptions` / `/:id`: Client active service contracts.
-
-### Route Guard Implementation
-The protected routes are wrapped in a custom `<Protected>` component:
-```jsx
-// src/Components/Protected/Protected.jsx
-export default function Protected(props) {
-  let { userToken, loading } = useContext(userContext);
-
-  if (loading) {
-    return <div>Loading...</div>; // Spinner fallback while checking authentication status
-  }
-
-  if (userToken !== null) {
-    return props.children; // Access allowed
-  } else {
-    return <Navigate to="/" />; // Redirect back to landing/login
-  }
-}
-```
-
----
-
-## 7. Authentication & Authorization
-
-### The Authentication Flow
-1. **Credentials Login**: Users insert email and password in the Formik form. Submission triggers a POST request to `/Auth`.
-2. **Token Storage**: On success, the API returns a JWT token. The application stores the token in `localStorage` under `token` and updates `userToken` in `userContext`.
-3. **Google OAuth Integration**: Clicking "Login with Google" redirects the browser to:
-   `https://accounts.google.com/o/oauth2/v2/auth` with the project's Google Client ID. Upon user authorization, Google redirects the browser back to `/google/callback` with a temporary code. The frontend exchanges this code via `/Auth/google` to obtain a standard JWT token.
-4. **Token Injection**: The Axios request interceptor intercepts all outgoing requests and appends the token to the header:
-   `Authorization: Bearer <JWT_TOKEN>`
-
-### Roles and Permissions (Authorization)
-- **Client User**: Restricted access to client profile panels and billing logs.
-- **Admin Roles**: Administrators can view and customize specific permission matrices inside the Admin Dashboard `/dashboard/roles/:id` panels. Backend validations inspect JWT claims, while the frontend dynamically hides or displays components based on the active administrator's permissions.
-
----
-
-## 8. Client-Side Section: Pages, Layouts, and UI Flows
-
-The Client-Side application provides a premium, responsive interface tailored for SMBs. The pages are designed with modern glassmorphism elements, dark gradient accents, and micro-interactions.
-
-### 8.1 Home & Features Explorer (`/home`)
-* **Visual Design**: Features a hero section with custom illustrations, a bold typography gradient (`Turn Your Business Data Into Actionable Insights`), and animated feature card grids.
-* **Component Flow & Logic**:
-  1. **Reviews Fetching**: On mount, a `useEffect` queries `/Reviews/landing-page` to retrieve customer testimonials. If there are more than 3 reviews, it mounts a fast, duplicate marquee tracker that scrolls infinitely using CSS animations.
-  2. **Service Tabs Showcase**: Queries `/Services` to fetch available services. It displays these service names in a scroll-resistant horizontal tab layout. Clicking a tab updates the active index, swapping the visible service card info, icon (resolved via a dynamic local `iconMap` of Lucide icons or server-delivered URLs), subheadings, and mockup images.
-  3. **Interactive CTA**: Directs users to `/demo` for automated trial setups or to `/features` for the deep feature index.
-
-### 8.2 Pricing, Packages & Estimator (`/pricing`)
-* **Visual Design**: Centered layout starting with a highlighted "Flexible Pricing" badge. Custom 3D carousel cards with rounded corners, bright purple highlights, and drop shadows are utilized to display different pricing tiers.
-* **Component Flow & Logic**:
-  1. **Bundle Carousel**: The carousel queries `/Packages` and lists all package bundles. It supports slide navigation (`goNext`, `goPrev`) updating a visible indices sub-array. The center card scales up (`carousel_card_active`), while the side cards scale down (`carousel_card_side`) to create a 3D effect.
-  2. **Individual Services Selector**: Queries `/Services/cards` to list individual features. Users can pick specific features to build custom estimates.
-  3. **Cart Syncing & Local Storage**: When a user clicks "Add to Estimate", the component checks if `userToken` exists. If logged in, it sends a POST request to `/Cart` to save it in the database. If the user is a guest, the selection is written into a local array in `localStorage` under `local cart`.
-  4. **Checkout Route**: Clicking "Proceed to Checkout" makes a POST request to `/Orders/package` for bundles, which generates a Stripe checkout URL, and redirects the browser window directly to the checkout page.
-
-### 8.3 Custom Estimation & Shopping Cart (`/cart`)
-* **Visual Design**: A split two-column dashboard layout. The left column contains expandable service configuration cards, and the right column houses the billing receipt summary block.
-* **Component Flow & Logic**:
-  1. **Cart Syncing on Login**: A `useEffect` detects if a guest has logged in. If a `userToken` is present and items exist in the local guest cart, it sequentializes POST calls to `/Cart` to sync guest items with the backend database. Once synced, it clears the local guest storage.
-  2. **Dynamic Plan Customizer**: For each service in the cart, the user can toggle custom commitment duration dropdowns (e.g., 30 days, 90 days, 180 days) and select token tiers.
-  3. **Real-time Cost Calculations**: Changing these inputs triggers a recalculation of the totals. It computes the Base Price, Token Allocation Price, and any commitment discounts dynamically using `useMemo` so that updates are instantaneous without extra network calls.
-  4. **Promo Codes**: Offers a Formik text field to apply discount codes. Submitting verifies the code via `/Orders/discount-codes/validate?code=PROMO` and deducts the discount percentage from the subtotal.
-  5. **Payment Redirect**: Clicking checkout triggers a POST request to `/Orders/services` with the payload array of `serviceId`, `servicePriceId`, and `serviceTokensId`, then transfers the client to the payment gateway.
-
----
-
-## 9. Admin Dashboard Section: Pages, Layouts, and UI Flows
-
-The Admin Dashboard features a deep purple dark-themed design language focusing on readability, tabular sorting, status control overlays, and analytical widgets.
-
-### 9.1 Clients Listing & Status Controller (`/dashboard/clients`)
-* **Visual Design**: The page opens with six KPI cards (Total Customers, Active Accounts, Disabled Accounts, Locked Accounts, Active Subscribers, and New This Month). The main area displays a data table with profile avatars and custom status badges.
-* **Component Flow & Logic**:
-  1. **Search & Checkbox Dropdown**: Admins can type search queries. Clicking "Search In" opens a floating relative dropdown menu to select target database properties (Email, BusinessName, Position, UserName).
-  2. **Sorting & Filtering**: Each header column contains interactive triangle buttons (▲/▼) that update state variables `sortColumn` and `sortDirection`. Changing these automatically triggers a fresh POST request to `/Clients/search`.
-  3. **Status Toggle Switch**: Every row features a custom iOS-style slider switch. Toggling the switch opens a SweetAlert2 confirmation dialog. If confirmed, a PUT request to `/Clients/:id/toggle-status` changes the user access status on the server.
-  4. **Account Unlock**: If an account is locked due to multiple failed login attempts, the badge turns red and displays a lock icon. Clicking the badge opens a dialog to trigger an unlock request via `/Clients/:id/unlock`.
-
-### 9.2 Client Detailed Inspector (`/dashboard/customersview/:id`)
-* **Visual Design**: Displays breadcrumb navigation, breadcrumb links, a large profile banner, detailed info grids, and a database credentials table.
-* **Component Flow & Logic**:
-  1. **Initial Profile Queries**: Fetches profile data from `/Clients/:id`, active user subscriptions from `/Clients/:id/subscriptions`, and database configs from `/Clients/:id/database-connections` on mount.
-  2. **Tableau Integration**: If a Tableau URL exists, it renders an embedded iframe or external link. If empty, a Formik form modal validates input via Yup and submits a PUT request to `/ClientSubscriptions/:customerId/tableau-url` to update the customer's dashboard.
-  3. **Database Connections Grid**: Lists all database connections established by the customer. Admins can view DB types, host names, connection statuses, and click "Manage" to configure credentials.
-
-### 9.3 Subscriptions Monitor (`/dashboard/subscriptions`)
-* **Visual Design**: Tabular layout listing active subscriptions, plan types (Standard vs Customized), auto-renewal states, and start/end dates.
-* **Component Flow & Logic**:
-  1. **API Parameter Construction**: Sends a GET request to `/admin/client-subscriptions` using `URLSearchParams` to pass pagination, search keys, plans filters, and sorting parameters.
-  2. **30-Day Expiry Warnings**: Evaluates active subscription end dates. If the end date falls within 30 days of the current date, the row highlights a warning color to prompt admin renewals.
-
-### 9.4 Orders & Revenue Tracker (`/dashboard/orders`)
-* **Visual Design**: Features 5 metrics tiles (Total Orders, Awaiting Payment, Refunded, Total Revenue, Today Revenue) followed by a data list.
-* **Component Flow & Logic**:
-  1. **Flexible Filter Controls**: Admins can filter by order types (Package, Service, AddOn), status (Pending, Paid, Cancelled, Refunded), date range pickers, and price range sliders.
-  2. **Real-time Validations**: Form controls block fetching queries if the input parameters are illogical (e.g., maximum price is less than minimum price or end date is earlier than start date).
-  3. **Interactive Sorting**: Features sorting by "TotalPrice" and "OrderDate" directly on the table headers.
-
----
-
-## 10. Component Architecture
-
-The codebase leverages clean composition patterns to minimize repetition and improve maintainability:
-
-### Reusable UI Components
-- **Tables & Pagination Footers**: Components utilizing custom CSS modules with integrated sorting arrow buttons, chevron page controllers, and indicators.
-- **Input Controllers**: Custom form inputs containing integrated icons, dynamic validation labels, and password eye togglers.
-- **Custom Overlays**: CSS module-isolated backdrops paired with `react-spinners` for background operations.
-- **Interactive Badges**: Aligned colors mapping active, cancelled, expired, or terminated categories.
-
-### Custom Context Hooks
-- **`useContext(userContext)`**: Exposes authentication details, active status verification, profile image URLs (appended with timestamp queries `?t=` to bypass local cache on updates), and login/logout methods.
-- **`useContext(CartContext)`**: Exposes active shopping arrays, checkout helpers, and database synchronization actions.
-
----
-
-## 11. State Management
-
-The global state system is kept lightweight and performant:
+The dashboard features a fine-grained, database-backed Role-Based Access Control (RBAC) layout. Permissions are checked server-side, but the client application dynamically handles layout grids based on the permissions returned by the API.
 
 ```mermaid
 graph TD
-    A[App Root] --> B(UserContextProvider)
-    B --> C(CartContextProvider)
-    C --> D[Client Components & Pages]
-    
-    style B fill:#3D1B6A,stroke:#fff,stroke-width:2px,color:#fff
-    style C fill:#4E3074,stroke:#fff,stroke-width:2px,color:#fff
-    style D fill:#2C204B,stroke:#fff,stroke-width:2px,color:#fff
+    A[Admin User] -->|Has| B(Role)
+    B -->|Contains| C[Permission Matrix]
+    C -->|Inheritable = True/False| D[Privileges]
+    D -->|Controls access to| E[API Endpoints & UI Actions]
 ```
 
-### Global State (Context API)
-- **Auth Credentials (`userContext`)**: Token values, loading checks, user emails, and profile avatars.
-- **Cart Contents (`CartContext`)**: Array of services in checkout, remote fetching, and client sync methods.
+### Roles Management (`Roles.jsx`)
+The [Roles](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Roles/Roles.jsx) component controls the creation and listing of custom user roles.
+- **Listing and Toggles**: It lists all custom security roles via `POST /Roles/search?includeDisabledRoles=true`. Administrators can enable or disable roles with a SweetAlert2 confirmation dialog, which fires a `PUT /Roles/${id}/toggle-status` request.
+- **Role Creation Form**: Uses Formik & Yup to collect the role's name, description, and permissions list. On mount, it queries `GET /Roles/Permissions` to fetch all available privileges, filters them to isolate inheritable ones (`isInheritable === true`), and displays them in a grid.
+- **Permission Matrix Selection**: The form uses local checkbox states (`selected` state) mapped to each permission name. Selecting a permission toggles an `add` boolean and a child `inheritable` boolean. If an administrator deselects the "Add" toggle for a permission, the "Inheritable" flag is automatically reset to false to avoid validation errors. On submit, the component compiles these selections into a nested array and makes a `POST /Roles` request.
 
-### Local State (`useState` / `useEffect`)
-- Grid filters, search queries, active pagination counts, sorting properties, temporary passwords, UI menu flags, and local form status.
+### Role Profiles (`RolesDetails.jsx`)
+The [RolesDetails](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/RolesDetails/RolesDetails.jsx) view queries `GET /Roles/${id}` to display a detailed breakdown of a role:
+- **Relationship Map**: Shows clickable button paths indicating who created, updated, and currently manages this role. Clicking these buttons navigates directly to the corresponding user details profiles.
+- **Read-Only Grid**: Displays a tabular overview of permissions assigned to the role, with read-only switches indicating whether each permission is active ("Add") and if it is marked as "Inheritable".
+
+### Internal Admin Users CRUD (`Users.jsx` & `UserDetails.jsx`)
+The internal team directory is controlled by [Users](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Users/Users.jsx) and [UserDetails](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/UserDetails/UserDetails.jsx).
+- **Advanced Filtering and Search**: Admin users can search the team by `FirstName`, `LastName`, `Email`, or `Role`. The search inputs automatically split spaced strings (e.g. "John Doe") into separate first and last name filters. Dropdowns filter users based on their active status (Active, Inactive, Pending) and account status (Locked, Unlocked, Disabled).
+- **Interactive Sorting**: Clicking headers triggers the `handleSort` function, updating the query parameters (`SortColumn`, `SortDirection`) and requesting clean data from `POST /users/search`.
+- **System User Creation**: The component incorporates a modal powered by Formik to invite new admins by submitting a `POST /Users` request containing names, email, password, and their designated RBAC role.
+- **User Profile Inspector**: Shows complete system logs, date of creation, failed login attempts, and last active timestamp. It enables updating profile info and resetting locked/disabled accounts via `PUT /users/${id}/toggle-status`.
+
+### Permissions Audit (`MyPermissions.jsx`)
+The [MyPermissions](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/MyPermissions/MyPermissions.jsx) component queries `GET /Roles/Permissions` on mount to fetch all privileges assigned to the currently logged-in administrator. It displays them in a clean list, providing agents and administrators with a quick way to audit their account privileges.
 
 ---
 
-## 12. API Integration
+## 4. Business Accounts & Client Profile Inspections
 
-API communications are routed through a dedicated Axios configuration file `/src/api.js`.
+Clients represent the registered SMBs using the platform. The admin dashboard provides a complete inspection view to monitor client health, synchronize databases, and track usage.
 
-### Interceptors & Request Pipeline
-- **Automatic Headers**: Sets `Authorization: Bearer <token>` automatically if a token exists in storage.
-- **Network Proxying**: Utilizes absolute paths proxied locally or hosted rewrites on Vercel to route traffic to `https://deebai.runasp.net`.
+### Clients List (`Clients.jsx`)
+The [Clients](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Clients/Clients.jsx) directory houses a comprehensive table of all client businesses:
+- **KPI Summary Row**: Fetches high-level stats from `GET /Clients/kpi`, displaying cards for Total Clients, Active Clients, Locked Accounts, and Inactive Clients to give immediate business context.
+- **Multi-Property Queries**: The search bar enables queries across multiple columns simultaneously, including Email, BusinessName, Position, and Username. Dropdowns filter results by account locks and activation status.
+- **Account Actions**: Provides buttons to toggle active status (`PUT /Clients/${id}/toggle-status`) or unlock accounts blocked by too many failed login attempts (`PUT /Clients/${id}/unlock`), both using SweetAlert2 dialogs to prevent accidental actions.
 
-### Silent Token Refresh Flow
-If a request encounters a `401 Unauthorized` response (and is not an authentication endpoint), the refresh mechanism kicks in:
-```mermaid
-sequenceDiagram
-    participant API as Axios Client
-    participant SRV as Backend Server
-    
-    API->>SRV: Fetch Dashboard Info (Expired Token)
-    SRV-->>API: 401 Unauthorized
-    Note over API: Intercepts 401 & starts token refresh
-    API->>SRV: POST /Auth/refresh (Old Token)
-    SRV-->>API: 200 OK (New JWT Token)
-    Note over API: Updates LocalStorage with New Token
-    Note over API: Retries queued requests automatically
-    API->>SRV: Fetch Dashboard Info (New Token)
-    SRV-->>API: 200 OK (Data Received)
+### Client Profile Inspector (`CustomersView.jsx`)
+The [CustomersView](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/CustomersView/CustomersView.jsx) component acts as a centralized dashboard for a single customer profile, pulling data from three endpoints on mount:
+- `GET /Clients/${id}`: For general contact, business metadata, account creation dates, and statuses.
+- `GET /Clients/${id}/subscriptions`: To view current standard or custom active subscription plans.
+- `GET /Clients/${id}/database-connections`: To list the client's connected data sources.
+
+#### Key Features & Sections:
+1. **Activity Summary Grid**: Renders graphical summary blocks for the customer's total orders count, reviews submitted, and database connection count.
+2. **Database Connection Records**: Renders a data table showing connected databases (PostgreSQL, MySQL, SQL Server, etc.), detailing connection names, database hosts, active status, and connection health.
+3. **Tableau Integration Modal**: Supports adding a custom Tableau dashboard url to the client profile.
+   - Clicking the "Add Tableau URL" button launches a modal.
+   - The form is validated using Formik & Yup to ensure the URL is formatted correctly.
+   - Submitting the form calls `PUT /ClientSubscriptions/${id}/tableau-url` with the new URL.
+   - Upon a successful update, local client state is updated dynamically and a success toast alerts the operator.
+
+---
+
+## 5. Service & Package CRUD
+
+Services are the modular AI analytics tools offered by the platform, and Packages are bundles of these services sold at different pricing levels.
+
+### Services Management (`Services.jsx`, `AddServices.jsx`, `EditServices.jsx`)
+- **Services Listing**: Lists all platform services via `GET /admin/services`. Administrators can toggle a service's status using the `PUT /admin/services/${id}/toggle-status` endpoint.
+- **Form Handling with File Uploads**: Both `AddServices` and `EditServices` use Formik to handle standard text fields, token pricing parameters, and file uploads.
+- **Multipart Submissions**: Because services include visual assets (e.g., icons), forms are submitted as `multipart/form-data`. Visual feedback is provided during submission using a loading toast, and the app redirects back to the services directory upon completion.
+
+### Dynamic Package Builder (`Packages.jsx`, `AddPackages.jsx`, `EditPackages.jsx`)
+- **Package Inventory**: Lists packages via `GET /admin/packages`, displaying details like duration, price, and active sales. It supports toggle actions to enable/disable packages.
+- **Service Composition Matrix**: When adding or editing a package, the component queries `GET /admin/services` to display a grid of all available platform services. Clicking a service card updates a Formik array field (`services`), managing the package composition dynamically.
+- **Token Allocation Matrix**: For every selected service, the form renders a configuration card to define its token limits. If a service does not require tokens (such as a view-only dashboard), the input can be left blank, which submits a `null` value to signify "Unlimited Tokens" on the backend.
+- **Sales & Discount Rules**: Includes configuration inputs for active sales:
+  - **Discount %**: Allows setting a discount percentage between 0% and 100%.
+  - **Start & End Date Pickers**: Opens browser date pickers. Validation rules require both dates if a discount is active, and ensure the end date is after the start date.
+  - **Real-Time Price Calculations**: Features a live calculator that displays original price, discount percentage, savings, and final price as the user types.
+- **API Form Submissions**:
+  - Creating a package makes a `POST /admin/packages` request. If a sale discount is configured, it extracts the returned `packageId` and immediately fires a second `POST /admin/packages/${packageId}/sales` request.
+  - Updating a package makes a `PUT /admin/packages/${id}` request. If the package has an active sale, it sends a `PUT /admin/packages/${id}/sales/${saleId}` request to update the sale details.
+
+---
+
+## 6. Financials, Orders, & Invoices
+
+This module tracks platform revenue and processes user transactions.
+
+### Orders Management (`Orders.jsx`)
+- **Overview Metrics**: Displays card widgets showing metrics like total revenue, average order size, completed orders, and refund requests, loaded from `GET /admin/orders/statistics`.
+- **Search & Filters**: Allows filtering orders by transaction ID, client name, order type (Standard, Custom), and status (Completed, Processing, Failed).
+- **Date & Price Range Checks**: Provides custom date and price sliders. The component validates ranges, preventing queries if the minimum price exceeds the maximum price or if the start date is set after the end date.
+- **Server-Side Sorting & Pagination**: Table headers feature click handlers that update sorting parameters (`SortColumn`, `SortDirection`) and request new data from the `GET /admin/orders` endpoint.
+
+### Invoices list (`Invoices.jsx`)
+- **Invoice Overview**: Fetches high-level invoice statistics using `GET /admin/invoices/statistics`, displaying metrics like total invoices, pending balances, paid amounts, and overdue accounts.
+- **Invoices Grid**: Queries `GET /admin/invoices` with page size and page number parameters to populate the main invoice grid.
+- **Status Indicators**: Highlights invoice states (Paid, Partially Paid, Unpaid, Overdue) using design system color variables.
+- **Print and Download Actions**: Features button placeholders to print invoices or export them to CSV.
+
+---
+
+## 7. Subscription Lifecycles & Controls
+
+Subscriptions represent active client agreements. Administrators use this module to manage renewals, modify package levels, and inspect subscription histories.
+
+```
++------------------------------------------------------------+
+| Subscription Details (#ID: 1)              [Cancel Plan]   |
++---------------------+--------------------------------------+
+| CLIENT INFORMATION  | ACTIVE PLAN DETAILS                  |
+| Business: Acme Corp | Package: Enterprise (EGP 24,999/mo)  |
+| Contact: John Doe   | Auto-Renew: [Toggle ON]              |
+|                     | End Date: 12 Aug 2026                |
++---------------------+--------------------------------------+
+| ACTIONS                                                    |
+| [Schedule Package Change] -> Opens Package selector modal  |
++------------------------------------------------------------+
+| EVENT HISTORY LOGS                                         |
+| [12:00] Subscription activated                             |
+| [14:32] Database sync configured successfully              |
++------------------------------------------------------------+
 ```
 
-1. **Queueing**: Sets a local flag `isRefreshing = true` and pushes all incoming failing requests into a queue (`failedQueue`).
-2. **Refresh POST**: Calls `/Auth/refresh`, passing the old token.
-3. **Success**: Stores the new token, updates Axios default headers, resolves all queued promises, and replays original requests.
-4. **Failure**: If token refresh fails (400, 401, 403 response), the system executes a logout: clears storage and redirects to `/login`.
+### Subscriptions directory (`Subscriptions.jsx`)
+- **Inventory Overview**: Lists all client subscriptions via `GET /admin/client-subscriptions`.
+- **Expiry Warning System**: Features a warning indicator helper function `isWarningDate()`. If a subscription is active and its end date is within 30 days of the current date, the row is highlighted and displays an expiry warning.
+- **Granular Filters**: Allows filtering the list by auto-renew status, plan type, activation state, and end dates.
+
+### Subscription Inspector & Controls (`SubscriptionView.jsx`)
+The [SubscriptionView](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/SubscriptionView/SubscriptionView.jsx) component manages individual subscriptions. It reads `subscriptionId` from the route params to show details and control active plans:
+
+1. **Auto-Renewal Controls**: Provides a toggle switch that sends a `PUT /admin/client-subscriptions/package/${subscriptionId}/auto-renewal-toggle` request to change the subscription's auto-renewal status.
+2. **Package Modification Modal**: Features a modal to schedule package changes.
+   - Clicking "Schedule Package Change" loads available packages via `GET /admin/packages`.
+   - The operator selects a package from a dropdown and submits.
+   - The form submits a `PUT /admin/client-subscriptions/package/${subscriptionId}/change-schedule` request, updating the package status and refreshing the current subscription details.
+3. **Cancellation & Termination**: Features a cancel button that triggers a SweetAlert2 confirmation dialog. Confirming sends a `PUT /admin/client-subscriptions/package/${subscriptionId}/cancel` request to immediately cancel or terminate the subscription.
+4. **Subscription Event Logs**: Displays an event log panel showing chronological activity and billing history. It queries the `GET /admin/client-subscriptions/package/${subscriptionId}/events` endpoint on mount to fetch and display subscription logs.
 
 ---
 
-## 13. UI/UX Design System
+## 8. Admin-Only API Integrations Reference
 
-The platform features a premium, modern design language:
+Below is a reference table mapping all admin-specific REST API endpoints integrated within the dashboard components:
 
-### Color Palette
-Deeb AI (Namaa) incorporates a modern, dark-themed violet and blue color spectrum defined via `oklch` coordinates in the admin project's design system:
-- **Primary / Sidebar Background**: `oklch(0.2 0.08 250)` (Deep Blue-Purple)
-- **Secondary / Hover State**: `oklch(30.256% 0.068 249.977)` (Royal Violet)
-- **Background Main**: `oklch(0.98 0.005 250)` (Ultra Light Slate Gray)
-- **Accent Highlight**: `oklch(0.45 0.1 250)` (Bright Slate Blue)
-- **Destructive State**: `oklch(0.577 0.245 27.325)` (Crimson Red)
-
-### Typography
-- **Font Face**: **Inter** variable font family loaded locally via `src/assets/fonts/Inter-VariableFont_opsz,wght.ttf` and imported in global stylesheets.
-- **Monospace Font**: `DM Mono` for special data keys and system identifiers.
-
-### Responsive Design
-The system uses a **mobile-first grid architecture** built on Bootstrap containers.
-- Custom media queries wrap search bar filter items, center button groupings on overflow, and collapse navigation sidebars on smaller screens to prevent content clipping.
-
----
-
-## 14. Error Handling & Edge Cases
-
-- **Validation Errors**: Validation rules are enforced using Yup. Input components display real-time warning labels in case of invalid entries.
-- **Route Fallbacks (404)**: Unmatched paths are caught by `<Route path="*" element={<NotFound />} />` which displays an illustrated 404 message guiding users back to safety.
-- **Empty States**: Data tables render clear, friendly notification rows (e.g., "0 subscriptions found" or "No records match search parameters") when lists return empty from the API.
-- **SweetAlert2 Alerts**: Failures are intercepted globally to display stylized alert popups with rich color gradients.
-
----
-
-## 15. Performance Optimization
-
-- **Vite Bundling**: Production files are generated with index hashes, preventing caching issues during deployment cycles.
-- **Cache-Busting Image Links**: Profile images append dynamic timestamps (`?t=timestamp`) during update cycles, allowing browsers to reload local avatars without requiring page restarts.
-- **Lazy Cart Fetching**: Cart updates are limited to essential lifecycle hooks, and local cart syncing minimizes backend traffic.
-
----
-
-## 16. Browser & Device Support
-
-### Tested Breakpoints
-- **Mobile Viewports** (up to `768px`): Fluid collapsing navigation menus, full-screen form steps, centered dialog popups.
-- **Tablet Layouts** (`768px` to `1024px`): Adaptive grids, scrolling list wrappers, grid columns.
-- **Desktop Screens** (`1024px` and above): Expanded sidebars, large analytics charts, complete tabular lists.
-
-### Browser Compatibility
-Tested and optimized for performance across all modern engines:
-- Google Chrome
-- Apple Safari
-- Mozilla Firefox
-- Microsoft Edge
-
----
-
-## 17. Deployment (Vercel)
-
-Both frontend applications are configured for deployment on the **Vercel** platform.
-
-### Rewrite Configurations (`vercel.json`)
-To bypass CORS blocks during browser communications and support React Router Single Page Application (SPA) routing, both roots feature `vercel.json` rewrite settings:
-
-```json
-{
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://deebai.runasp.net/api/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
-}
-```
-
-- **API Redirection**: Intercepts all client calls targeting `/api/*` and proxies them to the backend API (`https://deebai.runasp.net/api/*`).
-- **SPA Rewrite**: Directs all non-file asset URLs to `/index.html`, allowing React Router to parse path parameters correctly.
-
-### Deployment Process
-1. Connect the GitHub repository to the Vercel Dashboard.
-2. Select your framework preset: **Vite**.
-3. Confirm Build Settings:
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Set Environment Variables on Vercel:
-   - Add `VITE_API_BASE_URL` with value `/api`.
-5. Click **Deploy**.
-
----
-
-## 18. Known Issues / Limitations
-
-- **Local Storage Reliance**: The JWT is stored in `localStorage`, which is susceptible to cross-site scripting (XSS) in insecure environments.
-- **Network Dependency**: Analytics graphs require active connections to render analytical components correctly.
-
----
-
-## 19. Future Improvements
-
-- **Secure HTTP-Only Cookies**: Update authentication architecture to use secure HTTP-only cookies for token transmission, enhancing platform protection.
-- **Global State Scalability**: Introduce **Zustand** or **Redux Toolkit** if client dashboard modules scale beyond auth/cart requirements.
-- **WebSockets Integrations**: Implement live server-sent event feeds for real-time order alerts and live analytics tracking inside the Admin Dashboard.
+| Endpoint Path | HTTP Method | Purpose | Triggering Component(s) |
+| :--- | :---: | :--- | :--- |
+| `/Dashboard/analytics` | `GET` | Fetch main metrics card values (total/active users, roles). | [Admin.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Admin/Admin.jsx) |
+| `/Dashboard/recent-users` | `GET` | Retrieve list of recently created system users. | [Admin.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Admin/Admin.jsx) |
+| `/Dashboard/recent-roles` | `GET` | Retrieve list of recently configured roles. | [Admin.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Admin/Admin.jsx) |
+| `/Roles/Permissions` | `GET` | Fetch available permissions; used for creation check lists. | [Roles.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Roles/Roles.jsx), [MyPermissions.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/MyPermissions/MyPermissions.jsx) |
+| `/Roles/search` | `POST` | Query, filter, and paginate security roles. | [Roles.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Roles/Roles.jsx) |
+| `/Roles` | `POST` | Create a new role with a custom permission matrix. | [Roles.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Roles/Roles.jsx) |
+| `/Roles/${id}` | `GET` | Fetch detailed configuration and permissions for a role. | [RolesDetails.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/RolesDetails/RolesDetails.jsx) |
+| `/Roles/${id}/toggle-status` | `PUT` | Enable or disable an administrative role. | [Roles.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Roles/Roles.jsx) |
+| `/users/search` | `POST` | Query, filter, and paginate administrative users. | [Users.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Users/Users.jsx) |
+| `/Users` | `POST` | Create a new administrative user account. | [Users.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Users/Users.jsx) |
+| `/users/${id}/toggle-status` | `PUT` | Lock, unlock, or change status for a system user. | [Users.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Users/Users.jsx), [UserDetails.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/UserDetails/UserDetails.jsx) |
+| `/Clients/kpi` | `GET` | Fetch summary KPI metrics for business accounts. | [Clients.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Clients/Clients.jsx) |
+| `/Clients/search` | `POST` | Query, filter, and paginate customer business accounts. | [Clients.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Clients/Clients.jsx) |
+| `/Clients/${id}` | `GET` | Fetch contact and business profile details for a client. | [CustomersView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/CustomersView/CustomersView.jsx) |
+| `/Clients/${id}/toggle-status`| `PUT` | Enable or disable a customer account. | [Clients.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Clients/Clients.jsx) |
+| `/Clients/${id}/unlock` | `PUT` | Reset account lockouts for a customer. | [Clients.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Clients/Clients.jsx) |
+| `/Clients/${id}/subscriptions`| `GET` | Fetch subscription history and active plan for a client. | [CustomersView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/CustomersView/CustomersView.jsx) |
+| `/Clients/${id}/database-connections` | `GET` | Fetch connected data source configurations for a client. | [CustomersView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/CustomersView/CustomersView.jsx) |
+| `/ClientSubscriptions/${id}/tableau-url` | `PUT` | Configure a custom Tableau dashboard URL for a client. | [CustomersView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/CustomersView/CustomersView.jsx) |
+| `/admin/services` | `GET` | Fetch available platform services. | [Services.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Services/Services.jsx), [AddPackages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/AddPackages/AddPackages.jsx) |
+| `/admin/services` | `POST` | Create a new platform service (multipart/form-data). | [AddServices.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/AddServices/AddServices.jsx) |
+| `/admin/services/${id}` | `GET` | Fetch configuration details for a service. | [EditServices.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/EditServices/EditServices.jsx) |
+| `/admin/services/${id}` | `PUT` | Update service details (multipart/form-data). | [EditServices.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/EditServices/EditServices.jsx) |
+| `/admin/services/${id}/toggle-status` | `PUT` | Enable or disable a service. | [Services.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Services/Services.jsx) |
+| `/admin/packages` | `GET` | Fetch list of platform packages. | [Packages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Packages/Packages.jsx), [SubscriptionView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/SubscriptionView/SubscriptionView.jsx) |
+| `/admin/packages` | `POST` | Create a new pricing package. | [AddPackages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/AddPackages/AddPackages.jsx) |
+| `/admin/packages/${id}` | `GET` | Fetch pricing package details and composition. | [EditPackages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/EditPackages/EditPackages.jsx) |
+| `/admin/packages/${id}` | `PUT` | Update details for a pricing package. | [EditPackages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/EditPackages/EditPackages.jsx) |
+| `/admin/packages/${id}/toggle-status` | `PUT` | Enable or disable a package. | [Packages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Packages/Packages.jsx) |
+| `/admin/packages/${id}/sales` | `POST` | Create a sale discount period for a package. | [AddPackages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/AddPackages/AddPackages.jsx) |
+| `/admin/packages/${id}/sales/${saleId}` | `PUT` | Update sale discount parameters. | [EditPackages.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/EditPackages/EditPackages.jsx) |
+| `/admin/orders/statistics` | `GET` | Fetch order summary metrics. | [Orders.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Orders/Orders.jsx) |
+| `/admin/orders` | `GET` | Query, filter, sort, and paginate orders. | [Orders.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Orders/Orders.jsx) |
+| `/admin/invoices/statistics` | `GET` | Fetch financial summary metrics. | [Invoices.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Invoices/Invoices.jsx) |
+| `/admin/invoices` | `GET` | Fetch, filter, and paginate client invoices. | [Invoices.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Invoices/Invoices.jsx) |
+| `/admin/client-subscriptions` | `GET` | Query, filter, and paginate active client subscriptions. | [Subscriptions.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/Subscriptions/Subscriptions.jsx) |
+| `/admin/client-subscriptions/details/${id}` | `GET` | Fetch comprehensive detail state for a subscription. | [SubscriptionView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/SubscriptionView/SubscriptionView.jsx) |
+| `/admin/client-subscriptions/package/${id}/auto-renewal-toggle` | `PUT` | Toggle subscription auto-renewal. | [SubscriptionView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/SubscriptionView/SubscriptionView.jsx) |
+| `/admin/client-subscriptions/package/${id}/change-schedule` | `PUT` | Schedule a plan change for a subscription. | [SubscriptionView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/SubscriptionView/SubscriptionView.jsx) |
+| `/admin/client-subscriptions/package/${id}/cancel` | `PUT` | Terminate or cancel a client subscription. | [SubscriptionView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/SubscriptionView/SubscriptionView.jsx) |
+| `/admin/client-subscriptions/package/${id}/events` | `GET` | Fetch activity and event logs for a subscription. | [SubscriptionView.jsx](file:///c:/Users/tefa/Desktop/grad-app/Admin-grad-app/src/Components/SubscriptionView/SubscriptionView.jsx) |

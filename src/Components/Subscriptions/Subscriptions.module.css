@@ -42,21 +42,33 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+}
+
+@media (max-width: 992px) {
+  .controlBar {
+    flex-wrap: wrap;
+  }
 }
 
 .leftControls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+@media (max-width: 992px) {
+  .leftControls {
+    flex-wrap: wrap;
+  }
 }
 
 .searchWrapper {
   position: relative;
   display: flex;
   align-items: center;
-  width: 320px;
+  width: 240px;
 }
 
 @media (max-width: 576px) {
@@ -154,11 +166,11 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  min-width: 1000px;
+  min-width: 800px;
 }
 
 .th {
-  padding: 14px 20px;
+  padding: 12px 10px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -188,7 +200,7 @@
 }
 
 .td {
-  padding: 14px 20px;
+  padding: 12px 10px;
   vertical-align: middle;
   font-size: 13.5px;
   color: #374151;
@@ -467,7 +479,7 @@
 .dateLabel {
   font-weight: 500;
   color: #6b7280;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .dateInput {
@@ -476,7 +488,7 @@
   background: transparent;
   color: #374151;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
 }
 

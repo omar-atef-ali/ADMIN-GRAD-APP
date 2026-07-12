@@ -217,11 +217,12 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  min-width: 1000px;
+  min-width: 900px;
 }
 
 .th {
-  padding: 14px 20px;
+  padding: 14px 10px;
+  padding-left: 15px;
   font-size: 12px;
   font-weight: 600;
   color: #4b5563;
@@ -251,7 +252,8 @@
 }
 
 .td {
-  padding: 14px 20px;
+  padding: 14px 10px;
+  padding-left: 15px;
   vertical-align: middle;
   font-size: 13.5px;
   color: #374151;

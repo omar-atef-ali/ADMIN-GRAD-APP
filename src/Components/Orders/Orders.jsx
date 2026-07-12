@@ -5,18 +5,6 @@ import { userContext } from '../../context/userContext';
 import api from '../../api';
 import toast from 'react-hot-toast';
 
-const mockOrders = [
-  { id: 'ORD-2025-001', name: 'Sarah Johnson', email: 'sarah.j@techcorp.com', type: 'Package', status: 'Completed', total: 'EGP 229,500', date: '28 Jun 2025', invoice: 'Issued' },
-  { id: 'ORD-2025-002', name: 'Mohamed Hassan', email: 'm.hassan@dataflow.io', type: 'Service', status: 'Completed', total: 'EGP 14,435', date: '25 Jun 2025', invoice: 'Issued' },
-  { id: 'ORD-2025-003', name: 'Emma Wilson', email: 'emma.w@cloudbase.co', type: 'Package', status: 'Processing', total: 'EGP 60,500', date: '22 Jun 2025', invoice: 'Pending' },
-  { id: 'ORD-2025-004', name: 'Karim El-Nasser', email: 'k.nasser@infodata.eg', type: 'Package', status: 'Failed', total: 'EGP 24,999', date: '20 Jun 2025', invoice: '-' },
-  { id: 'ORD-2025-005', name: 'Nour Abdallah', email: 'nour.a@digitaledge.com', type: 'Service', status: 'Completed', total: 'EGP 5,000', date: '18 Jun 2025', invoice: 'Issued' },
-  { id: 'ORD-2025-006', name: 'James Rodriguez', email: 'j.rodriguez@deveops.net', type: 'Package', status: 'Completed', total: 'EGP 232,499', date: '15 Jun 2025', invoice: 'Issued' },
-  { id: 'ORD-2025-007', name: 'Fatima Al-Rashid', email: 'fatima.r@insightlab.sa', type: 'Service', status: 'Completed', total: 'EGP 36,500', date: '10 Jun 2025', invoice: 'Issued' },
-  { id: 'ORD-2025-008', name: 'Omar Khaled', email: 'o.khaled@techventures.eg', type: 'Package', status: 'Cancelled', total: 'EGP 249,999', date: '05 Jun 2025', invoice: 'Refunded' },
-  { id: 'ORD-2025-009', name: 'Amira Sayed', email: 'amira.s@databridge.com', type: 'Service', status: 'Completed', total: 'EGP 20,400', date: '20 May 2025', invoice: 'Issued' },
-  { id: 'ORD-2025-010', name: 'Ryan Thompson', email: 'r.thompson@netgrid.net', type: 'Package', status: 'Pending', total: 'EGP 24,999', date: '25 May 2025', invoice: 'Pending' }
-];
 
 export default function Orders() {
 
@@ -278,7 +266,7 @@ export default function Orders() {
                 <th className={style.th}>Client</th>
                 <th className={style.th}>Type</th>
                 <th className={style.th}>
-                  Status <FaChevronDown className={style.thIcon} />
+                  Status
                 </th>
                 <th className={style.th}>
                   <div className={style.sortingContainer}>
