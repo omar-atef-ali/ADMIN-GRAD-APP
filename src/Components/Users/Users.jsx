@@ -20,7 +20,8 @@ export default function Users() {
   const [isOpenEditRole, setIsOpenEditRole] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageLoading, setPageLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const [searchtext, setsearchtext] = useState("");
 
@@ -74,7 +75,9 @@ export default function Users() {
     activeProps = Propertiesvalue
   ) {
     try {
-      setPageLoading(true);
+      if (isFirstLoad) {
+        setPageLoading(true);
+      }
       const trimmedSearch = searchValue.trim();
       let activeProperties =
         activeProps.length === 0
@@ -191,7 +194,10 @@ export default function Users() {
     } catch (error) {
       console.log("ERROR:", error.response?.data || error.message);
     } finally {
-      setPageLoading(false);
+      if (isFirstLoad) {
+        setPageLoading(false);
+        setIsFirstLoad(false);
+      }
     }
   }
 

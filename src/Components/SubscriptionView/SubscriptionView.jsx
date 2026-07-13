@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
     FaArrowLeft,
     FaExclamationTriangle,
@@ -25,8 +25,8 @@ import { userContext } from '../../context/userContext';
 
 export default function SubscriptionView() {
     const navigate = useNavigate();
-
-    const subscriptionId = 1
+    const {id}=useParams()
+    const subscriptionId = id
     const [subscription, setSubscription] = useState(null);
     const [dataState, setDataState] = useState('populated'); // 'populated' or 'empty' for testing/empty views
     const [loading, setLoading] = useState(false);
@@ -37,6 +37,7 @@ export default function SubscriptionView() {
     const [events, setEvents] = useState([]);
     const [packages, setPackages] = useState([]);
     const [addOns, setAddOns] = useState([]);
+    const [renewalHistory, setRenewalHistory] = useState([]);
 
 
     const fetchSubscriptionDetails = async () => {
@@ -44,7 +45,7 @@ export default function SubscriptionView() {
             setLoading(true);
             const { data } = await api.get(`/admin/client-subscriptions/details/${subscriptionId}`);
             setSubscription(data);
-            console.log(data)
+            // console.log(data)
         } catch (error) {
             toast.error(
                 error?.response?.data?.errors[1] ||
@@ -426,20 +427,6 @@ export default function SubscriptionView() {
         }
     };
 
-
-
-    const mockRenewals = [
-        {
-            id: 1,
-            date: "01 Mar 2025",
-            amount: "EGP 69,999",
-            payment: "Paid",
-            reference: "TXN-BT-24R005"
-        }
-    ];
-
-
-
     async function getEvents() {
         try {
             const { data } = await api.get(`/admin/client-subscriptions/events/${subscriptionId}`, {
@@ -447,7 +434,7 @@ export default function SubscriptionView() {
                     Authorization: `Bearer ${userToken}`
                 }
             })
-            console.log(data);
+            // console.log(data);
             setEvents(data);
         } catch (error) {
             console.log(error)
@@ -553,7 +540,7 @@ export default function SubscriptionView() {
                     Authorization: `Bearer ${userToken}`
                 }
             })
-            console.log(data);
+            // console.log(data);
             setPackages(data);
         }catch(error){
             console.log(error)
@@ -596,7 +583,7 @@ export default function SubscriptionView() {
                     }
                 }
             );
-            console.log(data);
+            // console.log(data);
             toast.success("Schedule changed successfully.");
             fetchSubscriptionDetails();
             getEvents();
@@ -647,7 +634,7 @@ export default function SubscriptionView() {
                     Authorization: `Bearer ${userToken}`
                 }
             })
-            console.log(data);
+            // console.log(data);
             setAddOns(data);
         } catch (error) {
             console.log(error);
@@ -678,11 +665,50 @@ export default function SubscriptionView() {
         }
     }
 
+    async function getRenewalHistory() {
+        try{
+            const {data} = await api.get(`/admin/client-subscriptions/renewal-history/${subscriptionId}`,{
+                headers:{
+                    Authorization: `Bearer ${userToken}`
+                }
+            })
+            console.log(data);
+            setRenewalHistory(data);
+        }catch(error){
+            console.log(error);
+            toast.error(
+                error?.response?.data?.errors[1] ||
+                "Failed to fetch Renewal History.",
+                {
+                    position: "top-center",
+                    duration: 4000,
+                    style: {
+                        background:
+                            "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                        padding: "16px 20px",
+                        color: "#ffffff",
+                        fontSize: "0.95rem",
+                        borderRadius: "5px",
+                        width: "300px",
+                        height: "60px",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+                    },
+                    iconTheme: {
+                        primary: "#FF4D4F",
+                        secondary: "#ffffff",
+                    },
+                }
+            );
+        }
+    }
+
 
     useEffect(() => {
         getEvents();
         getPackages();
         getAddOns();
+        getRenewalHistory();
     }, [userToken, subscriptionId]);
 
     return (
@@ -803,14 +829,7 @@ export default function SubscriptionView() {
                                                 </td>
                                                 <td>
                                                     <div className={styles.actionsCell}>
-                                                        {/* <label className={styles.switch}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={isAutoRenew}
-                                                                onChange={() => handleServiceAutoRenewToggle(service.subscriptionItemId)}
-                                                            />
-                                                            <span className={styles.slider}></span>
-                                                        </label> */}
+  
                                                         <label className={styles.switch}>
                                                             <input
                                                                 type="checkbox"
@@ -849,26 +868,6 @@ export default function SubscriptionView() {
                                                                 </button>
                                                             </div>
                                                         )}
-
-                                                        {/* {(status === 'Expired' || status === 'Terminated') && (
-                                                            <button
-                                                                className={styles.resumeRowBtn}
-                                                                onClick={() => handleServiceReactivate(service.subscriptionItemId)}
-                                                                title="Re-activate"
-                                                            >
-                                                                <FaSync />
-                                                            </button>
-                                                        )} */}
-                                                        {/* <button
-                                                            className={styles.resumeRowBtn}
-                                                            onClick={() =>
-                                                                status !== "Terminated" &&
-                                                                handleServiceReactivate(service.subscriptionItemId)
-                                                            }
-                                                            disabled={status !== "Active"}
-                                                        >
-                                                            <FaSync />
-                                                        </button> */}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -932,65 +931,6 @@ export default function SubscriptionView() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Action Row below standard info card */}
-                        {/* {subscription?.packageStatus !== 'Canceled' && subscription?.packageStatus !== 'Terminated' ? (
-                            <div className={styles.standardActiveActions}>
-                                <div className={styles.autoRenewStatus}>
-                                    <div>
-                                        <p className={styles.autoRenewLabel}>Auto-renewal</p>
-                                        <span className={styles.autoRenewSub}>Automatically renew at {new Date(subscription?.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                                    </div>
-                                    <label className={styles.switch}>
-                                        <input
-                                            type="checkbox"
-                                            checked={subscription?.packageAutoRenew || false}
-                                            onChange={handlePackageAutoRenewToggle}
-                                        />
-                                        <span className={styles.slider}></span>
-                                    </label>
-                                </div>
-
-                                <div className={styles.standardActiveButtons}>
-                                    <button
-                                        className={styles.cancelSubscriptionBtn}
-                                        onClick={handlePackageCancel}
-                                    >
-                                        <FaExclamationTriangle className={styles.btnWarningIcon} />
-                                        <span>Cancel Subscription</span>
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            // <div className={styles.standardCanceledActions}>
-                            //     <div className={styles.cancelAlertBanner}>
-                            //         <FaExclamationTriangle className={styles.alertBannerIcon} />
-                            //         <div>
-                            //             <h4 className={styles.alertBannerTitle}>Subscription Cancelled</h4>
-                            //             <p className={styles.alertBannerText}>
-                            //                 Your service will remain active until <strong>{new Date(subscription?.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>. After that, all services will be paused.
-                            //             </p>
-                            //         </div>
-                            //     </div>
-                            //     <div className={styles.canceledButtons}>
-                            //         <button
-                            //             className={styles.resumeSubscriptionBtn}
-                            //             onClick={handlePackageReactivate}
-                            //         >
-                            //             <FaSync className={styles.btnIcon} />
-                            //             <span>Resume Subscription</span>
-                            //         </button>
-                            //         <button
-                            //             className={styles.endNowBtnOutline}
-                            //             onClick={handlePackageTerminate}
-                            //         >
-                            //             <FaBan className={styles.btnIcon} />
-                            //             <span>End Now</span>
-                            //         </button>
-                            //     </div>
-                            // </div>
-                            ""
-                        )} */}
                         {subscription?.packageStatus === "Active" && (
                             <div className={styles.standardActiveActions}>
                                 <div className={styles.autoRenewStatus}>
@@ -1131,7 +1071,7 @@ export default function SubscriptionView() {
                 <div className={styles.splitCard}>
                     <h3 className={styles.splitCardTitle}>Renewal History</h3>
 
-                    {dataState === 'empty' ? (
+                    {!renewalHistory || renewalHistory.length === 0 ? (
                         <div className={styles.emptyState}>
                             <div className={styles.emptyIconCircleDashed}>
                                 <FaSync className={styles.emptyIcon} />
@@ -1150,16 +1090,27 @@ export default function SubscriptionView() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {mockRenewals.map((ren) => (
-                                        <tr key={ren.id}>
-                                            <td>{ren.date}</td>
-                                            <td className={styles.boldText}>{ren.amount}</td>
-                                            <td>
-                                                <span className={styles.badgePaid}>{ren.payment}</span>
-                                            </td>
-                                            <td className={styles.purpleRef}>{ren.reference}</td>
-                                        </tr>
-                                    ))}
+                                    {renewalHistory.map((ren) => {
+                                        let statusClass = styles.badgePaid;
+                                        const statusLower = ren.status?.toLowerCase();
+                                        if (statusLower === 'pending') {
+                                            statusClass = styles.badgePending;
+                                        } else if (statusLower === 'failed' || statusLower === 'cancelled' || statusLower === 'refunded') {
+                                            statusClass = styles.badgeFailed;
+                                        }
+                                        return (
+                                            <tr key={ren.invoiceId}>
+                                                <td>{formatDateOnly(ren.billingDate)}</td>
+                                                <td className={styles.boldText}>
+                                                    {ren.currency} {ren.amount?.toLocaleString()}
+                                                </td>
+                                                <td>
+                                                    <span className={statusClass}>{ren.status}</span>
+                                                </td>
+                                                <td className={styles.purpleRef}>{ren.transactionId || '-'}</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>

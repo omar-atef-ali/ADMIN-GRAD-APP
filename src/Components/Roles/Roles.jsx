@@ -11,7 +11,8 @@ import { Link } from "react-router-dom";
 export default function Roles() {
   const { userToken } = useContext(userContext);
   const [showModal, setShowModal] = useState(false);
-  const [pageLoading, setPageLaoding] = useState(false);
+  const [pageLoading, setPageLaoding] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const [allRoles, setAllRoles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -246,7 +247,9 @@ export default function Roles() {
 
   async function getAllRoles(page = currentPage) {
     try {
-      setPageLaoding(true);
+      if (isFirstLoad) {
+        setPageLaoding(true);
+      }
 
       const body2 = {
         PageNumber: page,
@@ -271,10 +274,7 @@ export default function Roles() {
       // console.log(data);
       setAllRoles(data.items);
       setTotalPages(data.totalPages);
-      setPageLaoding(false);
     } catch (error) {
-      setPageLaoding(false);
-
       console.log(error);
       toast.error(error.response?.data?.errors[1] || "Something went wrong.", {
         position: "top-center",
@@ -296,6 +296,11 @@ export default function Roles() {
           secondary: "#ffffff",
         },
       });
+    } finally {
+      if (isFirstLoad) {
+        setPageLaoding(false);
+        setIsFirstLoad(false);
+      }
     }
   }
 

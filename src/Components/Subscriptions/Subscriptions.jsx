@@ -12,6 +12,7 @@ import {
 import { userContext } from "../../context/userContext";
 import api from "../../api";
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -49,6 +50,7 @@ const isWarningDate = (dateString, status) => {
   return diffDays >= 0 && diffDays <= 30;
 };
 export default function Subscriptions() {
+  const navigate=useNavigate()
   const { userToken } = useContext(userContext);
   const [subscription, setSubscription] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
@@ -62,12 +64,17 @@ export default function Subscriptions() {
   const [filterStatus, setFilterStatus] = useState('')
   const [autoRenew, setAutoRenew] = useState('')
   const [EndDate, setEndDate] = useState('')
+  const [pageLoading, setPageLoading] = useState(true)
+  const [isFirstLoad, setIsFirstLoad] = useState(true)
 
   
   
 
   async function getSubscriptions(page = 1) {
     try {
+      if (isFirstLoad) {
+        setPageLoading(true);
+      }
       const params = new URLSearchParams();
       params.append("PageNumber", page);
       params.append("PageSize", 10);
@@ -133,6 +140,11 @@ export default function Subscriptions() {
           },
         },
       );
+    } finally {
+      if (isFirstLoad) {
+        setPageLoading(false);
+        setIsFirstLoad(false);
+      }
     }
   }
 
@@ -148,7 +160,13 @@ export default function Subscriptions() {
   }, [userToken, sortColumn, sortDirection, search, filterPlanType, filterStatus, autoRenew, EndDate]);
   
   return (
-    <div className={style.pageContainer}>
+    <>
+      {pageLoading && (
+        <div className={style.overlay}>
+          <div className={style.spinner}></div>
+        </div>
+      )}
+      <div className={style.pageContainer}>
       {/* Header Section */}
       <header className={style.pageHeader}>
         <h1 className={style.pageTitle}>Subscriptions</h1>
@@ -319,7 +337,7 @@ export default function Subscriptions() {
             </thead>
             <tbody>
               {subscription.map((sub) => (
-                <tr key={sub.subscriptionId} className={style.tr}>
+                <tr onClick={()=>navigate(`/dashboard/subscriptionsview/${sub.subscriptionId}`)} key={sub.subscriptionId} className={style.tr}>
                   {/* Subscription ID */}
                   <td className={style.td}>
                     <span className={style.subId}>SUB-{sub.subscriptionId}</span>
@@ -432,5 +450,6 @@ export default function Subscriptions() {
         </footer>
       </div>
     </div>
+    </>
   );
 }

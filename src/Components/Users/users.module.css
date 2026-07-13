@@ -422,7 +422,6 @@
 }
 
 .pageLink:hover:not(:disabled) {
-  background-color: #FAF9F8;
   color: #4E3074;
   border-color: #4E3074;
   transform: scale(1.05);

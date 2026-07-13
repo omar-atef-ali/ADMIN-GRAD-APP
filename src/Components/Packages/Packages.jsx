@@ -10,7 +10,8 @@ export default function Packages() {
     const navigate=useNavigate()
 
     const [packages, setPackages] = useState([])
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("");
@@ -51,7 +52,9 @@ export default function Packages() {
     // get All packages
     async function getAllPackages() {
         try {
-            setLoading(true);
+            if (isFirstLoad) {
+                setLoading(true);
+            }
             const { data } = await api.get('admin/packages', {
                 headers: {
                     Authorization: `Bearer ${userToken}`
@@ -69,7 +72,10 @@ export default function Packages() {
             console.log(error)
         }
         finally {
-            setLoading(false);
+            if (isFirstLoad) {
+                setLoading(false);
+                setIsFirstLoad(false);
+            }
         }
     }
     useEffect(() => {
@@ -253,13 +259,6 @@ export default function Packages() {
                                         {/* Actions: Edit + Toggle */}
                                         <td className={styles.td}>
                                             <div className={styles.actionsWrapper}>
-                                                <button
-                                                    className={styles.editButton}
-                                                    title="Edit Package"
-                                                    type="button"
-                                                >
-                                                    <FaPencilAlt size={13} />
-                                                </button>
 
                                                 <label className={styles.switch} onClick={(e) => e.stopPropagation()}>
                                                     <input

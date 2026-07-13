@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import toast from 'react-hot-toast';
 import api from '../../api';
+import { useNavigate } from 'react-router-dom';
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -46,7 +47,10 @@ export default function Invoices() {
   const [endDate, setEndDate] = useState("")
   const [sortColumn, setSortColumn] = useState("")
   const [sortDirection, setSortDirection] = useState("")
+  const [pageLoading, setPageLoading] = useState(true)
+  const [isFirstLoad, setIsFirstLoad] = useState(true)
 
+  const navigate = useNavigate();
   const { userToken } = useContext(userContext)
 
   async function getStats() {
@@ -90,6 +94,9 @@ export default function Invoices() {
 
   async function getInvoices(page = 1, sortCol = sortColumn, sortDir = sortDirection) {
     try{
+      if (isFirstLoad) {
+        setPageLoading(true);
+      }
       const params = {
         PageNumber : page ,
         PageSize : pageSize 
@@ -113,7 +120,9 @@ export default function Invoices() {
         params.DateFrom = startDate;
       }
       if (endDate) {
-        params.DateTo = endDate;
+        if (!startDate || new Date(endDate) >= new Date(startDate)) {
+          params.DateTo = endDate;
+        }
       }
 
       const {data} = await api.get("/admin/invoices",{
@@ -153,6 +162,11 @@ export default function Invoices() {
           },
         }
       );
+    } finally {
+      if (isFirstLoad) {
+        setPageLoading(false);
+        setIsFirstLoad(false);
+      }
     }
   }
 
@@ -170,9 +184,59 @@ export default function Invoices() {
   }, [userToken, search, filterType, filterStatus, startDate, endDate]);
 
 
+  async function handleDownloadInvoice(invoiceId) {
+    try{
+      const {data} = await api.get(`/admin/invoices/${invoiceId}/download`,{
+        headers:{
+          Authorization:`Bearer ${userToken}`
+        }
+        ,responseType: 'blob'
+      })
+      const url = window.URL.createObjectURL(new Blob([data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `invoice-${invoiceId}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    }catch(error){
+      console.log(error);
+      toast.error(
+        error?.response?.data?.errors?.[1] || "Failed to download invoice.",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background: "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
+    }
+  }
+
+
 
   return (
-    <div className={style.pageContainer}>
+    <>
+      {pageLoading && (
+        <div className={style.overlay}>
+          <div className={style.spinner}></div>
+        </div>
+      )}
+      <div className={style.pageContainer}>
       {/* Header Section */}
       <header className={style.pageHeader}>
         <h1 className={style.pageTitle}>Invoices</h1>
@@ -301,7 +365,6 @@ export default function Invoices() {
             <option value="Paid">Paid</option>
             <option value="Void">Void</option>
             <option value="Uncollectible">Uncollectible</option>
-            <option value="PastDue">Past Due</option>
           </select>
 
           <div className={style.dateInputWrapper}>
@@ -323,6 +386,22 @@ export default function Invoices() {
               style={{ width: "100%" }}
             />
           </div>
+
+          {(search || filterType || filterStatus || startDate || endDate) && (
+            <button 
+              type="button"
+              className={style.clearFilterBtn}
+              onClick={() => {
+                setSearch("");
+                setFilterType("");
+                setFilterStatus("");
+                setStartDate("");
+                setEndDate("");
+              }}
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
 
         <div className={style.rightCount}>
@@ -395,7 +474,7 @@ export default function Invoices() {
             <tbody>
               {/* Row 1 */}
               {invoices?.map((invoice) => (
-              <tr key={invoice.invoiceId} className={style.tr}>
+              <tr onClick={()=>{navigate(`/dashboard/invoice-details/${invoice.invoiceId}`)}} key={invoice.invoiceId} className={style.tr}>
                 <td className={style.td}>
                   <span className={style.invoiceId}>INV-{invoice.invoiceId}</span>
                 </td>
@@ -438,8 +517,14 @@ export default function Invoices() {
                   <span className={style.orderText}>ORD-{invoice.orderId}</span>
                 </td>
                 <td className={style.td}>
-
-                  <button className={style.actionBtn} title="Download Invoice">
+                  <button
+                    className={style.actionBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownloadInvoice(invoice.invoiceId);
+                    }}
+                    title="Download"
+                  >
                     <FaDownload />
                   </button>
                 </td>
@@ -475,5 +560,6 @@ export default function Invoices() {
         </footer>
       </div>
     </div>
+    </>
   );
 }

@@ -56,6 +56,7 @@ export default function Layout() {
     { path: "orders", label: "Orders", icon: "fa-solid fa-bag-shopping" },
     { path: "subscriptions", label: "Subscriptions", icon: "fa-solid fa-repeat" },
     { path: "invoices", label: "Invoices", icon: "fa-solid fa-file-invoice-dollar" },
+    { path: "payments", label: "Payments", icon: "fa-solid fa-credit-card" },
     { path: "my-permissions", label: "My Permissions", icon: "fa-solid fa-lock" },
     { path: "settings", label: "Settings", icon: "fa-solid fa-sliders" },
 

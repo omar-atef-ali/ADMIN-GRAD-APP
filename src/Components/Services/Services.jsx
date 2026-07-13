@@ -10,7 +10,8 @@ export default function Services() {
     const { userToken } = useContext(userContext)
     const navigate = useNavigate();
     const [services, setServices] = useState([])
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("");
@@ -50,7 +51,9 @@ export default function Services() {
     // get All Services
     async function getAllServices() {
         try {
-            setLoading(true);
+            if (isFirstLoad) {
+                setLoading(true);
+            }
             const { data } = await api.get('/admin/services', {
                 headers: {
                     Authorization: `Bearer ${userToken}`
@@ -92,7 +95,10 @@ export default function Services() {
             );
         }
         finally {
-            setLoading(false);
+            if (isFirstLoad) {
+                setLoading(false);
+                setIsFirstLoad(false);
+            }
         }
     }
     useEffect(() => {
@@ -238,14 +244,6 @@ export default function Services() {
                                             {/* Actions Column */}
                                             <td className={styles.td}>
                                                 <div className={styles.actionsWrapper}>
-                                                    {/* Edit button */}
-                                                    <button
-                                                        className={styles.editButton}
-                                                        title="Edit Service"
-
-                                                    >
-                                                        <FaPencilAlt size={13} />
-                                                    </button>
 
                                                     {/* Status Toggle Switch */}
                                                     <label className={styles.switch} onClick={(e) => e.stopPropagation()}>

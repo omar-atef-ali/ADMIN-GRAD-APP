@@ -25,7 +25,8 @@ import { useNavigate } from "react-router-dom";
 export default function Clients() {
   const navigate = useNavigate()
   const [stats, setStats] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [customers, setCustomers] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -237,7 +238,9 @@ export default function Clients() {
 
   async function getCustomers(page = 1) {
     try {
-      setLoading(true);
+      if (isFirstLoad) {
+        setLoading(true);
+      }
       const boolProperties = {};
       if (accountStatus !== "all") {
         boolProperties["IsDisabled"] = accountStatus === "disabled";
@@ -303,7 +306,10 @@ export default function Clients() {
         }
       );
     } finally {
-      setLoading(false);
+      if (isFirstLoad) {
+        setLoading(false);
+        setIsFirstLoad(false);
+      }
     }
 
   }

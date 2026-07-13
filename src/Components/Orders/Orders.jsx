@@ -4,11 +4,12 @@ import { FaChevronDown, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { userContext } from '../../context/userContext';
 import api from '../../api';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Orders() {
 
-
+  const navigate=useNavigate()
    const {userToken} = useContext(userContext)
 
    const [statistics , setStatistics ]= useState({})
@@ -25,6 +26,8 @@ export default function Orders() {
    const [maxPrice, setMaxPrice] = useState('')
    const [startDate, setStartDate] = useState('')
    const [endDate, setEndDate] = useState('')
+   const [pageLoading, setPageLoading] = useState(true)
+   const [isFirstLoad, setIsFirstLoad] = useState(true)
 
    async function getStatistics() {
     try {
@@ -64,6 +67,9 @@ export default function Orders() {
 
   async function getOrders(page = 1, size = 10, sortCol = sortColumn, sortDir = sortDirection) {
     try {
+      if (isFirstLoad) {
+        setPageLoading(true);
+      }
       const params = {
         PageNumber: page,
         PageSize: size,
@@ -135,6 +141,11 @@ export default function Orders() {
           },
         }
       );
+    } finally {
+      if (isFirstLoad) {
+        setPageLoading(false);
+        setIsFirstLoad(false);
+      }
     }
   }
 
@@ -159,7 +170,13 @@ export default function Orders() {
 
 
   return (
-    <div className={style.pageContainer}>
+    <>
+      {pageLoading && (
+        <div className={style.overlay}>
+          <div className={style.spinner}></div>
+        </div>
+      )}
+      <div className={style.pageContainer}>
       {/* Header Section */}
       <header className={style.pageHeader}>
         <h1 className={style.pageTitle}>Orders</h1>
@@ -333,7 +350,7 @@ export default function Orders() {
                 else if (invoiceLower === 'refunded') invoiceClass = style.invoiceRefunded;
 
                 return (
-                  <tr key={order.orderId} className={style.tableRow}>
+                  <tr onClick={()=>navigate(`/dashboard/orders-details/${order?.orderId}`)} key={order.orderId} className={style.tableRow}>
                     <td className={`${style.td} ${style.orderId}`}>o-{order?.orderId}</td>
                     <td className={style.td}>
                       <div className={style.clientDetails}>
@@ -395,5 +412,6 @@ export default function Orders() {
         </div>
       </section>
     </div>
+    </>
   );
 }

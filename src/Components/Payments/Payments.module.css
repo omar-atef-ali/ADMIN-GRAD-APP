@@ -1,0 +1,733 @@
+.pageContainer {
+    padding: 24px 30px;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #2D2735;
+    background-color: #FAF9F8;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Header */
+.pageHeader {
+    margin-bottom: 28px;
+}
+
+.pageTitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: #4E3074;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.pageSubtitle {
+    font-size: 0.94rem;
+    color: #797185;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Stats Cards Grid */
+.statsGrid {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.statCard {
+    background-color: #ffffff;
+    border: 1px solid #EAE6E2;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(45, 39, 53, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
+
+
+.statHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.statIconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+/* Icon Colors */
+.statIconWrapper.blue {
+    background-color: #EEF2FF;
+    color: #4F46E5;
+}
+
+.statIconWrapper.green {
+    background-color: #ECFDF5;
+    color: #10B981;
+}
+
+.statIconWrapper.purple {
+    background-color: #F5F3FF;
+    color: #8B5CF6;
+}
+
+.statIconWrapper.teal {
+    background-color: #F0FDFA;
+    color: #0D9488;
+}
+
+.statIconWrapper.red {
+    background-color: #FEF2F2;
+    color: #EF4444;
+}
+
+.statIconWrapper.orange {
+    background-color: #FFF7ED;
+    color: #F97316;
+}
+
+.statValue {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #1F1926;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+
+.redText {
+    color: #EF4444 !important;
+}
+
+/* Payment Status Breakdown Widget */
+.breakdownWidget {
+    background-color: #ffffff;
+    border: 1px solid #EAE6E2;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 12px rgba(45, 39, 53, 0.02);
+}
+
+.widgetTitle {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1F1926;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 16px 0;
+}
+
+.breakdownGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.breakdownItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.breakdownBadge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: capitalize;
+}
+
+.breakdownBadge.success {
+    background-color: #ECFDF5;
+    color: #047857;
+}
+
+.breakdownBadge.pending {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+}
+
+.breakdownBadge.failed {
+    background-color: #FEF2F2;
+    color: #B91C1C;
+}
+
+.breakdownBadge.refunded {
+    background-color: #FFF7ED;
+    color: #C2410C;
+}
+
+.breakdownBadge.partRefunded {
+    background-color: #FFFBEB;
+    color: #B45309;
+}
+
+.breakdownCount {
+    font-size: 0.84rem;
+    color: #1F1926;
+}
+
+.muted {
+    color: #9CA3AF;
+    font-size: 0.78rem;
+}
+
+/* Filter Controls Bar */
+.controlBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.leftControls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+.searchWrapper {
+    position: relative;
+    min-width: 280px;
+    max-width: 400px;
+    flex-grow: 1;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    font-size: 0.85rem;
+}
+
+.searchInput {
+    width: 100%;
+    height: 38px;
+    background-color: #ffffff;
+    border: 1px solid #E0DCD8;
+    border-radius: 8px;
+    padding: 0 12px 0 34px;
+    font-size: 0.82rem;
+    color: #2D2735;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+    border-color: #4E3074;
+    box-shadow: 0 0 0 3px rgba(78, 48, 116, 0.1);
+}
+
+.selectWrapper {
+    position: relative;
+}
+
+.filterSelect {
+    height: 38px;
+    background-color: #ffffff;
+    border: 1px solid #E0DCD8;
+    border-radius: 8px;
+    padding: 0 32px 0 14px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #4B4553;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    appearance: none;
+    min-width: 140px;
+}
+
+.filterSelect:hover {
+    background-color: #FAF9F8;
+    border-color: #C0BBB5;
+}
+
+.chevronIcon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    font-size: 0.72rem;
+    pointer-events: none;
+}
+
+.dateRangeBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    background-color: #ffffff;
+    border: 1px solid #E0DCD8;
+    border-radius: 8px;
+    padding: 0 16px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #4B4553;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dateRangeBtn:hover {
+    background-color: #FAF9F8;
+    border-color: #C0BBB5;
+}
+
+.calendarIcon {
+    color: #797185;
+}
+
+.rightCount {
+    font-size: 0.84rem;
+    color: #797185;
+    font-weight: 500;
+}
+
+/* Invoices/Payments Table Card */
+.tableCard {
+    background-color: #ffffff;
+    border: 1px solid #EAE6E2;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(45, 39, 53, 0.02);
+    overflow: hidden;
+}
+
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 1100px;
+}
+
+.th {
+    padding: 14px 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #797185;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid #F2EFEB;
+    background-color: #FAF9F8;
+}
+
+.tr {
+    border-bottom: 1px solid #F2EFEB;
+    transition: background-color 0.15s ease;
+}
+
+.tr:hover {
+    background-color: #FAF9F8;
+}
+
+.tr:last-child {
+    border-bottom: none;
+}
+
+.td {
+    padding: 14px 20px;
+    vertical-align: middle;
+    font-size: 0.84rem;
+    color: #4B4553;
+}
+
+.paymentId {
+    font-weight: 500;
+    color: #4E3074;
+    font-size: 14px ;
+}
+
+.clientName {
+    font-weight: 600;
+    color: #1F1926;
+}
+
+.invoiceNumber {
+    color: #797185;
+    font-weight: 500;
+}
+
+/* Type Badges */
+.typeBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.typeInitial {
+    background-color: #F5F3FF;
+    color: #8B5CF6;
+}
+
+.typeRenewal {
+    background-color: #F0FDF4;
+    color: #16A34A;
+}
+
+.typeAddon {
+    background-color: #EFF6FF;
+    color: #3B82F6;
+}
+
+.typeUpgrade {
+    background-color: #ECFDF5;
+    color: #0D9488;
+}
+
+.typeProration {
+    background-color: #FFF7ED;
+    color: #F97316;
+}
+
+/* Status Container */
+.statusContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    width: fit-content;
+}
+
+.statusCompleted {
+    background-color: #ECFDF5;
+    color: #10B981;
+}
+
+.statusPending {
+    background-color: #FFFBEB;
+    color: #D97706;
+}
+
+.statusFailed {
+    background-color: #FEF2F2;
+    color: #EF4444;
+}
+
+.statusRefunded {
+    background-color: #FFF7ED;
+    color: #EA580C;
+}
+
+.statusPartRefunded {
+    background-color: #FFFBEB;
+    color: #B45309;
+}
+
+.statusProcessing {
+    background-color: #E0F2FE;
+    color: #0369A1;
+}
+
+.statusCancelled {
+    background-color: #F1F5F9;
+    color: #475569;
+}
+
+.refundSubtext {
+    font-size: 0.7rem;
+    color: #D97706;
+    font-weight: 600;
+    margin-top: 1px;
+}
+
+.amountText {
+    font-weight: 700;
+    color: #1F1926;
+}
+
+.methodWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #4B4553;
+    font-weight: 500;
+}
+
+.methodIcon {
+    font-size: 0.9rem;
+    color: #797185;
+}
+
+.fawryIcon {
+    color: #EAB308;
+}
+
+.dateText {
+    color: #797185;
+    font-weight: 500;
+}
+
+.actionBtn {
+    border: none;
+    background: none;
+    color: #9CA3AF;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+    color: #4E3074;
+    background-color: #F5F3FF;
+}
+
+.noDataTd {
+    padding: 40px;
+    text-align: center;
+    color: #9CA3AF;
+    font-size: 0.9rem;
+}
+
+/* Table Footer / Pagination */
+.tableFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid #F2EFEB;
+    background-color: #FAF9F8;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.showingText {
+    font-size: 0.8rem;
+    color: #797185;
+    font-weight: 500;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pageBtn {
+    border: 1px solid #E0DCD8;
+    background-color: #ffffff;
+    color: #4B4553;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+    color: #4E3074;
+}
+
+.pageBtn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.pageInfo {
+    font-size: 0.8rem;
+    color: #4B4553;
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .pageContainer {
+    padding: 16px 20px;
+  }
+  
+  .statsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .statCard {
+    width: auto;
+    min-width: 0;
+    flex: none;
+    padding: 16px;
+  }
+
+  .controlBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .leftControls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .searchWrapper {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .selectWrapper {
+    width: 100%;
+  }
+
+  .filterSelect {
+    width: 100%;
+  }
+
+  .dateRangeBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dateInputWrapper {
+    width: 100%;
+  }
+
+  .clearFilterBtn {
+    width: 100%;
+  }
+
+  .rightCount {
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  .breakdownGrid {
+    gap: 14px;
+  }
+
+  .breakdownItem {
+    width: calc(50% - 7px);
+  }
+}
+
+@media (max-width: 600px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .breakdownItem {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 2rem;
+  }
+}
+
+.sortBtn {
+  color: #A28EB9 !important;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  padding: 0 2px;
+}
+
+.sortBtn:hover {
+  color: #4E3074 !important;
+}
+
+.sortBtn:focus {
+  color: #4E3074 !important;
+  outline: none;
+}
+
+.activeSort {
+  color: #4E3074 !important;
+}
+
+.sortingContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dateInputWrapper {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #E0DCD8;
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 38px;
+  font-size: 0.82rem;
+  color: #2D2735;
+}
+
+.dateInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #4B4553;
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.clearFilterBtn {
+  background: none;
+  border: none;
+  color: #4e3074;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 8px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.clearFilterBtn:hover {
+  color: #3b205a;
+  text-decoration: underline;
+}
