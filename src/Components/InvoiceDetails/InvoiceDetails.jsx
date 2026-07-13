@@ -182,7 +182,7 @@ export default function InvoiceDetails() {
             <div className={styles.referenceBlock}>
               <span className={styles.refLabel}>SUBSCRIPTION</span>
               {subscription ? (
-                <div className={styles.refBox}>
+                <div onClick={()=>navigate(`/dashboard/subscriptionsview/${subscription.id}`)} className={styles.refBox}>
                   <div className={styles.refBoxLeft}>
                     <FiPackage className={styles.refBoxIcon} />
                     <div className={styles.refBoxText}>
@@ -204,7 +204,7 @@ export default function InvoiceDetails() {
               ) : order.status === "Renewal" ? (
                 <div className={styles.emptyState}>No Order Linked - renewals are generated automatically. </div>
               ) : (
-                <div className={styles.refBox}>
+                <div onClick={()=>navigate(`/dashboard/orders-details/${order.id}`)} className={styles.refBox}>
                   <div className={styles.refBoxLeft}>
                     <div className={styles.refBoxText}>
                       <span className={styles.refBoxId}>

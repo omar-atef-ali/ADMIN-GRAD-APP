@@ -41,6 +41,8 @@ import Orders from './Components/Orders/Orders'
 import Invoices from './Components/Invoices/Invoices'
 import InvoiceDetails from './Components/InvoiceDetails/InvoiceDetails'
 import Payments from './Components/Payments/Payments'
+import PaymentDetails from './Components/PaymentsDetails/PaymentDetails'
+import Settings from './Components/Settings/Settings'
 
 
 let routers = createBrowserRouter([
@@ -76,7 +78,9 @@ let routers = createBrowserRouter([
       { path: 'orders-details/:id', element: <OrdersDetails /> },
       { path: 'subscriptionsview/:id', element: <SubscriptionView /> },
       { path: 'invoice-details/:id', element: <InvoiceDetails /> },
-      { path: "payments", element: <Protected><Payments /></Protected> }
+      { path: "payments", element: <Protected><Payments /></Protected> },
+      { path: 'payment-details', element: <PaymentDetails /> },
+      { path: 'settings', element: <Settings /> } 
 
 
 

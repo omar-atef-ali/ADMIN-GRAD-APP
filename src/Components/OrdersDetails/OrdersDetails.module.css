@@ -97,6 +97,33 @@
   background: #f9fafb;
 }
 
+
+.retryBtn {
+  background: #4E3074;
+  border: 1px solid #fca5a5;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retryBtn:hover {
+  background: #4d307466;
+}
+
+.retryBtn:disabled {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.retryBtn:disabled:hover {
+  background: #f9fafb;
+}
+
 .content {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -318,6 +345,11 @@
   text-decoration: underline;
 }
 
+.buttonWrapper{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
 .overlay {
   position: fixed;
   top: 0;
