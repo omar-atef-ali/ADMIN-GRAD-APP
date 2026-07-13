@@ -1,0 +1,41 @@
+/* Custom SweetAlert2 Button Styling to match Figma/screenshot designs */
+.swal2-popup .swal2-confirm {
+  background: linear-gradient(135deg, #4c1d95, #6d28d9) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 10px 28px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 110px !important;
+  box-shadow: none !important;
+}
+
+.swal2-popup .swal2-confirm:hover {
+  background: linear-gradient(135deg, #3b0764, #5b21b6) !important;
+}
+
+.swal2-popup .swal2-cancel {
+  background-color: #ffffff !important;
+  border: 1px solid #fca5a5 !important;
+  color: #ef4444 !important;
+  border-radius: 8px !important;
+  padding: 10px 28px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 110px !important;
+  box-shadow: none !important;
+}
+
+.swal2-popup .swal2-cancel:hover {
+  background-color: #fef2f2 !important;
+  border-color: #ef4444 !important;
+}
+
+.swal2-popup .swal2-actions {
+  gap: 12px !important;
+}

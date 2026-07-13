@@ -22,10 +22,11 @@ import toast from 'react-hot-toast';
 import api from '../../api';
 import styles from './SubscriptionView.module.css';
 import { userContext } from '../../context/userContext';
+import Swal from 'sweetalert2';
 
 export default function SubscriptionView() {
     const navigate = useNavigate();
-    const {id}=useParams()
+    const { id } = useParams()
     const subscriptionId = id
     const [subscription, setSubscription] = useState(null);
     const [dataState, setDataState] = useState('populated'); // 'populated' or 'empty' for testing/empty views
@@ -82,6 +83,19 @@ export default function SubscriptionView() {
 
     // Standard package API endpoints
     const handlePackageAutoRenewToggle = async () => {
+        const isAutoRenew = subscription?.packageAutoRenew;
+        const result = await Swal.fire({
+            title: isAutoRenew ? 'Disable Auto Renewal?' : 'Enable Auto Renewal?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/package/${subscriptionId}/auto-renewal-toggle`);
@@ -118,6 +132,19 @@ export default function SubscriptionView() {
     };
 
     const handlePackageCancel = async () => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will cancel your subscription!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/package/${subscriptionId}/cancel`);
@@ -154,6 +181,19 @@ export default function SubscriptionView() {
     };
 
     const handlePackageTerminate = async () => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will terminate your subscription!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, terminate it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/package/${subscriptionId}/terminate`);
@@ -190,6 +230,19 @@ export default function SubscriptionView() {
     };
 
     const handlePackageReactivate = async () => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will reactivate your subscription!',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reactivate it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/package/${subscriptionId}/reactivate`);
@@ -228,7 +281,20 @@ export default function SubscriptionView() {
     };
 
     // Customized package (Service Row-level) API endpoints
-    const handleServiceAutoRenewToggle = async (subscriptionItemId) => {
+    const handleServiceAutoRenewToggle = async (subscriptionItemId, serviceName, currentAutoRenewVal) => {
+        const result = await Swal.fire({
+            title: currentAutoRenewVal ? 'Disable Auto Renewal?' : 'Enable Auto Renewal?',
+            text: currentAutoRenewVal ? `Auto-renewal for "${serviceName}" will be disabled.` : `Auto-renewal for "${serviceName}" will be enabled.`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/service/${subscriptionId}/${subscriptionItemId}/auto-renewal-toggle`);
@@ -264,7 +330,20 @@ export default function SubscriptionView() {
         }
     };
 
-    const handleServiceCancel = async (subscriptionItemId) => {
+    const handleServiceCancel = async (subscriptionItemId, serviceName) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: `You will cancel auto-renewal for "${serviceName}"!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/service/${subscriptionId}/${subscriptionItemId}/cancel`);
@@ -300,7 +379,20 @@ export default function SubscriptionView() {
         }
     };
 
-    const handleServiceTerminate = async (subscriptionItemId) => {
+    const handleServiceTerminate = async (subscriptionItemId, serviceName) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: `You will terminate "${serviceName}" immediately!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, terminate it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/service/${subscriptionId}/${subscriptionItemId}/terminate`);
@@ -336,7 +428,20 @@ export default function SubscriptionView() {
         }
     };
 
-    const handleServiceReactivate = async (subscriptionItemId) => {
+    const handleServiceReactivate = async (subscriptionItemId, serviceName) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: `You will reactivate "${serviceName}"!`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reactivate it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/service/${subscriptionId}/${subscriptionItemId}/reactivate`);
@@ -382,9 +487,22 @@ export default function SubscriptionView() {
         setSelectedPackageId('');
     };
 
-    
+
 
     const handleCancelSchedule = async () => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will cancel the scheduled package change. The current package will remain unchanged.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         try {
             setLoading(true);
             await api.put(`/admin/client-subscriptions/package/${subscriptionId}/cancel-scheduled-change`, {}, {
@@ -547,15 +665,15 @@ export default function SubscriptionView() {
 
 
     async function getPackages() {
-        try{
-            const {data} = await api.get(`/admin/packages`,{
-                headers:{
+        try {
+            const { data } = await api.get(`/admin/packages`, {
+                headers: {
                     Authorization: `Bearer ${userToken}`
                 }
             })
             console.log(data);
             setPackages(data);
-        }catch(error){
+        } catch (error) {
             console.log(error)
             toast.error(
                 error?.response?.data?.errors[1] ||
@@ -642,8 +760,8 @@ export default function SubscriptionView() {
 
     async function getAddOns() {
         try {
-            const {data} = await api.get(`/admin/client-subscriptions/add-ons/${subscriptionId}`,{
-                headers:{
+            const { data } = await api.get(`/admin/client-subscriptions/add-ons/${subscriptionId}`, {
+                headers: {
                     Authorization: `Bearer ${userToken}`
                 }
             })
@@ -697,7 +815,7 @@ export default function SubscriptionView() {
             {/* Breadcrumbs Header */}
             <header className={styles.header}>
                 <div className={styles.backSection}>
-                    <button onClick={() => navigate(-1)} className={styles.backLink}>
+                    <button onClick={() => navigate(`/dashboard/subscriptions`)} className={styles.backLink}>
                         <FaArrowLeft className={styles.backIcon} />
                         <span>Subscriptions</span>
                     </button>
@@ -815,7 +933,7 @@ export default function SubscriptionView() {
                                                             <input
                                                                 type="checkbox"
                                                                 checked={isAutoRenew}
-                                                                onChange={() => handleServiceAutoRenewToggle(service.subscriptionItemId)}
+                                                                onChange={() => handleServiceAutoRenewToggle(service.subscriptionItemId, service.name, isAutoRenew)}
                                                                 disabled={status !== "Active"}
                                                             />
                                                             <span className={styles.slider}></span>
@@ -824,7 +942,7 @@ export default function SubscriptionView() {
                                                         {status === 'Active' && (
                                                             <button
                                                                 className={styles.cancelRowBtn}
-                                                                onClick={() => handleServiceCancel(service.subscriptionItemId)}
+                                                                onClick={() => handleServiceCancel(service.subscriptionItemId, service.name)}
                                                                 title="Cancel Auto-renew"
                                                             >
                                                                 <FaExclamationTriangle className={styles.warningIcon} />
@@ -835,14 +953,14 @@ export default function SubscriptionView() {
                                                             <div className={styles.rowActionButtons}>
                                                                 <button
                                                                     className={styles.resumeRowBtn}
-                                                                    onClick={() => handleServiceReactivate(service.subscriptionItemId)}
+                                                                    onClick={() => handleServiceReactivate(service.subscriptionItemId, service.name)}
                                                                     title="Resume"
                                                                 >
                                                                     <FaSync />
                                                                 </button>
                                                                 <button
                                                                     className={styles.endRowBtn}
-                                                                    onClick={() => handleServiceTerminate(service.subscriptionItemId)}
+                                                                    onClick={() => handleServiceTerminate(service.subscriptionItemId, service.name)}
                                                                     title="End Now"
                                                                 >
                                                                     <FaBan />
@@ -1279,7 +1397,7 @@ export default function SubscriptionView() {
                                                 </option>
                                             ))
                                     ) : (
-                                       <option value="">No packages available</option>
+                                        <option value="">No packages available</option>
                                     )}
                                 </select>
                             </div>

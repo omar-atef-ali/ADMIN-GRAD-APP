@@ -4,6 +4,7 @@ import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import styles from './OrdersDetails.module.css';
+import Swal from 'sweetalert2';
 
 export default function OrdersDetails() {
   const { id } = useParams();
@@ -39,7 +40,18 @@ export default function OrdersDetails() {
       return;
     }
 
-   
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will cancel this order!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
 
     try {
       setLoading(true);
@@ -48,9 +60,89 @@ export default function OrdersDetails() {
 
       const response = await api.get(`/admin/orders/${actualId}`);
       setOrder(response.data);
-    } catch (err) {
-      console.error("Error cancelling order:", err);
-      toast.error(err.response?.data?.message || "Failed to cancel order");
+    } catch (error) {
+
+      toast.error(
+        error?.response?.data?.errors?.[0] ||
+        error?.response?.data?.message ||
+        "Failed to cancel order.",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background: "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleRetryPayment = async () => {
+    const status = order?.status;
+
+    if (!["Pending", "AwaitingPayment"].includes(status)) {
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will retry the payment for this order!',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, retry it!',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await api.post(`/admin/orders/${actualId}/retry-payment`);
+      toast.success("Payment retried successfully.");
+
+      const response = await api.get(`/admin/orders/${actualId}`);
+      setOrder(response.data);
+    } catch (error) {
+
+      toast.error(
+        error?.response?.data?.errors?.[0] ||
+        error?.response?.data?.message ||
+        "Failed to retry payment.",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background: "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -145,15 +237,26 @@ export default function OrdersDetails() {
               <p className={styles.subtitle}>{formatCurrency(order.total)} &middot; {formatDate(order.orderDate)}</p>
             </div>
           </div>
-          <button
-            className={styles.cancelBtn}
-            onClick={handleCancelOrder}
-            disabled={
-              !["Pending", "AwaitingPayment"].includes(order?.status)
-            }
-          >
-            Cancel order
-          </button>
+          <div className={styles.buttonWrapper}>
+            <button
+              className={styles.cancelBtn}
+              onClick={handleCancelOrder}
+              disabled={
+                !["Pending", "AwaitingPayment"].includes(order?.status)
+              }
+            >
+              Cancel order
+            </button>
+            <button
+              className={styles.retryBtn}
+              onClick={handleRetryPayment}
+              disabled={
+                !["Pending", "AwaitingPayment"].includes(order?.status)
+              }
+            >
+              Retry Payment
+            </button>
+          </div>
         </div>
       </div>
 
@@ -478,7 +581,7 @@ export default function OrdersDetails() {
 
                   {order.subscription && (
                     <Link
-                      to={`/subscriptions/${order.subscription.subscriptionId}`}
+                      to={`/dashboard/subscriptionsview/${order?.subscription?.subscriptionId}`}
                       className={styles.subscriptionLink}
                     >
                       View full subscription <FiExternalLink />
@@ -538,7 +641,7 @@ export default function OrdersDetails() {
                   Resulting subscription
 
                   <Link
-                    to={`/subscriptions/${order.subscription.subscriptionId}`}
+                    to={`/dashboard/subscriptionsview/${order?.subscription?.subscriptionId}`}
                     className={styles.subscriptionLink}
                   >
                     View full subscription <FiExternalLink />
@@ -574,7 +677,7 @@ export default function OrdersDetails() {
               <div className={styles.card}>
                 <div className={styles.cardHeader}>
                   Resulting subscription
-                  <Link to={`/subscriptions/${order.subscription.subscriptionId}`} className={styles.subscriptionLink}>
+                  <Link to={`/dashboard/subscriptionsview/${order?.subscription?.subscriptionId}`} className={styles.subscriptionLink}>
                     View full subscription <FiExternalLink />
                   </Link>
                 </div>
@@ -622,7 +725,7 @@ export default function OrdersDetails() {
                       {order.client.phone && <p>{order.client.phone}</p>}
                     </div>
                   </div>
-                  <Link to={`/customers/${order.client.id}`} className={styles.profileLink}>View customer profile &rarr;</Link>
+                  {/* <Link to={`/dashboard/customersview/${order.client.id}`} className={styles.profileLink}>View customer profile &rarr;</Link> */}
                 </div>
               </div>
             )}
@@ -648,7 +751,7 @@ export default function OrdersDetails() {
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Payment</span>
-                  <span className={getStatusBadge(order.payments?.[0]?.status )}>{order.payments?.[0]?.status}</span>
+                  <span className={getStatusBadge(order.payments?.[0]?.status)}>{order.payments?.[0]?.status}</span>
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.summaryLabel}>Currency</span>
@@ -667,7 +770,7 @@ export default function OrdersDetails() {
                 {order.discount ? (
                   <>
                     <div style={{ display: 'inline-block', background: '#f3f4f6', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', color: '#6b7280', marginBottom: '16px' }}>
-                       {order.discount?.discountCode || "No Code"}
+                      {order.discount?.discountCode || "No Code"}
                     </div>
                     <div className={styles.summaryRow}>
                       <span className={styles.summaryLabel}>Discount</span>
