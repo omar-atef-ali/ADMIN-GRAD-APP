@@ -260,10 +260,10 @@ export default function CustomersView() {
                             <span className={styles.breadcrumbActive}>{customer.fullName}</span>
                         </nav>
                     </div>
-                    <button className={styles.manageBtn}>
+                    {/* <button className={styles.manageBtn}>
                         <FaDatabase className={styles.manageIcon} />
                         <span>Manage Credentials</span>
-                    </button>
+                    </button> */}
                 </header>
 
                 {/* Main Profile Card */}
@@ -511,7 +511,7 @@ export default function CustomersView() {
                                         <th>DB TYPE</th>
                                         <th>HOST</th>
                                         <th>STATUS</th>
-                                        <th>ACTIONS</th>
+                                        {/* <th>ACTIONS</th> */}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -525,9 +525,9 @@ export default function CustomersView() {
                                             <td>
                                                 <span className={styles.badgeActive}>{d.status}</span>
                                             </td>
-                                            <td>
+                                            {/* <td>
                                                 <button className={styles.manageLink}>Manage</button>
-                                            </td>
+                                            </td> */}
                                         </tr>
                                     ))}
 

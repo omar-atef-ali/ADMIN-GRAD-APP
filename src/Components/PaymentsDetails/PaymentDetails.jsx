@@ -194,7 +194,7 @@ export default function PaymentDetails() {
             <div className={styles.errorContainer}>
                 <div className={styles.errorCard}>
                     <p className={styles.errorMessage}>{error || "Payment details not found."}</p>
-                    <button onClick={() => navigate(-1)} className={styles.backBtn}>
+                    <button onClick={() => navigate(`/dashboard/payments`)} className={styles.backBtn}>
                         <FiArrowLeft /> Back
                     </button>
                 </div>

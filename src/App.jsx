@@ -73,14 +73,13 @@ let routers = createBrowserRouter([
       { path: "orders", element: <Protected><Orders /></Protected> },
       { path: "subscriptions", element: <Protected><Subscriptions /></Protected> },
       { path: "invoices", element: <Protected><Invoices /></Protected> },
-      { path: 'customersview/:id', element: <CustomersView /> },
-      { path: 'subscriptions/:id', element: <SubscriptionView /> },
-      { path: 'orders-details/:id', element: <OrdersDetails /> },
-      { path: 'subscriptionsview/:id', element: <SubscriptionView /> },
-      { path: 'invoice-details/:id', element: <InvoiceDetails /> },
+      { path: 'customersview/:id', element: <Protected><CustomersView /></Protected> },
+      { path: 'orders-details/:id', element: <Protected><OrdersDetails /></Protected> },
+      { path: 'subscriptionsview/:id', element: <Protected><SubscriptionView /></Protected> },
+      { path: 'invoice-details/:id', element: <Protected><InvoiceDetails /></Protected> },
       { path: "payments", element: <Protected><Payments /></Protected> },
-      { path: 'payment-details', element: <PaymentDetails /> },
-      { path: 'settings', element: <Settings /> } 
+      { path: 'payment-details/:id', element:<Protected> <PaymentDetails /></Protected> },
+      { path: 'settings', element: <Protected><Settings /></Protected> } 
 
 
 

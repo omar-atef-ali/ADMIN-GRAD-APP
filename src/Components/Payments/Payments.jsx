@@ -14,8 +14,10 @@ import {
 import { userContext } from '../../context/userContext';
 import api from '../../api';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const formatDate = (dateString) => {
+ 
   if (!dateString) return "-";
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return dateString;
@@ -27,6 +29,7 @@ const formatDate = (dateString) => {
 };
 
 export default function Payments() {
+   const navigate=useNavigate()
 
   const {userToken} = useContext(userContext);
   const [stats , setStats] = useState({});
@@ -418,7 +421,7 @@ export default function Payments() {
             </thead>
             <tbody>
               {payments.map((payment) => (
-                <tr className={style.tr}>
+                <tr onClick={()=>navigate(`/dashboard/payment-details/${payment?.paymentId}`)} className={style.tr}>
                   <td className={style.td}>
                     <span className={style.paymentId}>PAY-{payment.paymentId}</span>
                   </td>

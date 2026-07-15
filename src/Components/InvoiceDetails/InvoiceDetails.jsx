@@ -88,7 +88,7 @@ export default function InvoiceDetails() {
       <div className={styles.errorWrapper}>
         <div className={styles.errorCard}>
           <p className={styles.errorMessage}>{error || "Invoice not found."}</p>
-          <button onClick={() => navigate(-1)} className={styles.backButton}>
+          <button onClick={() => navigate(`/dashboard/invoices`)} className={styles.backButton}>
             <FiArrowLeft /> Back to Invoices
           </button>
         </div>
