@@ -260,10 +260,10 @@ export default function CustomersView() {
                             <span className={styles.breadcrumbActive}>{customer.fullName}</span>
                         </nav>
                     </div>
-                    <button className={styles.manageBtn}>
+                    {/* <button className={styles.manageBtn}>
                         <FaDatabase className={styles.manageIcon} />
                         <span>Manage Credentials</span>
-                    </button>
+                    </button> */}
                 </header>
 
                 {/* Main Profile Card */}
@@ -508,26 +508,37 @@ export default function CustomersView() {
                                 <thead>
                                     <tr>
                                         <th>CONNECTION NAME</th>
+                                        <th>DB UserName</th>
                                         <th>DB TYPE</th>
                                         <th>HOST</th>
+                                        <th>Port</th>
+                                        <th>DB Password</th>
                                         <th>STATUS</th>
-                                        <th>ACTIONS</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {DatabaseCred?.map((d) => (
                                         <tr>
                                             <td className={styles.dbName}>{d.databaseName}</td>
+                                            <td>{d.databaseUsername}</td>
                                             <td>
                                                 <span className={styles.badgeBlue}>{d.databaseType}</span>
                                             </td>
                                             <td className={styles.dbHost}>{d.databaseHost}</td>
                                             <td>
-                                                <span className={styles.badgeActive}>{d.status}</span>
+                                                {d.databasePort}
                                             </td>
                                             <td>
-                                                <button className={styles.manageLink}>Manage</button>
+                                                {d.databasePassword}
                                             </td>
+                                            <td>
+                                                <span className={styles.badgeActive}>{d.status}</span>
+                                            </td>
+
+                                            {/* <td>
+                                                <button className={styles.manageLink}>Manage</button>
+                                            </td> */}
                                         </tr>
                                     ))}
 

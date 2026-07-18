@@ -63,7 +63,6 @@ let routers = createBrowserRouter([
       { path: "users", element: <Protected><Users /></Protected> },
       { path: "users/:id", element: <Protected><UserDetails /></Protected> },
       { path: "services", element: <Protected><Services /></Protected> },
-
       { path: "services/add", element: <Protected><AddServices /></Protected> },
       { path: "services/:id", element: <Protected><ViewServices /></Protected> },
       { path: "services/:id/edit", element: <Protected><EditServices /></Protected> },
@@ -81,8 +80,9 @@ let routers = createBrowserRouter([
       { path: 'invoice-details/:id', element: <Protected><InvoiceDetails /></Protected> },
       { path: "payments", element: <Protected><Payments /></Protected> },
       { path: 'payment-details', element: <Protected><PaymentDetails /></Protected> },
-      { path: 'settings', element: <Protected><Settings /></Protected> },
-      { path: 'addons', element: <Protected><Addons /></Protected> } 
+      { path: 'addons', element: <Protected><Addons /></Protected> } ,
+      { path: 'payment-details/:id', element:<Protected> <PaymentDetails /></Protected> },
+      { path: 'settings', element: <Protected><Settings /></Protected> } 
 
 
 

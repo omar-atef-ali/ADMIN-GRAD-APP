@@ -345,6 +345,7 @@
 
 .tr:hover {
     background-color: #FAF9F8;
+    cursor: pointer;
 }
 
 .tr:last-child {
