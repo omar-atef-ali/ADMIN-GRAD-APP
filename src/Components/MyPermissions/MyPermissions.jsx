@@ -16,11 +16,13 @@ export default function MyPermissions() {
       const { data } = await api.get(`/Roles/Permissions`, {
         headers: { Authorization: `Bearer ${userToken}` },
       });
+      console.log(data);
+      
       setPermissions(data);
     } catch (error) {
       console.log(error);
       toast.error(
-        error?.response?.data?.errors[1] || "Failed to fetch role details.",
+        error?.response?.data?.errors[1] || "Failed to fetch permisssions.",
         {
           position: "top-center",
           duration: 4000,

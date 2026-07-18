@@ -43,6 +43,7 @@ import InvoiceDetails from './Components/InvoiceDetails/InvoiceDetails'
 import Payments from './Components/Payments/Payments'
 import PaymentDetails from './Components/PaymentsDetails/PaymentDetails'
 import Settings from './Components/Settings/Settings'
+import Addons from './Components/Addons/Addons'
 
 
 let routers = createBrowserRouter([
@@ -54,13 +55,13 @@ let routers = createBrowserRouter([
   // {path:"/main",element:<Protected><Main/></Protected>},
   {
     path: "/dashboard", element: <Layout />, children: [
-      { path: "", element: <Admin /> },
+      { path: "", element: <Protected><Admin /></Protected> },
       { path: "clients", element: <Protected><Clients /></Protected> },
-      { path: "roles", element: <Roles /> },
-      { path: "my-permissions", element: <MyPermissions /> },
-      { path: "roles/:id", element: <RolesDetails /> },
-      { path: "users", element: <Users /> },
-      { path: "users/:id", element: <UserDetails /> },
+      { path: "roles", element: <Protected><Roles /></Protected> },
+      { path: "my-permissions", element: <Protected><MyPermissions /></Protected> },
+      { path: "roles/:id", element: <Protected><RolesDetails /></Protected> },
+      { path: "users", element: <Protected><Users /></Protected> },
+      { path: "users/:id", element: <Protected><UserDetails /></Protected> },
       { path: "services", element: <Protected><Services /></Protected> },
 
       { path: "services/add", element: <Protected><AddServices /></Protected> },
@@ -73,14 +74,15 @@ let routers = createBrowserRouter([
       { path: "orders", element: <Protected><Orders /></Protected> },
       { path: "subscriptions", element: <Protected><Subscriptions /></Protected> },
       { path: "invoices", element: <Protected><Invoices /></Protected> },
-      { path: 'customersview/:id', element: <CustomersView /> },
-      { path: 'subscriptions/:id', element: <SubscriptionView /> },
-      { path: 'orders-details/:id', element: <OrdersDetails /> },
-      { path: 'subscriptionsview/:id', element: <SubscriptionView /> },
-      { path: 'invoice-details/:id', element: <InvoiceDetails /> },
+      { path: 'customersview/:id', element: <Protected><CustomersView /></Protected> },
+      { path: 'subscriptions/:id', element: <Protected><SubscriptionView /></Protected> },
+      { path: 'orders-details/:id', element: <Protected><OrdersDetails /></Protected> },
+      { path: 'subscriptionsview/:id', element: <Protected><SubscriptionView /></Protected> },
+      { path: 'invoice-details/:id', element: <Protected><InvoiceDetails /></Protected> },
       { path: "payments", element: <Protected><Payments /></Protected> },
-      { path: 'payment-details', element: <PaymentDetails /> },
-      { path: 'settings', element: <Settings /> } 
+      { path: 'payment-details', element: <Protected><PaymentDetails /></Protected> },
+      { path: 'settings', element: <Protected><Settings /></Protected> },
+      { path: 'addons', element: <Protected><Addons /></Protected> } 
 
 
 

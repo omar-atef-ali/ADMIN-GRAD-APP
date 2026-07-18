@@ -5,6 +5,7 @@ import styles from "./Layout.module.css";
 import api from "../../api";
 import { userContext } from "../../context/userContext";
 import logo from "../../assets/logo.png";
+import toast from "react-hot-toast";
 
 export default function Layout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -53,6 +54,7 @@ export default function Layout() {
     { path: "roles", label: "Roles", icon: "fa-solid fa-user-gear" },
     { path: "packages", label: "Packages", icon: "fa-solid fa-cubes" },
     { path: "services", label: "Services", icon: "fa-solid fa-box" },
+    { path: "addons", label: "Add-ons", icon: "fa-solid fa-puzzle-piece" },
     { path: "orders", label: "Orders", icon: "fa-solid fa-bag-shopping" },
     { path: "subscriptions", label: "Subscriptions", icon: "fa-solid fa-repeat" },
     { path: "invoices", label: "Invoices", icon: "fa-solid fa-file-invoice-dollar" },
@@ -75,6 +77,85 @@ export default function Layout() {
   useEffect(() => {
     userInfo()
   }, []);
+
+
+  const [permissions, setPermissions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const { userToken } = useContext(userContext);
+
+
+
+  async function fetchPermissions() {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/Roles/Permissions`, {
+        headers: { Authorization: `Bearer ${userToken}` },
+      });
+      console.log(data);
+
+      setPermissions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.errors[1] || "Failed to fetch permisssions.",
+        {
+          position: "top-center",
+          duration: 4000,
+          style: {
+            background:
+              "linear-gradient(to right, rgba(121, 5, 5, 0.9), rgba(171, 0, 0, 0.85))",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: "16px 20px",
+            color: "#ffffff",
+            fontSize: "0.95rem",
+            borderRadius: "5px",
+            width: "300px",
+            height: "60px",
+            boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          },
+          iconTheme: {
+            primary: "#FF4D4F",
+            secondary: "#ffffff",
+          },
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  useEffect(() => {
+    if (userToken) {
+      fetchPermissions();
+    }
+  }, [userToken]);
+
+  const hasPermissionFor = (item) => {
+    const publicPaths = ["my-permissions", "settings"];
+    if (publicPaths.includes(item.path)) {
+      return true;
+    }
+
+    if (!Array.isArray(permissions) || permissions.length === 0) {
+      return false;
+    }
+
+    // Normalize path to lowercase, letters only, and strip trailing 's'
+    const normPath = item.path.toLowerCase().replace(/[^a-z]/g, "").replace(/s$/, "");
+
+    return permissions.some((p) => {
+      if (!p?.name) return false;
+      const [resourceName] = p.name.split(":");
+      if (!resourceName) return false;
+
+      // Normalize permission resource to lowercase, letters only, and strip trailing 's'
+      const normResource = resourceName.toLowerCase().replace(/[^a-z]/g, "").replace(/s$/, "");
+      return normPath === normResource;
+    });
+  };
+
 
   return (
     <div className={styles.layoutContainer}>
@@ -110,7 +191,7 @@ export default function Layout() {
 
         {/* Navigation Menu */}
         <nav className={styles.navMenu}>
-          {menuItems.map((item) => (
+          {menuItems.filter(hasPermissionFor).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}

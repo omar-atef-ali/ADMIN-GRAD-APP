@@ -44,6 +44,8 @@ export default function Payments() {
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("All");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [pageLoading, setPageLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   
 
 
@@ -88,6 +90,9 @@ export default function Payments() {
 
   async function getPayments(page = 1, sortCol = sortColumn, sortDir = sortDirection, searchVal = search, statusF = statusFilter, typeF = invoiceTypeFilter, methodF = paymentMethodFilter, dateFrom = startDate, dateTo = endDate) {
     try{
+      if (isFirstLoad) {
+        setPageLoading(true);
+      }
       const params = {
         PageNumber : page,
         PageSize : pageSize ,
@@ -156,6 +161,9 @@ export default function Payments() {
           },
         }
       );
+    } finally {
+      setPageLoading(false);
+      setIsFirstLoad(false);
     }
   }
 
@@ -173,7 +181,13 @@ export default function Payments() {
 
 
   return (
-    <div className={style.pageContainer}>
+    <>
+      {pageLoading && (
+        <div className={style.overlay}>
+          <div className={style.spinner}></div>
+        </div>
+      )}
+      <div className={style.pageContainer}>
       {/* Header */}
       <header className={style.pageHeader}>
         <h1 className={style.pageTitle}>Payments</h1>
@@ -499,5 +513,6 @@ export default function Payments() {
         </footer>
       </div>
     </div>
+    </>
   );
 }
