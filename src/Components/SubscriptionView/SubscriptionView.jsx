@@ -962,7 +962,7 @@ export default function SubscriptionView() {
                                                             <button
                                                                 className={styles.cancelRowBtn}
                                                                 onClick={() => handleServiceCancel(service.subscriptionItemId, service.name)}
-                                                                title="Cancel Auto-renew"
+                                                                title="Cancel Subscription"
                                                             >
                                                                 <FaExclamationTriangle className={styles.warningIcon} />
                                                             </button>
